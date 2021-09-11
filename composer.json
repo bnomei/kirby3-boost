@@ -1,0 +1,71 @@
+{
+  "name": "bnomei/kirby3-turbo",
+  "type": "kirby-plugin",
+  "version": "1.0.0",
+  "description": "Boost the speed of Kirby by having content files of pages (mem-)cached, with automatic unique ID, fast lookup and Tiny-URL.",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Bruno Meilick",
+      "email": "b@bnomei.com"
+    }
+  ],
+  "keywords": [
+    "kirby3",
+    "kirby3-cms",
+    "kirby3-plugin",
+    "autoid",
+    "turboid",
+    "pages",
+    "files",
+    "random",
+    "uuid",
+    "token",
+    "lookup",
+    "cache",
+    "performance",
+    "tiny-url",
+    "memcache",
+    "memcached"
+  ],
+  "autoload": {
+    "psr-4": {
+      "Bnomei\\": "classes/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  },
+  "require": {
+    "php": ">=7.3.0",
+    "getkirby/composer-installer": "^1.2"
+  },
+  "require-dev": {
+    "getkirby/cms": "^3.5",
+    "php-coveralls/php-coveralls": "^2.4",
+    "phpunit/phpunit": "^9.5"
+  },
+  "scripts": {
+    "analyze": "phpstan analyse",
+    "fix": "php-cs-fixer fix",
+    "test": [
+      "mkdir -p tests/logs",
+      "@putenv XDEBUG_MODE=coverage",
+      "phpunit --configuration ./phpunit.xml"
+    ],
+    "dist": [
+      "composer install --no-dev --optimize-autoloader",
+      "git rm -rf --cached .; git add .;"
+    ],
+    "kirby": [
+      "composer install",
+      "composer update",
+      "composer install --working-dir=tests/kirby --no-dev --optimize-autoloader",
+      "composer update --working-dir=tests/kirby"
+    ]
+  },
+  "extra": {
+    "kirby-cms-path": "tests/kirby"
+  }
+}

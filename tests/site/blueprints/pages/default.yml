@@ -1,0 +1,8 @@
+preset: page
+
+fields:
+  boostid:
+    type: boostid
+
+  related:
+    extends: fields/boostidpages
