@@ -12,6 +12,8 @@ final class BoostCacheTest extends TestCase
         $cache = BoostCache::singleton();
         // cli will have file cache
         $this->assertInstanceOf(\Kirby\Cache\FileCache::class, $cache);
+
+        $this->assertFalse(option('debug'));
     }
 
     public function testWriteAndRead()

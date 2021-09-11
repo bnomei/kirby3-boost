@@ -63,12 +63,12 @@ final class Bolt
     {
         $lookup = A::get(static::$idToPage, $id);
         if (!$lookup && $cache && static::cache()) {
-            if ($diruri = static::cache()->get('bolt-' . md5($id))) {
+            if ($diruri = static::cache()->get(crc32($id) . '-bolt')) {
                 if ($page = $this->findByID($diruri, false)) {
                     $this->pushLookup($id, $page);
                     $lookup = $page;
                 } else {
-                    $this->cache()->remove(md5($id) . '-bolt');
+                    $this->cache()->remove(crc32($id) . '-bolt');
                 }
             }
         }
@@ -78,7 +78,7 @@ final class Bolt
     public function pushLookup(string $id, Page $page): void
     {
         static::$idToPage[$id] = $page;
-        $this->cache()->set(md5($id) . '-bolt', $page->diruri(), option('bnomei.boost.bolt.expire'));
+        $this->cache()->set(crc32($id) . '-bolt', $page->diruri(), option('bnomei.boost.expire'));
     }
 
     public static function toArray(): array

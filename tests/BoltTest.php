@@ -9,6 +9,8 @@ class BoltTest extends WithPages
     {
         $bolt = new Bnomei\Bolt();
         $this->assertInstanceOf(Bnomei\Bolt::class, $bolt);
+
+        $this->assertFalse(option('debug'));
     }
 
     public function testFind()

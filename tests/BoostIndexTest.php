@@ -20,6 +20,8 @@ final class BoostIndexTest extends WithPages
 
     public function testBoostFindById()
     {
+        $this->assertFalse(option('debug'));
+        
         $index = BoostIndex::singleton();
         $index->index(true);
 

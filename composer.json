@@ -1,7 +1,7 @@
 {
   "name": "bnomei/kirby3-boost",
   "type": "kirby-plugin",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Boost the speed of Kirby by having content files of pages (mem-)cached, with automatic unique ID, fast lookup and Tiny-URL.",
   "license": "MIT",
   "authors": [
@@ -25,7 +25,12 @@
     "performance",
     "tiny-url",
     "memcache",
-    "memcached"
+    "memcached",
+    "memory",
+    "sqlite",
+    "redis",
+    "apcu",
+    "file"
   ],
   "autoload": {
     "psr-4": {
@@ -66,5 +71,9 @@
   },
   "extra": {
     "kirby-cms-path": "tests/kirby"
+  },
+  "suggest": {
+    "bnomei/kirby3-redis-cachedriver": "Redis based Cache-Driver",
+    "bnomei/kirby3-sqlite-cachedriver": "SQLite based Cache-Driver"
   }
 }

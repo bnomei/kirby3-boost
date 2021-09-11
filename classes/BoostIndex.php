@@ -20,7 +20,7 @@ final class BoostIndex
 
     public function __construct()
     {
-        $this->expire = option('bnomei.boost.index.expire', 0);
+        $this->expire = option('bnomei.boost.expire', 0);
         $this->isDirty = false;
 
         $this->index = $this->read();
@@ -145,7 +145,7 @@ final class BoostIndex
 
     public static function modified(string $id): ?int
     {
-        return BoostCache::singleton()->get(md5($id) . '-modified');
+        return BoostCache::singleton()->get(crc32($id) . '-modified');
     }
 
     public static function page(string $id): ?Page

@@ -2,7 +2,6 @@
 
 @include_once __DIR__ . '/vendor/autoload.php';
 
-// order matters
 load([
     'Bnomei\\Memcached' => 'classes/Memcached.php',
     'Bnomei\\Bolt' => 'classes/Bolt.php',
@@ -48,23 +47,16 @@ if (! function_exists('boost')) {
 
 Kirby::plugin('bnomei/boost', [
     'options' => [
-        'cache' => true,
-        'cacheType' => 'memcached', // or file
-        'memcached' => [
-            'host' => '127.0.0.1',
-            'port' => 11211,
-            'prefix' => 'boost',
-            'expire' => 0,
+        'cache' => [
+            'type' => 'file',
+            'prefix'  => 'boost',
         ],
+        'expire' => 0,
         'index' => [
             'generator' => function (?string $seed = null) {
                 // override with custom callback if needed
                 return (new \Bnomei\TokenGenerator($seed))->generate();
             },
-            'expire' => 0,
-        ],
-        'bolt' => [
-            'expire' => 0,
         ],
         'tinyurl' => [
             'url' => function () {

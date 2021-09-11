@@ -51,7 +51,7 @@ trait PageHasBoost
 
     public function memcachedKey(string $languageCode = null): string
     {
-        $key = md5($this->id());
+        $key = strval(crc32($this->id()));
         if (!$languageCode) {
             $languageCode = kirby()->languages()->count() ? kirby()->language()->code() : null;
             if ($languageCode) {
@@ -121,13 +121,13 @@ trait PageHasBoost
         $cache->set(
             $this->memcachedKey($languageCode).'-modified',
             $this->modified(),
-            option('bnomei.boost.memcached.expire')
+            option('bnomei.boost.expire')
         );
 
         return $cache->set(
             $this->memcachedKey($languageCode),
             $data,
-            option('bnomei.boost.memcached.expire')
+            option('bnomei.boost.expire')
         );
     }
 

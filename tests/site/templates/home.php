@@ -1,6 +1,13 @@
 <?php
 
-echo 'file: ' . \Bnomei\CacheBenchmark::file(2) . PHP_EOL; // seconds
-echo 'memc: ' . \Bnomei\CacheBenchmark::memcached(2) . PHP_EOL; // seconds
-// or just
-// echo \Bnomei\CacheBenchmark::fastest() . PHP_EOL;
+// use helpers to generate caches to compare
+$caches = [
+    \Bnomei\BoostCache::file(),
+    \Bnomei\BoostCache::apcu(),
+    \Bnomei\BoostCache::memcached(),
+    \Bnomei\BoostCache::memory(),
+    //\Bnomei\BoostCache::sqlite(),
+    //\Bnomei\BoostCache::redis(),
+];
+// run the benchmark
+var_dump(\Bnomei\CacheBenchmark::run($caches));

@@ -10,7 +10,7 @@ use Kirby\Toolkit\Str;
 
 final class CacheBenchmark
 {
-    private static function benchmark(int $seconds, $cache, $count = 2000, $contentLength = 128): int
+    private static function benchmark($cache, int $seconds = 2, $count = 2000, $contentLength = 128): int
     {
         for ($i = 0; $i < $count; $i++) {
             $cache->set('CacheBenchmark-' . $i, Str::random($contentLength), 0);
@@ -34,29 +34,17 @@ final class CacheBenchmark
         return count($values);
     }
 
-    public static function file(int $seconds): int
+    public static function run(array $caches = [], int $seconds = 2, $count = 2000, $contentLength = 128): array
     {
-        $cache = new FileCache([
-            'root' => kirby()->cache('bnomei.boost')->root(),
-        ]);
-        return static::benchmark($seconds, $cache);
-    }
+        $caches = $caches ?? [ BoostCache::file() ];
 
-    public static function memcached(int $seconds): int
-    {
-        $cache = new Memcached(option('bnomei.boost.memcached'));
-        return static::benchmark($seconds, $cache);
-    }
-
-    public static function fastest(int $seconds = 2): string
-    {
-        $benchmarks = [
-            'file' => static::file($seconds),
-            'memcached' => static::memcached($seconds),
-        ];
-        foreach ($benchmarks as $key => $val) {
-            $lastkey = $key;
+        $benchmarks = [];
+        foreach ($caches as $cache) {
+            if (!$cache) continue;
+            $benchmarks[$cache::class] = static::benchmark($cache, $seconds, $count, $contentLength);
         }
-        return $lastkey;
+
+        asort($benchmarks);
+        return array_reverse($benchmarks, true); // DESC
     }
 }

@@ -6,8 +6,9 @@ namespace Bnomei;
 
 use Kirby\Cache\Cache;
 use Kirby\Cache\FileCache;
+use Kirby\Cache\ApcuCache;
+use Kirby\Cache\MemoryCache;
 use Kirby\Cache\MemCached;
-use Kirby\Cms\Page;
 
 final class BoostCache
 {
@@ -15,26 +16,66 @@ final class BoostCache
     public static function singleton(): Cache
     {
         if (! self::$singleton) {
-            $config = [
-                'host' => option('bnomei.boost.memcached.host'),
-                'port' => option('bnomei.boost.memcached.port'),
-                'prefix' => option('bnomei.boost.memcached.prefix'),
-            ];
-            foreach (array_keys($config) as $key) {
-                if (!is_string($config[$key]) && is_callable($config[$key])) {
-                    $config[$key] = $config[$key]();
-                }
-            }
-            if (class_exists('Memcached') && option('bnomei.boost.cacheType') === 'memcached') {
-                self::$singleton = new Memcached($config);
-            } else {
-                self::$singleton = kirby()->cache('bnomei.boost');
-            }
+            self::$singleton = kirby()->cache('bnomei.boost');
         }
         if (option('debug')) {
             self::$singleton->flush();
         }
 
         return self::$singleton;
+    }
+
+    public static function file(array $options = []): FileCache
+    {
+        return new FileCache(array_merge([
+            'root' => kirby()->cache('bnomei.boost')->root(),
+            'prefix' => 'boost',
+        ], $options));
+    }
+
+    public static function apcu(array $options = []): ApcuCache
+    {
+        return new ApcuCache(array_merge([
+            'prefix' => 'boost',
+        ], $options));
+    }
+
+    public static function memcached(array $options = []): MemCached
+    {
+        return new Memcached(array_merge([
+            'prefix' => 'boost',
+            'host' => '127.0.0.1',
+            'port' => 11211,
+        ]));
+    }
+
+    public static function memory(array $options = []): MemoryCache
+    {
+        return new MemoryCache(array_merge([
+            'prefix' => 'boost',
+        ], $options));
+    }
+
+    public static function sqlite(array $options = [])//: Cache
+    {
+        if (class_exists('Bnomei\\SQLiteCache')) {
+            $feather = \Bnomei\SQLiteCache::singleton(array_merge([
+                'prefix' => 'boost',
+            ], $options));
+            return $feather;
+        }
+        return null;
+    }
+
+    public static function redis(array $options = [])//: Cache
+    {
+        if (class_exists('Bnomei\\Redis')) {
+            return new \Bnomei\Redis(array_merge([
+                'prefix' => 'boost',
+                'host'   => '127.0.0.1',
+                'port'   => 6379,
+            ], $options));
+        }   
+        return null;
     }
 }

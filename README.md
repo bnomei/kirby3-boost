@@ -16,6 +16,7 @@ If you have a lot of page objects (1000+) with or without relations to each othe
 ## How does this plugin work?
 
 - It caches all content files and keeps the cache up to date when you add or modify content. This cache will be used when constructing page objects making everything that involves page objects faster (even the Panel).
+- It provides a benchmark to help you decide which cachedriver to use.
 - It can add an unique ID for page objects that can be used create relations that do not break even if the slug or directory of a page object changes.
 - It provides a very fast lookup for page objects via id, diruri or the unique id.
 - It provides you with a tiny-url for page objects that have an unique id.
@@ -82,11 +83,46 @@ $page = boost($boostId); // will use fastest internally
 $page = modified($somePageId);
 ```
 
-## Memcached
+## Cache
 
-This plugin uses the PHP Memcached extension for optimal performance. Not Memcache, but Memcached. It can also use Kirbys default file cache driver.
+### Limitations
 
-### Memcached Setup
+How much and if you gain anything regarding performance depends on the hardware. All your content files must fit within the memory limitation. If you run into errors consider increasing the server settings or choose a different cache driver.
+
+| Defaults for | Memcached | APCu | Redis | SQLite |
+|----|----|----|----|----|
+| max memory size | 64MB | 32MB | 0 (none) | 0 (none) |
+| size of key/value pair | 1MB | 4MB | 512MB | 0 (none) |
+
+Kirby has [built in support](https://getkirby.com/docs/reference/system/options/cache#cache-driver) for File, Apcu, Memcached and Memory. I have created additional cache drivers for [SQLite](https://github.com/bnomei/kirby3-sqlite-cachedriver) and [Redis](https://github.com/bnomei/kirby3-redis-cachedriver).
+
+### Benchmark
+
+The included benchmark can help you make an educated guess which is the faster cache driver. The only way to make sure is measuring in production. 
+Be aware that this will create and remove 2000 items cached. The benchmark will try to perform as many get operations within given timeframe (default 2 seconds per cache). The higher results are better.
+
+```php
+// use helpers to generate caches to compare
+// rough performance level is based on my tests
+$caches = [
+    \Bnomei\BoostCache::memory(),    // 100
+    \Bnomei\BoostCache::sqlite(),    //  80
+    \Bnomei\BoostCache::apcu(),      //  40
+    \Bnomei\BoostCache::redis(),     //  30
+    \Bnomei\BoostCache::file(),      //  10
+    \Bnomei\BoostCache::memcached(), //   4
+];
+// run the benchmark
+var_dump(\Bnomei\CacheBenchmark::run($caches));
+```
+
+Memory Cache Driver will probably perform best but caches in memory only for current request and that is not really usefull for this plugin. SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34).
+
+But do not take my word for it. Run the benchmark on your production server.
+
+### Config
+
+Once you know which driver you want to use you can set the plugin cache options.
 
 **site/config/config.php**
 ```php
@@ -94,41 +130,40 @@ This plugin uses the PHP Memcached extension for optimal performance. Not Memcac
 
 return [
     // other options
-    // use memached
-    // defaults...
-    'bnomei.boost.cacheType' => 'memcached', // file
-    'bnomei.boost.memcached' => [
-        'host'    => '127.0.0.1',
-        'port'    => 11211,
-        'prefix'  => 'boost',
-        'expire'  => 0,
-        'enforce' => true,
+
+    // default is file cache driver
+    'bnomei.boost.cache' => [
+        'type'     => 'file',
+        'prefix'   => 'boost',
+    ],
+
+    // example memached
+    'bnomei.boost.cache' => [
+        'type'     => 'memcached',
+        'prefix'   => 'boost',
+        'host'     => '127.0.0.1',
+        'port'     => 11211,
+    ],
+
+    // example sqlite
+    // https://github.com/bnomei/kirby3-sqlite-cachedriver
+    'bnomei.boost.cache' => [
+        'type'     => 'sqlite',
+        'prefix'   => 'boost',
+    ],
+
+    // example redis
+    // https://github.com/bnomei/kirby3-redis-cachedriver
+    'bnomei.boost.cache' => [
+        'type'     => 'redis',
+        'prefix'   => 'boost',
+        'host'     => function() { return env('REDIS_HOST'); },
+        'port'     => function() { return env('REDIS_PORT'); },
+        'database' => function() { return env('REDIS_DATABASE'); },
+        'password' => function() { return env('REDIS_PASSWORD'); },
     ],
 ];
 ```
-
-### Benchmark
-
-The included benchmark can help you make an educated guess if on your server the memcached cache driver is faster than the file cache driver. This will create and remove 2000 items cached.
-
-```php
-// see numbers
-echo \Bnomei\CacheBenchmark::file(2) . PHP_EOL; // seconds
-echo \Bnomei\CacheBenchmark::memcached(2) . PHP_EOL; // seconds
-// or just
-echo \Bnomei\CacheBenchmark::fastest(2) . PHP_EOL;
-```
-
-### Limitations
-
-How much and if you gain anything regarding performance depends on the hardware. But on most production servers reading data from RAM (via TCP/IP) should be faster than reading a lot of files (even from SSD disks). 
-
-All your content files must fit within the memory limitation of Memcached Server. If you run into errors consider increasing the server settings.
-
-| Defaults for | Memcached |
-|----|----|
-| max memory size | 64MB 
-| size of key/value pair | 1MB |
 
 ## Tiny-URL
 
