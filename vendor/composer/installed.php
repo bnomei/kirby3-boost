@@ -6,11 +6,11 @@
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'reference' => NULL,
-        'name' => 'bnomei/kirby3-turbo',
+        'name' => 'bnomei/kirby3-boost',
         'dev' => false,
     ),
     'versions' => array(
-        'bnomei/kirby3-turbo' => array(
+        'bnomei/kirby3-boost' => array(
             'pretty_version' => '1.0.0',
             'version' => '1.0.0.0',
             'type' => 'kirby-plugin',
