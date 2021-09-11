@@ -126,7 +126,7 @@ How much and if you gain anything regarding performance depends on the hardware.
 All your content files must fit within the memory limitation of Memcached Server. If you run into errors consider increasing the server settings.
 
 | Defaults for | Memcached |
-|----|----|----|----|
+|----|----|
 | max memory size | 64MB 
 | size of key/value pair | 1MB |
 
