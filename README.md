@@ -22,10 +22,6 @@ If you have a lot of page objects (1000+) with or without relations to each othe
 
 > This plugin is an enhanced combination of [Page Memcached](https://github.com/bnomei/kirby3-page-memcached), [AutoID](https://github.com/bnomei/kirby3-autoid/) and [Bolt](https://github.com/bnomei/kirby3-bolt). 
 
-## TODO:
-add memcache for bolt resolves?
-check if uniique by queriing the lookup table
-
 ## Setup
 
 **site/blueprints/pages/default.yml**
