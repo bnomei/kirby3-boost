@@ -171,7 +171,7 @@ This plugin allows you to use the BoostID value in a shortend URL. It also regis
 
 ```php
 echo $page->url(); // https://devkit.bnomei.com/test-43422931f00e27337311/test-2efd96419d8ebe1f3230/test-32f6d90bd02babc5cbc3
-echo $page->autoid()->value(); // 8j5g64hh
+echo $page->boostid()->value(); // 8j5g64hh
 echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
 ```
 
