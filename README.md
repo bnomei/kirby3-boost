@@ -88,7 +88,7 @@ This plugin uses the PHP Memcached extension for optimal performance. Not Memcac
 
 ### Memcached Setup
 
-** site/config/config.php**
+**site/config/config.php**
 ```php
 <?php
 
