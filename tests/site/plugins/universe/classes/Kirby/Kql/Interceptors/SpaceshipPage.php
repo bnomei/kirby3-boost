@@ -2,7 +2,7 @@
 
 namespace Kirby\Kql\Interceptors;
 
-class PlanetPage extends \Kirby\Kql\Interceptors\Cms\Page
+class SpaceshipPage extends \Kirby\Kql\Interceptors\Cms\Page
 {
     public function allowedMethods(): array
     {

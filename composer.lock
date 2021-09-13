@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "bnomei/autoloader-for-kirby",
-            "version": "1.2.8",
+            "version": "1.2.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bnomei/autoloader-for-kirby.git",
-                "reference": "de50d3d4907b9d11da99af8993b069fe05db631b"
+                "reference": "37637d1b8416cf4de76d7c5f0f865ea9365a642a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bnomei/autoloader-for-kirby/zipball/de50d3d4907b9d11da99af8993b069fe05db631b",
-                "reference": "de50d3d4907b9d11da99af8993b069fe05db631b",
+                "url": "https://api.github.com/repos/bnomei/autoloader-for-kirby/zipball/37637d1b8416cf4de76d7c5f0f865ea9365a642a",
+                "reference": "37637d1b8416cf4de76d7c5f0f865ea9365a642a",
                 "shasum": ""
             },
             "require": {
@@ -72,7 +72,7 @@
             ],
             "support": {
                 "issues": "https://github.com/bnomei/autoloader-for-kirby/issues",
-                "source": "https://github.com/bnomei/autoloader-for-kirby/tree/v1.2.8"
+                "source": "https://github.com/bnomei/autoloader-for-kirby/tree/v1.2.9"
             },
             "funding": [
                 {
@@ -92,7 +92,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-09-08T16:21:35+00:00"
+            "time": "2021-09-13T13:21:26+00:00"
         },
         {
             "name": "getkirby/composer-installer",

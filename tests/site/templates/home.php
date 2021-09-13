@@ -43,15 +43,17 @@ $password = 'kirby3boost';
 			}
 		}" class="grid grid-cols-5 sm:grid-cols-12">
 			<nav class="col-span-5 sm:col-span-2 bg-blue-100 text-blue-900 sm:min-h-screen">
-				<div class="font-bold p-4">Kirby3 Boost</div>
-				<ul class="flex sm:flex-wrap border-b border-blue-200">
+				<div class="font-bold p-4"><a href="https://github.com/bnomei/kirby3-boost">Kirby3 Boost</a></div>
+				<ul class="flex flex-wrap border-b border-blue-200">
 					<li class="flex-grow sm:w-full border-t border-blue-200"><a href="https://github.com/bnomei/kirby3-boost" class="block hover:bg-blue-200 p-4 w-full text-left">Github</a></li>
+					<!--
 					<li class="sm:hidden border-r border-blue-200"></li>
 					<li class="flex-grow sm:w-full border-t border-blue-200"><a href="<?= site()->url() ?>/benchmark" class="block hover:bg-blue-200 p-4 w-full text-left">Benchmark</a></li>
+					-->
 				</ul>
 				<div class="font-bold p-4 mt-12">Predefined queries</div>
-				<ul class="flex sm:flex-wrap border-b border-blue-200">
-					<?php foreach(site()->children()->filterBy('template', 'kqlquery') as $q): ?>
+				<ul class="flex flex-wrap border-b border-blue-200">
+					<?php foreach(site()->children()->listed()->filterBy('template', 'kqlquery') as $q): ?>
 					<li class="flex-grow  sm:w-full border-t border-blue-200">
 						<button @click="input = $el.firstElementChild.text; fetchKQL(); $nextTick(() => { autosize() })"
 							class="hover:bg-blue-200 p-4 w-full text-left"
@@ -60,18 +62,22 @@ $password = 'kirby3boost';
 					<?php endforeach; ?>
 				</ul>
 			</nav>
-			<div class="col-span-5 border-r border-blue-200"><textarea class="focus:outline-none w-full h-full sm:min-h-screen p-4 bg-blue-50 text-blue-800 font-mono" x-model="input" placeholder="Enter query" @input.debounce=" fetchKQL()" autofocus autocomplete="false"></textarea></div>
-			<div class="col-span-5">
+			<div class="col-span-5 border-r border-blue-200 text-xs sm:text-base"><textarea class="focus:outline-none w-full h-full sm:min-h-screen p-4 bg-blue-50 text-blue-800 font-mono" x-model="input" placeholder="Enter query" @input.debounce=" fetchKQL()" autofocus autocomplete="false"></textarea></div>
+			<div class="col-span-5 text-xs sm:text-base">
 				<pre x-show="output != undefined && output.length > 0" class="p-4 font-mono" x-html="output"></pre>
 				<div x-show="output == undefined" class="flex items-center justify-center min-h-screen"><div><svg class="spinner text-blue-200"><circle cx="20" cy="20" r="18"></circle></svg></div></div>
 			</div>
 		</main>
 		<footer class="w-full bg-yellow-200 text-yellow-800 p-4 grid gap-4 grid-cols-4 sm:grid-cols-12 text-sm">
-			<div class="col-span-4">This demo is not static. Every time someone makes a request the spaceships consume energy and move, humans might arrive on or leave planets with spaceships, factories produce food and energy, food gets eaten, ... It is a simulation. There is stuff happening in the background, just like with your website project.</p>
-			</div>	
+			<div class="col-span-4"><!--This demo is not static. Every time someone makes a specific request the spaceships consume energy and move, humans might arrive on or leave planets with spaceships, factories produce food and energy, food gets eaten, ... It is a simulation. There is stuff happening in the background, just like with your website project.-->Work in progres...
+			</div>
 			<div class="col-span-4">Performance of Kirby 3 CMS with a lot of page objects is improved by the <a class="underline" href="https://github.com/bnomei/kirby3-boost">Boost Plugin</a> using the <a class="underline" href="https://github.com/bnomei/kirby3-sqlite-cachedriver">SQLite Cache Driver</a>. Queries are sent to the public API endpoint of the <a class="underline" href="https://github.com/getkirby/kql">KQL Plugin</a>. You can either use this interactive playground or a tool like HTTPie, Insomnia, PAW or Postman to connect to the API. Have fun exploring...
 			</div>
-			<div class="col-span-4 font-mono"><?= site()->url() ?>/api/query<br><?= $username ?>:<?= $password ?></div>
+			<div class="col-span-4 font-mono">
+				<!--<?= site()->url() ?>/simulation-tick<br>-->
+				<?= site()->url() ?>/api/query<br>
+				<?= $username ?>:<?= $password ?>
+			</div>
 		</footer>
 		<script>
 			// autosize

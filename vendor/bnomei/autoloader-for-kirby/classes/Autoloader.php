@@ -154,7 +154,7 @@ final class Autoloader
                     if (preg_match('/^namespace (.*);$/im', $classFile, $matches) === 1) {
                         $class = str_replace($matches[1] . '\\', '', $class);
                         $class = $matches[1] . '\\' . $class;
-                    }
+                    }    
                 }
                 $this->registry[$type]['map'][$class] = $file->getRelativePathname();
                 

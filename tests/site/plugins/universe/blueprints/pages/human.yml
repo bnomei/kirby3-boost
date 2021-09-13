@@ -7,9 +7,9 @@ fields:
   gender:
     type: radio
     options:
-      m: male
-      f: female
-      o: other
+      male: male
+      female: female
+      other: other
 
   firstname:
     type: text

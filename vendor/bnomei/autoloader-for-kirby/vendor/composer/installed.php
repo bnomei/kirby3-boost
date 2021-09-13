@@ -1,7 +1,7 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => '1.2.8',
-        'version' => '1.2.8.0',
+        'pretty_version' => '1.2.9',
+        'version' => '1.2.9.0',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,8 +11,8 @@
     ),
     'versions' => array(
         'bnomei/autoloader-for-kirby' => array(
-            'pretty_version' => '1.2.8',
-            'version' => '1.2.8.0',
+            'pretty_version' => '1.2.9',
+            'version' => '1.2.9.0',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

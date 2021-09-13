@@ -21,10 +21,25 @@ Kirby::plugin('universe/things', [
 	],
 
 	'fieldMethods' => [
+		'toCount' => function($field): int
+		{
+			return count($field->split());
+		},
 		'toInlineJson' => function($field): string
 		{
 			return str_replace('\/', '/', json_encode(json_decode($field->value(), true), JSON_PRETTY_PRINT));
 		},
+	],
+
+	"routes" => [
+		[
+			'pattern' => 'simuation-tick',
+		    'action'  => function () {
+		        return [
+		        	'tick' => page('milkyway')->simulationTick(),
+		        ];
+		    }
+		]
 	],
 
 ]);

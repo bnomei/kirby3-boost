@@ -11,12 +11,12 @@
     ),
     'versions' => array(
         'bnomei/autoloader-for-kirby' => array(
-            'pretty_version' => '1.2.8',
-            'version' => '1.2.8.0',
+            'pretty_version' => '1.2.9',
+            'version' => '1.2.9.0',
             'type' => 'project',
             'install_path' => __DIR__ . '/../bnomei/autoloader-for-kirby',
             'aliases' => array(),
-            'reference' => 'de50d3d4907b9d11da99af8993b069fe05db631b',
+            'reference' => '37637d1b8416cf4de76d7c5f0f865ea9365a642a',
             'dev_requirement' => false,
         ),
         'bnomei/kirby3-boost' => array(

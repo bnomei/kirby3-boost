@@ -18,13 +18,8 @@ class HumanPage extends \Bnomei\BoostPage
         return $page;
     }
 
-    public function loldogs():string
+    public function kidsCount(): int
     {
-        return 'lol';
-    }
-
-    public function lolcats(): Field
-    {
-        return (new Field($this, 'lolcats', 'lol'));
+        return count($this->kids()->split());
     }
 }

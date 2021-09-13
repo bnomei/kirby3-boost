@@ -1,8 +1,9 @@
-title: Solar System
+title: Planetary System
 
 sections:
   things:
     type: pages
+    info: "{{page.humans.toCount}}"
     template:
       - star
       - planet

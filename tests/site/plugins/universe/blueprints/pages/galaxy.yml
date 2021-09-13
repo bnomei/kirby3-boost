@@ -5,3 +5,11 @@ sections:
     type: pages
     template:
       - system
+
+  content:
+    type: fields
+    fields:
+      tick:
+        type: number
+        min: 0
+        default: 0
