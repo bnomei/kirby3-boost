@@ -1,19 +1,32 @@
 <?php
 
+autoloader(__DIR__)->classes();
+
+
 Kirby::plugin('universe/things', [
 
-	'collections' => [
-		'humans' => require __DIR__ . '/collections/humans.php',
-		'planets' => require __DIR__ . '/collections/planets.php',
-		'spaceships' => require __DIR__ . '/collections/spaceships.php',
-		'suns' => require __DIR__ . '/collections/suns.php',
+	'blueprints' => autoloader(__DIR__)->blueprints(),
+	'collections' => autoloader(__DIR__)->collections(),
+	'pageModels' => autoloader(__DIR__)->pageModels(),
+
+	'templates' => [
+		'factory' 	=> __DIR__ . '/templates/empty.php',
+		'galaxy' 	=> __DIR__ . '/templates/empty.php',
+		'human' 	=> __DIR__ . '/templates/empty.php',
+		'humankind' => __DIR__ . '/templates/empty.php',
+		'planet' 	=> __DIR__ . '/templates/empty.php',
+		'spaceship' => __DIR__ . '/templates/empty.php',
+		'star' 		=> __DIR__ . '/templates/empty.php',
+		'system' 	=> __DIR__ . '/templates/empty.php',
 	],
 
 	'fieldMethods' => [
 		'toInlineJson' => function($field): string
 		{
-			return json_encode(json_decode($field->value(), true), JSON_PRETTY_PRINT);
+			return str_replace('\/', '/', json_encode(json_decode($field->value(), true), JSON_PRETTY_PRINT));
 		},
 	],
 
 ]);
+
+class_alias("Universe\\HumanPage", "HumanPage");

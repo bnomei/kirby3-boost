@@ -1,0 +1,14 @@
+title: Factory
+
+fields:
+  boostid:
+    type: boostid
+
+  product:
+    type: radio
+    options:
+      food: Food
+      energy: Energy
+
+  humans:
+    extends: fields/humans

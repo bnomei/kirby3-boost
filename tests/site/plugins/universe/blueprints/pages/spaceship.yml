@@ -1,0 +1,37 @@
+title: Spaceship
+
+fields:
+  boostid:
+    type: boostid
+
+  origin:
+    extends: fields/planet
+
+  destination:
+    extends: fields/planet
+
+  crew:
+    extends: fields/humans
+
+  passengers:
+    extends: fields/humans
+    min: 0
+    max: 100
+
+  cargofood:
+    type: number
+    min: 0
+
+  cargoenergy:
+    type: number
+    min: 0
+
+  energy:
+    type: number
+    min: 0
+    max: 120
+
+  progress:
+    type: number
+    min: 0
+    max: 100

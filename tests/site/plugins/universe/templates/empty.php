@@ -1,0 +1,3 @@
+<?php
+
+	go(site()->url());

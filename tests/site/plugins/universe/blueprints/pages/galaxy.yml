@@ -1,0 +1,7 @@
+title: Galaxy
+
+sections:
+  system:
+    type: pages
+    template:
+      - system

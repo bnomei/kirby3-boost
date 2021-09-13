@@ -1,0 +1,9 @@
+title: Star
+
+fields:
+  boostid:
+    type: boostid
+
+  radius:
+    type: number
+    min: 0

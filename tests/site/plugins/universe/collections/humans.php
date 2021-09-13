@@ -1,5 +1,5 @@
 <?php
 
 return function () {
-    return site()->index()->filterBy('template', 'human');
+    return page('humankind')->children()->filterBy('template', 'human');
 };

@@ -2,15 +2,7 @@
 
 @include_once __DIR__ . '/vendor/autoload.php';
 
-load([
-    'Bnomei\\Memcached' => 'classes/Memcached.php',
-    'Bnomei\\Bolt' => 'classes/Bolt.php',
-    'Bnomei\\BoostIndex' => 'classes/BoostIndex.php',
-    'Bnomei\\PageHasBoost' => 'classes/PageHasBoost.php',
-    'Bnomei\\BoostPage' => 'classes/BoostPage.php',
-    'Bnomei\\TokenGenerator' => 'classes/TokenGenerator.php',
-], __DIR__);
-
+autoloader(__DIR__)->classes();
 
 if (! function_exists('bolt')) {
     function bolt(string $id)
@@ -65,14 +57,8 @@ Kirby::plugin('bnomei/boost', [
             'folder' => 'x',
         ],
     ],
-    'blueprints' => [
-        'fields/boostid' => __DIR__ . '/blueprints/fields/boostid.yml',
-        'fields/boostidpage' => __DIR__ . '/blueprints/fields/boostidpage.yml',
-        'fields/boostidpages' => __DIR__ . '/blueprints/fields/boostidpages.yml',
-    ],
-    'collections' => [
-        'boostidpages' => require __DIR__ . '/collections/boostidpages.php',
-    ],
+    'blueprints' => autoloader(__DIR__)->blueprints(),
+    'collections' => autoloader(__DIR__)->collections(),
     'pageMethods' => [ // PAGE
         'bolt' => function (string $id) {
             return \Bnomei\Bolt::page($id, $this);

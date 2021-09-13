@@ -1,9 +1,0 @@
-title: Solar System
-
-sections:
-  planets:
-    type: pages
-    template:
-      - sun
-      - planet
-      - spaceship

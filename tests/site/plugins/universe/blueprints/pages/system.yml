@@ -1,0 +1,9 @@
+title: Solar System
+
+sections:
+  things:
+    type: pages
+    template:
+      - star
+      - planet
+      - spaceship
