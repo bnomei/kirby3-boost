@@ -1,0 +1,27 @@
+title: Human
+
+fields:
+  boostid:
+    type: boostid
+
+  gender:
+    type: radio
+    options:
+      m: male
+      f: female
+      o: other
+
+  firstname:
+    type: text
+
+  lastname:
+    type: text
+
+  birthday:
+    type: date
+
+  partner:
+    extends: fields/human
+
+  karma:
+    type: number

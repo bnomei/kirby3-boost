@@ -16,6 +16,7 @@
 /tests/site/sessions
 /tests/site/plugins/kirby3-sqlite-cachedriver
 /tests/site/plugins/kirby3-redis-cachedriver
+/tests/site/plugins/kql
 
 # files of Composer dependencies that are not needed for the plugin
 /vendor/**/.*

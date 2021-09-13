@@ -1,0 +1,7 @@
+title: Galaxy
+
+sections:
+  planets:
+    type: pages
+    template:
+      - solarsystem

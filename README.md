@@ -9,6 +9,13 @@
 
 Boost the speed of Kirby by having content files of pages (mem-)cached, with automatic unique ID, fast lookup and Tiny-URL.
 
+## Commerical Usage
+
+This plugin is free but if you use it in a commercial project please consider to 
+- [make a donation 🍻🍻🍻](https://www.paypal.me/bnomei/15) or
+- [buy me ☕☕☕](https://buymeacoff.ee/bnomei) or
+- [buy a Kirby license using this affiliate link](https://a.paddle.com/v2/click/1129/35731?link=1170)
+
 ## Usecase
 
 If you have a lot of page objects (1000+) with or without relations to each other via unique ids then consider using this plugin. With less page objects you will propably not gain enough to justify the overhead.
@@ -116,7 +123,7 @@ $caches = [
 var_dump(\Bnomei\CacheBenchmark::run($caches));
 ```
 
-Memory Cache Driver will probably perform best but caches in memory only for current request and that is not really usefull for this plugin. SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34).
+Memory Cache Driver will probably perform best but caches in memory only for current request and that is not really useful for this plugin. SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34).
 
 But do not take my word for it. Run the benchmark on your production server.
 

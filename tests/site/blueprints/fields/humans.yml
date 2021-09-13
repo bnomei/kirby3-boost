@@ -1,0 +1,6 @@
+type: multiselect
+options: query
+query:
+  fetch: kirby.collection('humans')
+  text: "{{ page.lastname }}, {{ page.firstname }}"
+  value: "{{ page.BOOSTID }}"

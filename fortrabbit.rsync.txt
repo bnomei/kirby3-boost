@@ -1,0 +1,17 @@
++ tests/
++ tests/site/
++ tests/site/blueprints/
++ tests/site/blueprints/*
++ tests/site/blueprints/**/*.yml
++ tests/site/config/
++ tests/site/config/*.php
++ tests/site/models/
++ tests/site/models/*.php
++ tests/site/plugins/
++ tests/site/plugins/universe/
++ tests/site/plugins/universe/*.php
++ tests/site/plugins/universe/collections/
++ tests/site/plugins/universe/collections/*.php
++ tests/site/templates/
++ tests/site/templates/*.php
+- *

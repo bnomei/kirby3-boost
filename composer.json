@@ -46,6 +46,7 @@
     "getkirby/composer-installer": "^1.2"
   },
   "require-dev": {
+    "fzaninotto/faker": "^1.9",
     "getkirby/cms": "^3.5",
     "php-coveralls/php-coveralls": "^2.4",
     "phpunit/phpunit": "^9.5"
@@ -67,13 +68,19 @@
       "composer update",
       "composer install --working-dir=tests/kirby --no-dev --optimize-autoloader",
       "composer update --working-dir=tests/kirby"
-    ]
+    ],
+    "push-content": [
+      "rsync -av --delete ./tests/content/ kirby3-boost@deploy.eu2.frbit.com:~/tests/content/"
+    ],
+    "push-code": "rsync -avz --include-from='fortrabbit.rsync.txt' --delete . kirby3-boost@deploy.eu2.frbit.com:."
   },
   "extra": {
     "kirby-cms-path": "tests/kirby"
   },
   "suggest": {
     "bnomei/kirby3-redis-cachedriver": "Redis based Cache-Driver",
-    "bnomei/kirby3-sqlite-cachedriver": "SQLite based Cache-Driver"
+    "bnomei/kirby3-sqlite-cachedriver": "SQLite based Cache-Driver",
+    "bnomei/kirby3-lapse": "Cache any data until set expiration time (with automatic keys)",
+    "getkirby/kql": "Kirby's Query Language API combines the flexibility of Kirby's data structures, the power of GraphQL and the simplicity of REST"
   }
 }

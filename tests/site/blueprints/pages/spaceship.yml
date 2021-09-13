@@ -1,0 +1,26 @@
+title: Spaceship
+
+fields:
+  boostid:
+    type: boostid
+
+  origin:
+    extends: fields/planet
+
+  destination:
+    extends: fields/planet
+
+  crew:
+    extends: fields/humans
+
+  passengers:
+    extends: fields/humans
+
+  fuel:
+    type: number
+    min: 0
+
+  progress:
+    type: number
+    min: 0
+    max: 100

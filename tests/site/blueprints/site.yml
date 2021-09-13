@@ -1,0 +1,18 @@
+sections:
+  pages:
+    type: pages
+    template:
+      - default
+      - home
+      - error
+
+  kql:
+    type: pages
+    template:
+      - kqlquery
+
+  space:
+    type: pages
+    template:
+      - galaxy
+      - humankind

@@ -1,0 +1,12 @@
+title: Planet
+
+fields:
+  boostid:
+    type: boostid
+
+  radius:
+    type: number
+    min: 0
+
+  humans:
+    extends: fields/humans
