@@ -1,37 +1,33 @@
 title: Spaceship
 
-fields:
-  boostid:
-    type: boostid
+sections:
+  things:
+    type: fields
+    fields:
+      boostid:
+        type: boostid
 
-  origin:
-    extends: fields/planet
+      origin:
+        extends: fields/planet
 
-  destination:
-    extends: fields/planet
+      destination:
+        extends: fields/planet
+
+      food:
+        type: number
+        min: 0
+
+      energy:
+        type: number
+        min: 0
+
+      distance:
+        label: Distance in ticks
+        type: number
+        min: 0
 
   crew:
-    extends: fields/humans
+    extends: sections/humans
 
-  passengers:
-    extends: fields/humans
-    min: 0
-    max: 100
-
-  cargofood:
-    type: number
-    min: 0
-
-  cargoenergy:
-    type: number
-    min: 0
-
-  energy:
-    type: number
-    min: 0
-    max: 120
-
-  progress:
-    type: number
-    min: 0
-    max: 100
+  humans:
+    extends: sections/humans

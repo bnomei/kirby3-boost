@@ -1,11 +1,6 @@
 title: Planet
 
 sections:
-  factories:
-    type: pages
-    template:
-      - factory
-
   things:
     type: fields
     fields:
@@ -24,5 +19,10 @@ sections:
         type: number
         min: 0
 
-      humans:
-        extends: fields/humans
+  factories:
+    type: pages
+    template:
+      - factory
+
+  humans:
+    extends: sections/humans

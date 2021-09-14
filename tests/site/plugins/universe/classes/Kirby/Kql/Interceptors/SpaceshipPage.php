@@ -8,6 +8,7 @@ class SpaceshipPage extends \Kirby\Kql\Interceptors\Cms\Page
     {
         return array_merge(parent::allowedMethods(), [
             'hasBoost',
+            'humans',
         ]);
     }
 }

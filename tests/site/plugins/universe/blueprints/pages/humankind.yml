@@ -1,9 +1,5 @@
 title: Humankind
 
-sections:
+fields:
   humans:
-    type: pages
-    info: "{{page.lastname}}, {{page.firstname}}, {{page.birthday}}"
-    sortBy: lastname birthday
-    templates:
-      - human
+    extends: fields/humans

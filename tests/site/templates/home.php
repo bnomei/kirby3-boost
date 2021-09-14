@@ -1,6 +1,21 @@
 <?php
 $username = 'api@kirby3-boost.frb.io';
 $password = 'kirby3boost';
+
+/*
+$c = 10;
+while($c > 0) {
+	page('milkyway/solar-system/earth')->addSingle();	
+	page('milkyway/solar-system/earth')->addSingle();	
+	page('milkyway/solar-system/earth')->addSingle();	
+	page('milkyway/solar-system/earth')->addSingle();	
+	page('milkyway/solar-system/earth')->addFamily();	
+	$c--;
+}
+
+page('humankind')->addAllHumans();
+*/
+
 ?><html>
 	<head>
 		<title>Boost Plugin</title>
