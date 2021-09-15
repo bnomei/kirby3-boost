@@ -211,14 +211,17 @@ This plugin allows you to use the BoostID value in a shortend URL. It also regis
 
 ```php
 echo $page->url(); // https://devkit.bnomei.com/test-43422931f00e27337311/test-2efd96419d8ebe1f3230/test-32f6d90bd02babc5cbc3
-echo $page->boostid()->value(); // 8j5g64hh
+echo $page->boostIDField()->value(); // 8j5g64hh
 echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
 ```
 
-### Settings
+## Settings
 
 | bnomei.boost.            | Default        | Description               |            
 |---------------------------|----------------|---------------------------|
+| fieldname | `['boostid', 'autoid']` | change name of loaded fields |
+| expire | `0` | expire in minutes for all caches created |
+| index.generator | callback | the uuid genertor |
 | tinyurl.url | callback | returning `site()->url()`. Use htaccess on that domain to redirect `RewriteRule (.*) http://www.bnomei.com/x/$1 [R=301]` |
 | tinyurl.folder | `x` | Tinyurl format: yourdomain/{folder}/{hash} |
 
