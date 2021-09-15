@@ -1,11 +1,11 @@
 <?php
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/WithPages.php';
+require_once __DIR__ . '/WithPagesTest.php';
 
 use Bnomei\BoostIndex;
 
-final class BoostIndexTest extends WithPages
+final class BoostIndexTest extends WithPagesTest
 {
     public function testBoostModified()
     {
@@ -41,6 +41,8 @@ final class BoostIndexTest extends WithPages
 
         $randomPage = $this->randomPage();
         //site()->prune();
+        //if (!$randomPage->boostIDField()->value()) var_dump($randomPage);
+
 
         $this->assertEquals(
             $randomPage->id(),

@@ -2,12 +2,11 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Bnomei\BoostIndex;
 use Kirby\Cms\Page;
 use Kirby\Toolkit\Str;
 use PHPUnit\Framework\TestCase;
 
-abstract class WithPages extends TestCase
+class WithPagesTest extends TestCase
 {
     /**
      * @var int
@@ -36,7 +35,6 @@ abstract class WithPages extends TestCase
         /* @var $page Page */
         kirby()->impersonate('kirby');
 
-        //var_dump($boostids);
         $page = $parent->createChild([
             'slug' => Str::slug($id),
             'template' => 'default',
@@ -59,26 +57,31 @@ abstract class WithPages extends TestCase
 
     public function randomPage(): ?Page
     {
-        return site()->pages()->index()->notTemplate('home')->shuffle()->first();
+        return site()->index()->notTemplate('home')->shuffle()->first();
     }
 
     public function tearDownPages(): void
     {
         kirby()->impersonate('kirby');
         /* @var $page Page */
-        foreach (site()->pages()->index()->notTemplate('home') as $page) {
+        foreach (site()->index()->notTemplate('home') as $page) {
             $page->delete(true);
         }
     }
 
+    /**
+     * Only test here will create all pages and set relations
+     *
+     * @group SetupPagesInSeperatePHPUnitRun
+     */
     public function testRelated()
     {
-        $boostids = array_flip(site()->index()->filterBy('template', 'default')->toArray(function ($page) {
+        $boostids = array_values(site()->index()->filterBy('template', 'default')->toArray(function ($page) {
             return $page->boostid()->value();
         }));
 
         $this->assertTrue(count($boostids) > 0);
-        $this->assertTrue(site()->index()->count() > 0);
+        $this->assertTrue(site()->index()->count() > 1); // not just home
 
         kirby()->impersonate('kirby');
         foreach (site()->index()->filterBy('template', 'default') as $page) {
@@ -87,7 +90,7 @@ abstract class WithPages extends TestCase
             }
 
             $page->update([
-            'related' => count($boostids) >= 2 ? implode(',', array_rand($boostids, rand(2, min(count($boostids), 10)))) : ''
+                'related' => count($boostids) >= 2 ? implode(',', array_rand($boostids, rand(2, min(count($boostids), 10)))) : ''
             ]);
         }
     }

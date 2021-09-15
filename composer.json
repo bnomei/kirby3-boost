@@ -1,8 +1,8 @@
 {
   "name": "bnomei/kirby3-boost",
   "type": "kirby-plugin",
-  "version": "1.1.0",
-  "description": "Boost the speed of Kirby by having content files of pages (mem-)cached, with automatic unique ID, fast lookup and Tiny-URL.",
+  "version": "1.1.1",
+  "description": "Boost the speed of Kirby by having content files of pages cached, with automatic unique ID, fast lookup and Tiny-URL.",
   "license": "MIT",
   "authors": [
     {
@@ -28,6 +28,7 @@
     "memcached",
     "memory",
     "sqlite",
+    "mysql",
     "redis",
     "apcu",
     "file"
@@ -57,6 +58,7 @@
     "test": [
       "mkdir -p tests/logs",
       "@putenv XDEBUG_MODE=coverage",
+      "phpunit --configuration ./phpunit.xml --group SetupPagesInSeperatePHPUnitRun",
       "phpunit --configuration ./phpunit.xml"
     ],
     "dist": [
@@ -68,20 +70,17 @@
       "composer update",
       "composer install --working-dir=tests/kirby --no-dev --optimize-autoloader",
       "composer update --working-dir=tests/kirby"
-    ],
-    "push-content": [
-      "rsync -av --delete ./tests/content/ kirby3-boost@deploy.eu2.frbit.com:~/tests/content/"
-    ],
-    "push-code": "rsync -avz --include-from='fortrabbit.rsync.txt' --delete . kirby3-boost@deploy.eu2.frbit.com:."
+    ]
   },
   "extra": {
     "kirby-cms-path": "tests/kirby"
   },
   "suggest": {
-    "bnomei/kirby3-universe-kit": "Content generator and simulation for Kirby based on humankind in space theme",
+    "bnomei/kirby3-boost-demo": "Try boost with a big set of data",
+    "bnomei/kirby3-lapse": "Cache any data until set expiration time (with automatic keys)",
+    "bnomei/kirby3-mysql-cachedriver": "MySQL based Cache-Driver",
     "bnomei/kirby3-redis-cachedriver": "Redis based Cache-Driver",
     "bnomei/kirby3-sqlite-cachedriver": "SQLite based Cache-Driver",
-    "bnomei/kirby3-lapse": "Cache any data until set expiration time (with automatic keys)",
     "getkirby/kql": "Kirby's Query Language API combines the flexibility of Kirby's data structures, the power of GraphQL and the simplicity of REST"
   }
 }

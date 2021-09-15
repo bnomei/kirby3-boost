@@ -52,6 +52,10 @@ final class Bolt
         $this->modelFiles = array_map(static function ($value) use ($extension) {
             return $value . '.' . $extension;
         }, array_keys(Page::$models));
+
+        if (option('debug')) {
+            $this->flush();
+        }
     }
 
     private static function cache()
@@ -59,11 +63,24 @@ final class Bolt
         return BoostCache::singleton();
     }
 
+    public function flush()
+    {
+        static::$idToPage = [];
+
+        // this would flush content cache as well or depending on cache driver everything
+        // do NOT do this ever!
+        // // BoostCache::singleton()->flush();
+
+        return true;
+    }
+
     public function lookup(string $id, bool $cache = true): ?Page
     {
         $lookup = A::get(static::$idToPage, $id);
         if (!$lookup && $cache && static::cache()) {
             if ($diruri = static::cache()->get(crc32($id) . '-bolt')) {
+                // bolt will ignore caches with invalid paths and update them automatically
+                // it does not need to be flushed ever
                 if ($page = $this->findByID($diruri, false)) {
                     $this->pushLookup($id, $page);
                     $lookup = $page;
@@ -107,7 +124,9 @@ final class Bolt
                 $this->root .= '/_drafts';
                 continue;
             }
-            $partWithoutNum = array_reverse(explode(Dir::$numSeparator, $part))[0];
+            $numSplit = array_reverse(explode(Dir::$numSeparator, $part));
+            $partWithoutNum = $numSplit[0];
+            $num = count($numSplit) > 1 ? $numSplit[1] : null;
             $treeid = $treeid ? $treeid . '/' . $partWithoutNum : $partWithoutNum;
             $page = $this->lookup($treeid, $cache);
             if ($page) {
@@ -116,13 +135,12 @@ final class Bolt
                 continue;
             }
 
-
             $params = [
                 'root' => null,
                 'dirname' => null,
                 'parent' => $parent,
                 'slug' => $partWithoutNum,
-                'num' => null,
+                'num' => $num,
                 'model' => null,
             ];
 
@@ -163,6 +181,7 @@ final class Bolt
                                 $template = str_replace('.' . $this->extension, '', $modelFile);
                                 $params['template'] = $template;
                                 $params['model'] = $template;
+                                var_dump('DOUNDdddxxx');
                                 break;
                             }
                         }

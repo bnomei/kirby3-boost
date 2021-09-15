@@ -73,7 +73,7 @@ final class BoostIndex
         if ($this->cache()) {
             return $this->cache()->set('index', [], $this->expire);
         }
-        return false;
+        return true;
     }
 
     public function findByBoostId(string $boostid): ?Page
@@ -145,7 +145,17 @@ final class BoostIndex
 
     public static function modified(string $id): ?int
     {
-        return BoostCache::singleton()->get(crc32($id) . '-modified');
+        $modified = BoostCache::singleton()->get(crc32($id) . '-modified');
+        if ($modified) {
+            return $modified;
+        }
+
+        if ($page = \bolt($id)) {
+            $page->boost(); // force cache update
+            return $page->modified();
+        }
+
+        return null;
     }
 
     public static function page(string $id): ?Page

@@ -28,6 +28,11 @@ trait PageHasBoost
         return true;
     }
 
+    public function isContentBoosted(string $languageCode = null): bool
+    {
+        return $this->readContentCache($languageCode) !== null;
+    }
+
     public function forceNewBoostId(?string $id = null)
     {
         if ($this->boostIDField()->isEmpty()) {
@@ -44,12 +49,7 @@ trait PageHasBoost
         return $this;
     }
 
-    public function isContentMemcached(string $languageCode = null): bool
-    {
-        return $this->readContentCache($languageCode) !== null;
-    }
-
-    public function memcachedKey(string $languageCode = null): string
+    public function contentBoostedKey(string $languageCode = null): string
     {
         $key = strval(crc32($this->id()));
         if (!$languageCode) {
@@ -62,12 +62,43 @@ trait PageHasBoost
         return $key;
     }
 
+    public function isContentCacheExpiredByModified(string $languageCode = null): bool
+    {
+        $cache = BoostCache::singleton();
+        if (! $cache) {
+            return true;
+        }
+
+        $modified = $this->modified();
+        $modifiedCache = $cache->get(
+            $this->contentBoostedKey($languageCode).'-modified',
+            null
+        );
+        if ($modifiedCache && intval($modifiedCache) < intval($modified)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function readContentCache(string $languageCode = null): ?array
+    {
+        if ($this->isContentCacheExpiredByModified($languageCode)) {
+            return null;
+        }
+
+        return BoostCache::singleton()->get(
+            $this->contentBoostedKey($languageCode) . '-content',
+            null
+        );
+    }
+
     public function readContent(string $languageCode = null): array
     {
-        // read from memcached if exists
+        // read from boostedCache if exists
         $data = option('debug') ? null : $this->readContentCache($languageCode);
 
-        // read from file and update memcached
+        // read from file and update boostedCache
         if (! $data) {
             $data = parent::readContent($languageCode);
             $this->writeContentCache($data, $languageCode);
@@ -76,41 +107,6 @@ trait PageHasBoost
         return $data;
     }
 
-    /**
-     * @internal
-     */
-    public function readContentCache(string $languageCode = null): ?array
-    {
-        $cache = BoostCache::singleton();
-        if (! $cache) {
-            return null;
-        }
-
-        $modified = $this->modified();
-        $modifiedCache = $cache->get(
-            $this->memcachedKey($languageCode).'-modified',
-            null
-        );
-        if ($modifiedCache && intval($modifiedCache) < intval($modified)) {
-            return null;
-        }
-
-        return $cache->get(
-            $this->memcachedKey($languageCode),
-            null
-        );
-    }
-
-    public function writeContent(array $data, string $languageCode = null): bool
-    {
-        // write to file and memcached
-        return parent::writeContent($data, $languageCode) &&
-            $this->writeContentCache($data, $languageCode);
-    }
-
-    /**
-     * @internal
-     */
     public function writeContentCache(array $data, string $languageCode = null): bool
     {
         $cache = BoostCache::singleton();
@@ -119,16 +115,23 @@ trait PageHasBoost
         }
 
         $cache->set(
-            $this->memcachedKey($languageCode).'-modified',
+            $this->contentBoostedKey($languageCode) . '-modified',
             $this->modified(),
             option('bnomei.boost.expire')
         );
 
         return $cache->set(
-            $this->memcachedKey($languageCode),
+            $this->contentBoostedKey($languageCode) . '-content',
             $data,
             option('bnomei.boost.expire')
         );
+    }
+
+    public function writeContent(array $data, string $languageCode = null): bool
+    {
+        // write to file and memcached
+        return parent::writeContent($data, $languageCode) &&
+            $this->writeContentCache($data, $languageCode);
     }
 
     public function delete(bool $force = false): bool
@@ -140,17 +143,17 @@ trait PageHasBoost
 
         foreach (kirby()->languages() as $language) {
             $cache->remove(
-                $this->memcachedKey($language->code())
+                $this->contentBoostedKey($language->code()) . '-content'
             );
             $cache->remove(
-                $this->memcachedKey($language->code()).'-modified'
+                $this->contentBoostedKey($language->code()).'-modified'
             );
         }
         $cache->remove(
-            $this->memcachedKey()
+            $this->contentBoostedKey() . '-content'
         );
         $cache->remove(
-            $this->memcachedKey().'-modified'
+            $this->contentBoostedKey().'-modified'
         );
 
         return parent::delete($force);

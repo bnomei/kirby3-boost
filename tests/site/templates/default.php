@@ -24,9 +24,9 @@ bolt($page->id());
 var_dump(count(Bnomei\Bolt::toArray()));
 ?>
 
-<h3>memcachedKey</h3>
+<h3>contentBoostedKey</h3>
 <?php
-    $pmk = $page->memcachedKey();
+    $pmk = $page->contentBoostedKey();
     var_dump($pmk);
 ?>
 

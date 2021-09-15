@@ -1,7 +1,0 @@
-title: KQL Query
-
-fields:
-  json:
-    type: textarea
-    buttons: false
-    font: monospace

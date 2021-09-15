@@ -7,7 +7,7 @@
 [![Maintainability](https://flat.badgen.net/codeclimate/maintainability/bnomei/kirby3-boost)](https://codeclimate.com/github/bnomei/kirby3-boost) 
 [![Twitter](https://flat.badgen.net/badge/twitter/bnomei?color=66d9ef)](https://twitter.com/bnomei)
 
-Boost the speed of Kirby by having content files of pages (mem-)cached, with automatic unique ID, fast lookup and Tiny-URL.
+Boost the speed of Kirby by having content files of pages cached, with automatic unique ID, fast lookup and Tiny-URL.
 
 ## Commerical Usage
 
@@ -28,9 +28,9 @@ If you have a lot of page objects (1000+) with or without relations to each othe
 - It provides a very fast lookup for page objects via id, diruri or the unique id.
 - It provides you with a tiny-url for page objects that have an unique id.
 
-> This plugin is an enhanced combination of [Page Memcached](https://github.com/bnomei/kirby3-page-memcached), [AutoID](https://github.com/bnomei/kirby3-autoid/) and [Bolt](https://github.com/bnomei/kirby3-bolt). 
-
 ## Setup
+
+For each template you want to be cached you need to add the field to your blueprint AND use a model to add the content cache logic.
 
 **site/blueprints/pages/default.yml**
 ```yml
@@ -86,8 +86,30 @@ $page = boost($boostId); // will use fastest internally
 ```
 
 ### Modified timestamp from cache
+
+This will try to get the modified timestamp from cache. If the page object content can be cached but currently was not, it will force a content cache write. It will return the modified timestamp of a page object or if it does not exist it will return `null`.
+
 ```php
-$page = modified($somePageId);
+$page = modified($somePageId); // faster
+```
+
+### Debug === read from content file (not from cache)
+
+If you set Kirbys global debug option to `true` the plugin will not read the content cache but from the content file on disk. But it will write to the content cache so you can get debug messages if anything goes wrong with that process.
+
+### Forcing a content cache update
+
+You can force writing to the cache manually but doing that should not be necessary.
+
+```php
+// write content cache of a single page
+$page->boost();
+
+// write content cache of all pages in a Pages collection
+$page->children()->boost();
+
+// write content cache of all pages in site index
+site()->boost();
 ```
 
 ## Cache
@@ -96,28 +118,31 @@ $page = modified($somePageId);
 
 How much and if you gain anything regarding performance depends on the hardware. All your content files must fit within the memory limitation. If you run into errors consider increasing the server settings or choose a different cache driver.
 
-| Defaults for | Memcached | APCu | Redis | SQLite |
-|----|----|----|----|----|
-| max memory size | 64MB | 32MB | 0 (none) | 0 (none) |
-| size of key/value pair | 1MB | 4MB | 512MB | 0 (none) |
+| Defaults for | Memcached | APCu | Redis | MySQL | SQLite |
+|----|----|----|----|----|----|
+| max memory size | 64MB | 32MB | 0 (none) | 0 (none) | 0 (none) |
+| size of key/value pair | 1MB | 4MB | 512MB | 0 (none) | 0 (none) |
 
-Kirby has [built in support](https://getkirby.com/docs/reference/system/options/cache#cache-driver) for File, Apcu, Memcached and Memory. I have created additional cache drivers for [SQLite](https://github.com/bnomei/kirby3-sqlite-cachedriver) and [Redis](https://github.com/bnomei/kirby3-redis-cachedriver).
+Kirby has [built in support](https://getkirby.com/docs/reference/system/options/cache#cache-driver) for File, Apcu, Memcached and Memory. I have created additional cache drivers for [MySQL](https://github.com/bnomei/kirby3-mysql-cachedriver), [SQLite](https://github.com/bnomei/kirby3-sqlite-cachedriver) and [Redis](https://github.com/bnomei/kirby3-redis-cachedriver).
 
 ### Benchmark
 
 The included benchmark can help you make an educated guess which is the faster cache driver. The only way to make sure is measuring in production. 
-Be aware that this will create and remove 2000 items cached. The benchmark will try to perform as many get operations within given timeframe (default 2 seconds per cache). The higher results are better.
+Be aware that this will create and remove 1000 items cached. The benchmark will try to perform as many get operations within given timeframe (default 1 second per cache). The higher results are better.
 
 ```php
 // use helpers to generate caches to compare
 // rough performance level is based on my tests
 $caches = [
+    // better
     \Bnomei\BoostCache::memory(),    // 100
     \Bnomei\BoostCache::sqlite(),    //  80
     \Bnomei\BoostCache::apcu(),      //  40
+    \Bnomei\BoostCache::mysql(),     //  ??
     \Bnomei\BoostCache::redis(),     //  30
     \Bnomei\BoostCache::file(),      //  10
     \Bnomei\BoostCache::memcached(), //   4
+    // worse
 ];
 // run the benchmark
 var_dump(\Bnomei\CacheBenchmark::run($caches));
@@ -125,7 +150,15 @@ var_dump(\Bnomei\CacheBenchmark::run($caches));
 
 Memory Cache Driver will probably perform best but caches in memory only for current request and that is not really useful for this plugin. SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34).
 
-But do not take my word for it. Run the benchmark on your production server.
+> The MySQL Cache Driver is still in development but I expect it to on par with Redis and thus to be a lot SLOWER than the SQLite Cache Driver.
+
+You can find the benchmark and demos running on server sponsored by **Kirbyzone** here:
+- [Benchmark with all Drivers](https://kirby3-boost.bnomei.com)
+- [Demo using SQLite Cache Driver](https://kirby3-boost-sqlite.bnomei.com)
+- [Demo using MySQL Cache Driver](https://kirby3-boost-mysql.bnomei.com)
+- [Demo using Redis Cache Driver](https://kirby3-boost-redis.bnomei.com)
+
+But do not take my word for it. Download the plugin and run the benchmark on your production server.
 
 ### Config
 
@@ -144,7 +177,7 @@ return [
         'prefix'   => 'boost',
     ],
 
-    // example memached
+    // example memcached
     'bnomei.boost.cache' => [
         'type'     => 'memcached',
         'prefix'   => 'boost',
@@ -198,6 +231,14 @@ You can use this plugin instead of AutoID if you did not use autoid in site obje
 - Replace `autoid`/`AUTOID` in blueprint queries with `BOOSTID`
 - Replace calls to `autoid()` with `boost()` in php code
 - Replace `->fromAutoID()` with `->fromBoostID()` in php code
+
+## History
+
+This plugin is an enhanced combination of 
+- [Page Memcached](https://github.com/bnomei/kirby3-page-memcached), 
+- [Page SQLite](https://github.com/bnomei/kirby3-page-sqlite), 
+- [AutoID](https://github.com/bnomei/kirby3-autoid/) and 
+- [Bolt](https://github.com/bnomei/kirby3-bolt). 
 
 ## Disclaimer
 

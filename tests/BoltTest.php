@@ -1,9 +1,9 @@
 <?php
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/WithPages.php';
+require_once __DIR__ . '/WithPagesTest.php';
 
-class BoltTest extends WithPages
+class BoltTest extends WithPagesTest
 {
     public function testConstruct()
     {
@@ -11,6 +11,8 @@ class BoltTest extends WithPages
         $this->assertInstanceOf(Bnomei\Bolt::class, $bolt);
 
         $this->assertFalse(option('debug'));
+
+        $bolt->flush();
     }
 
     public function testFind()
@@ -52,7 +54,8 @@ class BoltTest extends WithPages
         $randomSibl = null;
         while ($randomSibl == null) {
             $randomPage = $this->randomPage();
-            $randomSibl = $randomPage->siblings()->count() ?
+            // has sibling and not under site
+            $randomSibl = $randomPage->siblings()->count() && $randomPage->parent() != null ?
                 $randomPage->siblings()->shuffle()->first() : null;
         }
         site()->prune();

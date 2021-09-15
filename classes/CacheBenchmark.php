@@ -10,7 +10,7 @@ use Kirby\Toolkit\Str;
 
 final class CacheBenchmark
 {
-    private static function benchmark($cache, int $seconds = 2, $count = 2000, $contentLength = 128): int
+    private static function benchmark($cache, int $seconds = 1, $count = 1000, $contentLength = 128): int
     {
         for ($i = 0; $i < $count; $i++) {
             $cache->set('CacheBenchmark-' . $i, Str::random($contentLength), 0);
@@ -34,7 +34,7 @@ final class CacheBenchmark
         return count($values);
     }
 
-    public static function run(array $caches = [], int $seconds = 2, $count = 2000, $contentLength = 128): array
+    public static function run(array $caches = [], int $seconds = 1, $count = 1000, $contentLength = 128): array
     {
         $caches = $caches ?? [ BoostCache::file() ];
 

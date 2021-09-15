@@ -43,6 +43,11 @@ Kirby::plugin('bnomei/boost', [
             'type' => 'file',
             'prefix'  => 'boost',
         ],
+        'fieldname' => [
+            'boostid',
+            // provide drop-in support for autoid (page objects only)
+            'autoid',
+        ],
         'expire' => 0,
         'index' => [
             'generator' => function (?string $seed = null) {
@@ -63,20 +68,26 @@ Kirby::plugin('bnomei/boost', [
         'bolt' => function (string $id) {
             return \Bnomei\Bolt::page($id, $this);
         },
-        'isBoosted' => function () {
-            /** @var $this \Bnomei\MemcachedPage */
+        'boost' => function () {
             return $this->hasBoost() === true &&
-                $this->isContentMemcached(kirby()->languageCode())
+                $this->writeContentCache(kirby()->languageCode());
+        },
+        'isBoosted' => function () {
+            return $this->hasBoost() === true &&
+                $this->isContentBoosted(kirby()->languageCode())
             ;
         },
         'boostIDField' => function () {
-            if ($this->boostid()->isNotEmpty()) {
-                return $this->boostid();
+            $fields = option('bnomei.boost.fieldname', []);
+            if (is_string($fields)) {
+                $fields = [$fields];
             }
-            // provide drop-in support for autoid (page objects only)
-            if ($this->autoid()->isNotEmpty()) {
-                return $this->autoid();
+            foreach ($fields as $field) {
+                if ($this->{$field}()->isNotEmpty()) {
+                    return $this->{$field}();
+                }
             }
+            // default
             return $this->boostid();
         },
         'BOOSTID' => function () { // casesensitive
@@ -91,6 +102,24 @@ Kirby::plugin('bnomei/boost', [
         },
         'tinyUrl' => function (): string {
             return $this->tinyurl();
+        },
+    ],
+    'pagesMethods' => [ // PAGES
+        'boost' => function () {
+            $count = 0;
+            foreach ($this as $page) {
+                $count += $page->boost() ? 1 : 0;
+            }
+            return $count;
+        },
+    ],
+    'siteMethods' => [
+        'boost' => function () {
+            $count = 0;
+            foreach (site()->index() as $page) {
+                $count += $page->boost() ? 1 : 0;
+            }
+            return $count;
         },
     ],
     'fieldMethods' => [
