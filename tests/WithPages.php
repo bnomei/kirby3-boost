@@ -74,14 +74,14 @@ abstract class WithPages extends TestCase
     public function testRelated()
     {
         $boostids = array_flip(site()->index()->filterBy('template', 'default')->toArray(function ($page) {
-                return $page->boostid()->value();
-            }));
+            return $page->boostid()->value();
+        }));
 
         $this->assertTrue(count($boostids) > 0);
         $this->assertTrue(site()->index()->count() > 0);
 
         kirby()->impersonate('kirby');
-        foreach(site()->index()->filterBy('template', 'default') as $page) {
+        foreach (site()->index()->filterBy('template', 'default') as $page) {
             if ($page->related()->isNotEmpty()) {
                 continue;
             }

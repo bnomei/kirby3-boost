@@ -1,7 +1,0 @@
-type: multiselect
-options: query
-max: 1
-query:
-  fetch: kirby.collection('planets')
-  text: "{{ page.title }}"
-  value: "{{ page.BOOSTID }}"

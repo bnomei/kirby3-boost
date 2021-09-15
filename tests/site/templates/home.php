@@ -5,12 +5,12 @@ $password = 'kirby3boost';
 /*
 $c = 10;
 while($c > 0) {
-	page('milkyway/solar-system/earth')->addSingle();	
-	page('milkyway/solar-system/earth')->addSingle();	
-	page('milkyway/solar-system/earth')->addSingle();	
-	page('milkyway/solar-system/earth')->addSingle();	
-	page('milkyway/solar-system/earth')->addFamily();	
-	$c--;
+    page('milkyway/solar-system/earth')->addSingle();
+    page('milkyway/solar-system/earth')->addSingle();
+    page('milkyway/solar-system/earth')->addSingle();
+    page('milkyway/solar-system/earth')->addSingle();
+    page('milkyway/solar-system/earth')->addFamily();
+    $c--;
 }
 
 page('humankind')->addAllHumans();
@@ -68,7 +68,7 @@ page('humankind')->addAllHumans();
 				</ul>
 				<div class="font-bold p-4 mt-12">Predefined queries</div>
 				<ul class="flex flex-wrap border-b border-blue-200">
-					<?php foreach(site()->children()->listed()->filterBy('template', 'kqlquery') as $q): ?>
+					<?php foreach (site()->children()->listed()->filterBy('template', 'kqlquery') as $q): ?>
 					<li class="flex-grow  sm:w-full border-t border-blue-200">
 						<button @click="input = $el.firstElementChild.text; fetchKQL(); $nextTick(() => { autosize() })"
 							class="hover:bg-blue-200 p-4 w-full text-left"

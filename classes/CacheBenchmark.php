@@ -40,7 +40,9 @@ final class CacheBenchmark
 
         $benchmarks = [];
         foreach ($caches as $cache) {
-            if (!$cache) continue;
+            if (!$cache) {
+                continue;
+            }
             $benchmarks[$cache::class] = static::benchmark($cache, $seconds, $count, $contentLength);
         }
 

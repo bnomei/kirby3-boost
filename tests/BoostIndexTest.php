@@ -29,7 +29,7 @@ final class BoostIndexTest extends WithPages
         //site()->prune();
 
         $this->assertEquals(
-            $randomPage->id(), 
+            $randomPage->id(),
             boost($randomPage->id())->id()
         );
     }
@@ -43,7 +43,7 @@ final class BoostIndexTest extends WithPages
         //site()->prune();
 
         $this->assertEquals(
-            $randomPage->id(), 
+            $randomPage->id(),
             boost($randomPage->boostIDField()->value())->id()
         );
     }
@@ -57,9 +57,9 @@ final class BoostIndexTest extends WithPages
         $randomPage = $this->randomPage();
         //site()->prune();
 
-        $this->assertTrue($randomPage->boostIDField()->isNotEmpty());    
-        $this->assertTrue($index->add($randomPage));    
-        //$index->write();  
+        $this->assertTrue($randomPage->boostIDField()->isNotEmpty());
+        $this->assertTrue($index->add($randomPage));
+        //$index->write();
         $this->assertCount(1, $index->toArray());
     }
 
@@ -72,7 +72,7 @@ final class BoostIndexTest extends WithPages
         //site()->prune();
 
         $this->assertEquals(
-            $randomPage->id(), 
+            $randomPage->id(),
             $randomPage->boostid()->fromBoostID()->id()
         );
     }

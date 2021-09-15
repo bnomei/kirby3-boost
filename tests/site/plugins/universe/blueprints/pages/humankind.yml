@@ -1,5 +1,0 @@
-title: Humankind
-
-fields:
-  humans:
-    extends: fields/humans

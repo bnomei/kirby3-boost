@@ -42,12 +42,11 @@
     "sort-packages": true
   },
   "require": {
-    "php": ">=7.3.0",
+    "php": ">=7.4.0",
     "bnomei/autoloader-for-kirby": "^1.2",
     "getkirby/composer-installer": "^1.2"
   },
   "require-dev": {
-    "fzaninotto/faker": "^1.9",
     "getkirby/cms": "^3.5",
     "php-coveralls/php-coveralls": "^2.4",
     "phpunit/phpunit": "^9.5"
@@ -79,6 +78,7 @@
     "kirby-cms-path": "tests/kirby"
   },
   "suggest": {
+    "bnomei/kirby3-universe-kit": "Content generator and simulation for Kirby based on humankind in space theme",
     "bnomei/kirby3-redis-cachedriver": "Redis based Cache-Driver",
     "bnomei/kirby3-sqlite-cachedriver": "SQLite based Cache-Driver",
     "bnomei/kirby3-lapse": "Cache any data until set expiration time (with automatic keys)",
