@@ -1,12 +1,18 @@
 <?php
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/WithPagesTest.php';
 
+use Kirby\Cms\Page;
 use Bnomei\BoostIndex;
+use PHPUnit\Framework\TestCase;
 
-final class BoostIndexTest extends WithPagesTest
+final class BoostIndexTest extends TestCase
 {
+    public function randomPage(): ?Page
+    {
+        return site()->index()->notTemplate('home')->shuffle()->first();
+    }
+
     public function testBoostModified()
     {
         $randomPage = $this->randomPage();

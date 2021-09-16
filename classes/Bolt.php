@@ -181,7 +181,6 @@ final class Bolt
                                 $template = str_replace('.' . $this->extension, '', $modelFile);
                                 $params['template'] = $template;
                                 $params['model'] = $template;
-                                var_dump('DOUNDdddxxx');
                                 break;
                             }
                         }

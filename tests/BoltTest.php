@@ -1,10 +1,17 @@
 <?php
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/WithPagesTest.php';
 
-class BoltTest extends WithPagesTest
+use PHPUnit\Framework\TestCase;
+use Kirby\Cms\Page;
+
+class BoltTest extends TestCase
 {
+    public function randomPage(): ?Page
+    {
+        return site()->index()->notTemplate('home')->shuffle()->first();
+    }
+
     public function testConstruct()
     {
         $bolt = new Bnomei\Bolt();

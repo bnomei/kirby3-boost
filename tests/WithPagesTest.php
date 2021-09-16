@@ -13,12 +13,12 @@ class WithPagesTest extends TestCase
      */
     private $depth;
 
-    public function setUp(): void
-    {
-        $this->setUpPages();
-    }
-
-    public function setUpPages(): void
+    /**
+     * Only test here will create all pages and set relations
+     *
+     * @group SetupPagesInSeperatePHPUnitRun
+     */
+    public function testSetUpPages(): void
     {
         $this->depth = 2;
 
@@ -27,6 +27,7 @@ class WithPagesTest extends TestCase
                 $this->createPage(site(), $i, $this->depth);
             }
         }
+        $this->assertTrue(site()->pages()->children()->notTemplate('home')->count() > 0);
     }
 
     public function createPage($parent, int $idx, int $depth = 3): Page
@@ -55,11 +56,6 @@ class WithPagesTest extends TestCase
         return $page;
     }
 
-    public function randomPage(): ?Page
-    {
-        return site()->index()->notTemplate('home')->shuffle()->first();
-    }
-
     public function tearDownPages(): void
     {
         kirby()->impersonate('kirby');
@@ -69,11 +65,6 @@ class WithPagesTest extends TestCase
         }
     }
 
-    /**
-     * Only test here will create all pages and set relations
-     *
-     * @group SetupPagesInSeperatePHPUnitRun
-     */
     public function testRelated()
     {
         $boostids = array_values(site()->index()->filterBy('template', 'default')->toArray(function ($page) {
