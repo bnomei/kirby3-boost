@@ -135,30 +135,47 @@ Be aware that this will create and remove 1000 items cached. The benchmark will 
 // rough performance level is based on my tests
 $caches = [
     // better
-    \Bnomei\BoostCache::memory(),    // 100
-    \Bnomei\BoostCache::sqlite(),    //  80
-    \Bnomei\BoostCache::apcu(),      //  40
-    \Bnomei\BoostCache::mysql(),     //  ??
-    \Bnomei\BoostCache::redis(),     //  30
-    \Bnomei\BoostCache::file(),      //  10
-    \Bnomei\BoostCache::memcached(), //   4
+    //\Bnomei\BoostCache::null(),
+    //\Bnomei\BoostCache::memory(),
+    \Bnomei\BoostCache::apcu(),      //  180
+    \Bnomei\BoostCache::sqlite(),    //  55
+    \Bnomei\BoostCache::file(),      //  44
+    \Bnomei\BoostCache::memcached(), //  14
+    \Bnomei\BoostCache::redis(),     //  11
+    //\Bnomei\BoostCache::mysql(),     //  ??
     // worse
 ];
 // run the benchmark
 var_dump(\Bnomei\CacheBenchmark::run($caches));
 ```
 
-Memory Cache Driver will probably perform best but caches in memory only for current request and that is not really useful for this plugin. SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34).
+- Memory Cache Driver and Null Cache Driver would perform best but it either caches in memory only for current request or not at all and that is not really useful for this plugin. 
+- APCu Cache can be expected to be very fast but one has to make sure all content fits into the memory limitations.
+- SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34).
+- The MySQL Cache Driver is still in development but I expect it to on par with Redis.
 
-> The MySQL Cache Driver is still in development but I expect it to on par with Redis and thus to be a lot SLOWER than the SQLite Cache Driver.
+But do not take my word for it. Download the plugin, set realistic benchmark options and run the benchmark on your production server.
+
+#### Demo Interactive
 
 You can find the benchmark and demos running on server sponsored by **Kirbyzone** here:
-- [Benchmark with all Drivers](https://kirby3-boost.bnomei.com)
-- [Demo using SQLite Cache Driver](https://kirby3-boost-sqlite.bnomei.com)
-- [Demo using MySQL Cache Driver](https://kirby3-boost-mysql.bnomei.com)
-- [Demo using Redis Cache Driver](https://kirby3-boost-redis.bnomei.com)
 
-But do not take my word for it. Download the plugin and run the benchmark on your production server.
+- [Benchmark with all Drivers](https://kirby3-boost.bnomei.com)
+- [Demo using APCu Cache Driver](https://kirby3-boost-apcu.bnomei.com)
+- [Demo using MySQL Cache Driver](https://kirby3-boost-mysql.bnomei.com)
+- [Demo using Null Cache Driver](https://kirby3-boost-null.bnomei.com). This setup behaves like without having the boost plugin active.
+- [Demo using Redis Cache Driver](https://kirby3-boost-redis.bnomei.com)
+- [Demo using SQLite Cache Driver](https://kirby3-boost-sqlite.bnomei.com)
+
+#### Demo Headless
+
+Queries are sent to the public API endpoint of the <a class="underline" href="https://github.com/getkirby/kql">KQL Plugin</a>. You can either use this interactive playground or a tool like HTTPie, Insomnia, PAW or Postman to connect to the API.
+
+**HTTPie examples**
+```shell
+http POST https://kirby3-boost.bnomei.com/benchmark --json
+http POST https://kirby3-boost-apcu.bnomei.com/api/query -a api@kirby3-boost.bnomei.com:kirby3boost < myquery.json
+```
 
 ### Config
 
