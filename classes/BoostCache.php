@@ -9,6 +9,7 @@ use Kirby\Cache\FileCache;
 use Kirby\Cache\ApcuCache;
 use Kirby\Cache\MemoryCache;
 use Kirby\Cache\MemCached;
+use Kirby\Cache\NullCache;
 
 final class BoostCache
 {
@@ -25,10 +26,16 @@ final class BoostCache
         return self::$singleton;
     }
 
+    public static function nulld(array $options = []): NullCache
+    {
+        return new NullCache(array_merge([
+        ], $options));
+    }
+
     public static function file(array $options = []): FileCache
     {
         return new FileCache(array_merge([
-            'root' => kirby()->cache('bnomei.boost')->root(),
+            'root' => kirby()->roots()->cache(),
             'prefix' => 'boost',
         ], $options));
     }

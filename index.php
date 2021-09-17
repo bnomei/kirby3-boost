@@ -40,7 +40,7 @@ if (! function_exists('boost')) {
 Kirby::plugin('bnomei/boost', [
     'options' => [
         'cache' => [
-            'type' => 'file',
+            'type' => 'null',
             'prefix'  => 'boost',
         ],
         'fieldname' => [

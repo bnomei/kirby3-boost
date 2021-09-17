@@ -8,7 +8,7 @@ use Kirby\Toolkit\Str;
 
 final class CacheBenchmark
 {
-    private static function benchmark($cache, int $seconds = 1, $count = 1000, $contentLength = 128, $writeRatio = 0.1): int
+    private static function benchmark($cache, int $seconds = 1, $count = 1000, $contentLength = 128, $writeRatio = 0.1): array
     {
         for ($i = 0; $i < $count; $i++) {
             $cache->set('CacheBenchmark-' . $i, Str::random($contentLength), 0);
@@ -16,14 +16,17 @@ final class CacheBenchmark
 
         $time = microtime(true);
         $gets = 0;
+        $sets = 0;
         $index = 0;
         $write = intval(ceil($count * $writeRatio));
         while ($time + $seconds > microtime(true)) {
             if ($v = $cache->get('CacheBenchmark-' . $index)) {
-                $gets++;
+                // $v
             }
+            $gets++; // count null caches and fails
             if ($index % $write === 0) {
                 $cache->set('CacheBenchmark-' . $i, Str::random($contentLength), 0);
+                $sets++;
             }
             $index++;
             if ($index >= $count) {
@@ -35,7 +38,11 @@ final class CacheBenchmark
             $cache->remove('CacheBenchmark-' . $i);
         }
 
-        return $gets;
+        return [
+            'gets' => $gets, 
+            'sets' => $sets,
+            'score' => 0, // will be created later
+        ];
     }
 
     public static function run(array $caches = [], int $seconds = 1, $count = 1000, $contentLength = 128, $writeRatio = 0.1): array
@@ -43,14 +50,41 @@ final class CacheBenchmark
         $caches = $caches ?? [ BoostCache::file() ];
 
         $benchmarks = [];
+        $highscore = 0;
         foreach ($caches as $cache) {
             if (!$cache) {
                 continue;
             }
-            $benchmarks[$cache::class] = static::benchmark($cache, $seconds, $count, $contentLength);
+            $benchmarks[$cache::class] = static::benchmark($cache, $seconds, $count, $contentLength, $writeRatio);
+            if ($benchmarks[$cache::class]['gets'] > $highscore) {
+                $highscore = $benchmarks[$cache::class]['gets'];
+            }
         }
 
-        asort($benchmarks);
-        return array_reverse($benchmarks, true); // DESC
+        $benchmarks = array_map(function($item) use ($highscore) {
+            $item['score'] = intval(ceil( $item['gets'] / $highscore * 100)). '/100';
+            return $item;
+        }, $benchmarks);
+
+        uasort($benchmarks, function ($a, $b) {
+            if ($a['gets'] < $b['gets']) {
+                return -1;
+            }
+            if ($a['gets'] > $b['gets']) {
+                return 1;
+            }
+            return 0;
+        });
+        $benchmarks = array_reverse($benchmarks, true); // DESC
+
+        return [
+            'options' => [
+               'seconds' => $seconds,
+               'count' => $count,
+               'contentLength' => $contentLength,
+               'writeRatio' => $writeRatio,
+            ],
+            'results' => $benchmarks,
+        ];
     }
 }
