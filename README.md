@@ -152,6 +152,7 @@ var_dump(\Bnomei\CacheBenchmark::run($caches));
 - Memory Cache Driver and Null Cache Driver would perform best but it either caches in memory only for current request or not at all and that is not really useful for this plugin. 
 - APCu Cache can be expected to be very fast but one has to make sure all content fits into the memory limitations.
 - SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34).
+- The File Cache Driver will perform decreasingly worse the more page objects you have. This is the only driver with this flaw.
 - The MySQL Cache Driver is still in development but I expect it to on par with Redis.
 
 But do not take my word for it. Download the plugin, set realistic benchmark options and run the benchmark on your production server.
@@ -163,7 +164,7 @@ You can find the benchmark and demos running on server sponsored by **Kirbyzone*
 - [Benchmark with all Drivers](https://kirby3-boost.bnomei.com)
 - [Demo using APCu Cache Driver](https://kirby3-boost-apcu.bnomei.com)
 - [Demo using MySQL Cache Driver](https://kirby3-boost-mysql.bnomei.com)
-- [Demo using Null Cache Driver](https://kirby3-boost-null.bnomei.com). This setup behaves like without having the boost plugin active.
+- [Demo using Null Cache Driver](https://kirby3-boost-null.bnomei.com). This setup behaves like having the boost plugin NOT active at all.
 - [Demo using Redis Cache Driver](https://kirby3-boost-redis.bnomei.com)
 - [Demo using SQLite Cache Driver](https://kirby3-boost-sqlite.bnomei.com)
 
