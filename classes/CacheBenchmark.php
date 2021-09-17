@@ -4,23 +4,27 @@ declare(strict_types=1);
 
 namespace Bnomei;
 
-use Kirby\Cache\FileCache;
-use Kirby\Cache\MemCached;
 use Kirby\Toolkit\Str;
 
 final class CacheBenchmark
 {
-    private static function benchmark($cache, int $seconds = 1, $count = 1000, $contentLength = 128): int
+    private static function benchmark($cache, int $seconds = 1, $count = 1000, $contentLength = 128, $writeRatio = 0.1): int
     {
         for ($i = 0; $i < $count; $i++) {
             $cache->set('CacheBenchmark-' . $i, Str::random($contentLength), 0);
         }
 
         $time = microtime(true);
-        $values = [];
+        $gets = 0;
         $index = 0;
+        $write = intval(ceil($count * $writeRatio));
         while ($time + $seconds > microtime(true)) {
-            $values[] = $cache->get(strval($index));
+            if ($v = $cache->get('CacheBenchmark-' . $index)) {
+                $gets++;
+            }
+            if ($index % $write === 0) {
+                $cache->set('CacheBenchmark-' . $i, Str::random($contentLength), 0);
+            }
             $index++;
             if ($index >= $count) {
                 $index = 0;
@@ -31,10 +35,10 @@ final class CacheBenchmark
             $cache->remove('CacheBenchmark-' . $i);
         }
 
-        return count($values);
+        return $gets;
     }
 
-    public static function run(array $caches = [], int $seconds = 1, $count = 1000, $contentLength = 128): array
+    public static function run(array $caches = [], int $seconds = 1, $count = 1000, $contentLength = 128, $writeRatio = 0.1): array
     {
         $caches = $caches ?? [ BoostCache::file() ];
 
