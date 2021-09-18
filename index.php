@@ -39,10 +39,7 @@ if (! function_exists('boost')) {
 
 Kirby::plugin('bnomei/boost', [
     'options' => [
-        'cache' => [
-            'type' => 'file',
-            'prefix'  => 'boost',
-        ],
+        'cache' => true,
         'fieldname' => [
             'boostid',
             // provide drop-in support for autoid (page objects only)
