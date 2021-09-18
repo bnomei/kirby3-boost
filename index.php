@@ -49,6 +49,7 @@ Kirby::plugin('bnomei/boost', [
             'autoid',
         ],
         'expire' => 0,
+        'fileModifiedCheck' => false, // expects file to not be altered outside of kirby
         'index' => [
             'generator' => function (?string $seed = null) {
                 // override with custom callback if needed
@@ -118,21 +119,11 @@ Kirby::plugin('bnomei/boost', [
             }
             return round(($time + microtime(true)) * 1000);
         },
-    ],
-    'siteMethods' => [
-        'boost' => function () {
-            $time = -microtime(true);
-            $count = 0;
-            foreach (site()->index() as $page) {
-                $count += $page->boost() ? 1 : 0;
-            }
-            return round(($time + microtime(true)) * 1000);
-        },
         'boostmark' => function (): array {
             $time = -microtime(true);
             $str = '';
             $count = 0;
-            foreach (site()->index() as $page) {
+            foreach ($this as $page) {
                 if ($page->hasBoost()) {
                     // uuid and a field to force reading from cache
                     $str .= $page->diruri() . $page->modified() . $page->boostIDField()->value();
@@ -144,6 +135,14 @@ Kirby::plugin('bnomei/boost', [
                 'count' => $count,
                 'checksum' => md5($str),
             ];
+        },
+    ],
+    'siteMethods' => [
+        'boost' => function () {
+            return site()->index()->boost();
+        },
+        'boostmark' => function () {
+            return site()->index()->boostmark();
         },
     ],
     'fieldMethods' => [

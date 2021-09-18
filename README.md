@@ -18,7 +18,7 @@ This plugin is free but if you use it in a commercial project please consider to
 
 ## Usecase
 
-If you have a lot of page objects (1000+) with or without relations to each other via unique ids then consider using this plugin. With less page objects you will propably not gain enough to justify the overhead.
+If you have to process within a single request a lot of page objects (1000+) or if you have a lot of relations between page objects to resolve then consider using this plugin. With less page objects you will propably not gain enough to justify the overhead.
 
 ## How does this plugin work?
 
@@ -254,6 +254,13 @@ Then comment out the forced cache update and run the benchmark that tracks how m
 var_dump(site()->boostmark());
 ```
 
+If you are interested in how fast a certain pages collection loads you can do that as well.
+
+```php
+// site()->boost();
+var_dump(page('blog/2021')->children()->listed()->boostmark());
+```
+
 ## Tiny-URL
 
 This plugin allows you to use the BoostID value in a shortend URL. It also registers a route to redirect from the shortend URL to the actual page. Retrieve the shortend URL it with the `tinyurl()` Page-Method. 
@@ -270,9 +277,14 @@ echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
 |---------------------------|----------------|---------------------------|
 | fieldname | `['boostid', 'autoid']` | change name of loaded fields |
 | expire | `0` | expire in minutes for all caches created |
+| fileModifiedCheck | `false` | expects file to not be altered outside of kirby |
 | index.generator | callback | the uuid genertor |
 | tinyurl.url | callback | returning `site()->url()`. Use htaccess on that domain to redirect `RewriteRule (.*) http://www.bnomei.com/x/$1 [R=301]` |
 | tinyurl.folder | `x` | Tinyurl format: yourdomain/{folder}/{hash} |
+
+## External changes to content files
+
+If your content file are written to by any other means than using Kirbys page object methods you need to enable the `bnomei.boost.fileModifiedCheck` option or overwrite the `checkModifiedTimestampForContentBoost(): bool` method on a model basis. This will reduce performance by about 1/3 but still be faster than without using a cache at all.
 
 ## Migration from AutoID
 

@@ -23,6 +23,11 @@ trait PageHasBoost
         return parent::create($props);
     }
 
+    public function checkModifiedTimestampForContentBoost(): bool
+    {
+        return option('bnomei.boost.fileModifiedCheck');
+    }
+
     public function hasBoost(): bool
     {
         return true;
@@ -86,8 +91,10 @@ trait PageHasBoost
 
     public function readContentCache(string $languageCode = null): ?array
     {
-        if ($this->isContentCacheExpiredByModified($languageCode)) {
-            return null;
+        if ($this->checkModifiedTimestampForContentBoost()) {
+            if ($this->isContentCacheExpiredByModified($languageCode)) {
+                return null;
+            }
         }
 
         return BoostCache::singleton()->get(
