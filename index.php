@@ -128,6 +128,23 @@ Kirby::plugin('bnomei/boost', [
             }
             return round(($time + microtime(true)) * 1000);
         },
+        'boostmark' => function (): array {
+            $time = -microtime(true);
+            $str = '';
+            $count = 0;
+            foreach (site()->index() as $page) {
+                if ($page->hasBoost()) {
+                    // uuid and a field to force reading from cache
+                    $str .= $page->diruri() . $page->modified() . $page->boostIDField()->value();
+                    $count++;
+                }
+            }
+            return [
+                'duration' => round(($time + microtime(true)) * 1000),
+                'count' => $count,
+                'checksum' => md5($str),
+            ];
+        },
     ],
     'fieldMethods' => [
         'fromBoostID' => function ($field): ?\Kirby\Cms\Page {

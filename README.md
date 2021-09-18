@@ -145,9 +145,16 @@ $caches = [
     // \Bnomei\BoostCache::mysql(),  //  ??
     // worse
 ];
-// run the benchmark
+
+// run the cachediver benchmark
 var_dump(\Bnomei\CacheBenchmark::run($caches, 1, 1000)); // a rough guess
 var_dump(\Bnomei\CacheBenchmark::run($caches, 1, site()->index()->count())); // more realistic
+
+// first make sure all boosted pages are up-to-date in cache
+// this can be skipped on next benchmark
+site()->boost();
+// run the boost pages benchmark
+var_dump(site()->boostmark());
 ```
 
 - Memory Cache Driver and Null Cache Driver would perform best but it either caches in memory only for current request or not at all and that is not really useful for this plugin. 
