@@ -36,21 +36,18 @@ final class BoostCache
     {
         return new FileCache(array_merge([
             'root' => kirby()->roots()->cache(),
-            'prefix' => 'boost',
         ], $options));
     }
 
     public static function apcu(array $options = []): ApcuCache
     {
         return new ApcuCache(array_merge([
-            'prefix' => 'boost',
         ], $options));
     }
 
     public static function memcached(array $options = []): MemCached
     {
         return new Memcached(array_merge([
-            'prefix' => 'boost',
             'host' => '127.0.0.1',
             'port' => 11211,
         ]));
@@ -59,7 +56,6 @@ final class BoostCache
     public static function memory(array $options = []): MemoryCache
     {
         return new MemoryCache(array_merge([
-            'prefix' => 'boost',
         ], $options));
     }
 
@@ -67,9 +63,17 @@ final class BoostCache
     {
         if (class_exists('Bnomei\\SQLiteCache')) {
             $feather = \Bnomei\SQLiteCache::singleton(array_merge([
-                'prefix' => 'boost',
             ], $options));
             return $feather;
+        }
+        return null;
+    }
+
+    public static function mysql(array $options = [])//: Cache
+    {
+        if (class_exists('Bnomei\\MySQLCache')) {
+            return \Bnomei\MySQLCache::singleton(array_merge([
+            ], $options));
         }
         return null;
     }
@@ -78,7 +82,6 @@ final class BoostCache
     {
         if (class_exists('Bnomei\\Redis')) {
             return new \Bnomei\Redis(array_merge([
-                'prefix' => 'boost',
                 'host'   => '127.0.0.1',
                 'port'   => 6379,
             ], $options));
