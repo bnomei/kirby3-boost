@@ -69,8 +69,13 @@ Kirby::plugin('bnomei/boost', [
             return \Bnomei\Bolt::page($id, $this);
         },
         'boost' => function () {
+            // has boost?
+            // needs write?
+            // then write
+            $lang = kirby()->languageCode();
             return $this->hasBoost() === true &&
-                $this->writeContentCache(kirby()->languageCode());
+                $this->isContentCacheExpiredByModified($lang) &&
+                $this->writeContentCache($lang);
         },
         'isBoosted' => function () {
             return $this->hasBoost() === true &&
@@ -106,20 +111,22 @@ Kirby::plugin('bnomei/boost', [
     ],
     'pagesMethods' => [ // PAGES
         'boost' => function () {
+            $time = -microtime(true);
             $count = 0;
             foreach ($this as $page) {
                 $count += $page->boost() ? 1 : 0;
             }
-            return $count;
+            return round(($time + microtime(true)) * 1000);
         },
     ],
     'siteMethods' => [
         'boost' => function () {
+            $time = -microtime(true);
             $count = 0;
             foreach (site()->index() as $page) {
                 $count += $page->boost() ? 1 : 0;
             }
-            return $count;
+            return round(($time + microtime(true)) * 1000);
         },
     ],
     'fieldMethods' => [

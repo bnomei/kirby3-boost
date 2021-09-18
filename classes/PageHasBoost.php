@@ -74,6 +74,9 @@ trait PageHasBoost
             $this->contentBoostedKey($languageCode).'-modified',
             null
         );
+        if (!$modifiedCache) {
+            return true;
+        }
         if ($modifiedCache && intval($modifiedCache) < intval($modified)) {
             return true;
         }

@@ -90,7 +90,7 @@ $page = boost($boostId); // will use fastest internally
 This will try to get the modified timestamp from cache. If the page object content can be cached but currently was not, it will force a content cache write. It will return the modified timestamp of a page object or if it does not exist it will return `null`.
 
 ```php
-$page = modified($somePageId); // faster
+$pageModifiedTimestampOrNull = modified($somePageId); // faster
 ```
 
 ### Debug === read from content file (not from cache)
@@ -99,17 +99,17 @@ If you set Kirbys global debug option to `true` the plugin will not read the con
 
 ### Forcing a content cache update
 
-You can force writing to the cache manually but doing that should not be necessary.
+You can force writing outdated values to the cache manually but doing that should not be necessary.
 
 ```php
 // write content cache of a single page
-$page->boost();
+$cachedYesOrNoAsBoolean = $page->boost();
 
 // write content cache of all pages in a Pages collection
-$page->children()->boost();
+$durationOfThisCacheIO = $page->children()->boost();
 
 // write content cache of all pages in site index
-site()->boost();
+$durationOfThisCacheIO = site()->boost();
 ```
 
 ## Cache
@@ -123,7 +123,7 @@ How much and if you gain anything regarding performance depends on the hardware.
 | max memory size | 64MB | 32MB | 0 (none) | 0 (none) | 0 (none) |
 | size of key/value pair | 1MB | 4MB | 512MB | 0 (none) | 0 (none) |
 
-Kirby has [built in support](https://getkirby.com/docs/reference/system/options/cache#cache-driver) for File, Apcu, Memcached and Memory. I have created additional cache drivers for [MySQL](https://github.com/bnomei/kirby3-mysql-cachedriver), [SQLite](https://github.com/bnomei/kirby3-sqlite-cachedriver) and [Redis](https://github.com/bnomei/kirby3-redis-cachedriver).
+Kirby has [built in support](https://getkirby.com/docs/reference/system/options/cache#cache-driver) for File, Apcu, Memcached and Memory. I have created additional cache drivers for [MySQL](https://github.com/bnomei/kirby3-mysql-cachedriver), [Redis](https://github.com/bnomei/kirby3-redis-cachedriver) and [SQLite](https://github.com/bnomei/kirby3-sqlite-cachedriver).
 
 ### Benchmark
 
@@ -135,29 +135,30 @@ Be aware that this will create and remove 1000 items cached. The benchmark will 
 // rough performance level is based on my tests
 $caches = [
     // better
-    //\Bnomei\BoostCache::null(),
-    //\Bnomei\BoostCache::memory(),
+    // \Bnomei\BoostCache::null(),
+    // \Bnomei\BoostCache::memory(),
     \Bnomei\BoostCache::apcu(),      //  180
     \Bnomei\BoostCache::sqlite(),    //  55
-    \Bnomei\BoostCache::file(),      //  44
+    // \Bnomei\BoostCache::file(),   //  44
     \Bnomei\BoostCache::memcached(), //  14
     \Bnomei\BoostCache::redis(),     //  11
-    //\Bnomei\BoostCache::mysql(),     //  ??
+    // \Bnomei\BoostCache::mysql(),  //  ??
     // worse
 ];
 // run the benchmark
-var_dump(\Bnomei\CacheBenchmark::run($caches));
+var_dump(\Bnomei\CacheBenchmark::run($caches, 1, 1000)); // a rough guess
+var_dump(\Bnomei\CacheBenchmark::run($caches, 1, site()->index()->count())); // more realistic
 ```
 
 - Memory Cache Driver and Null Cache Driver would perform best but it either caches in memory only for current request or not at all and that is not really useful for this plugin. 
 - APCu Cache can be expected to be very fast but one has to make sure all content fits into the memory limitations.
 - SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34).
-- The File Cache Driver will perform decreasingly worse the more page objects you have. This is the only driver with this flaw.
-- The MySQL Cache Driver is still in development but I expect it to on par with Redis.
+- The File Cache Driver will perform worse the more page objects you have. You are probably better of with no cache. This is the only driver with this flaw. Benchmarking this driver will also create a lot of file which in total might cause the script to exceed your php execution time.
+- The MySQL Cache Driver is still in development but I expect it to on par with Memcached and Redis.
 
 But do not take my word for it. Download the plugin, set realistic benchmark options and run the benchmark on your production server.
 
-#### Demo Interactive
+#### Interactive Demo
 
 You can find the benchmark and demos running on server sponsored by **Kirbyzone** here:
 
@@ -168,7 +169,7 @@ You can find the benchmark and demos running on server sponsored by **Kirbyzone*
 - [Demo using Redis Cache Driver](https://kirby3-boost-redis.bnomei.com)
 - [Demo using SQLite Cache Driver](https://kirby3-boost-sqlite.bnomei.com)
 
-#### Demo Headless
+#### Headless Demo
 
 Queries are sent to the public API endpoint of the <a class="underline" href="https://github.com/getkirby/kql">KQL Plugin</a>. You can either use this interactive playground or a tool like HTTPie, Insomnia, PAW or Postman to connect to the API.
 
@@ -189,18 +190,16 @@ Once you know which driver you want to use you can set the plugin cache options.
 return [
     // other options
 
-    // default is file cache driver
+    // default is file cache driver because it will always work
     'bnomei.boost.cache' => [
         'type'     => 'file',
         'prefix'   => 'boost',
     ],
 
-    // example memcached
+    // example apcu
     'bnomei.boost.cache' => [
-        'type'     => 'memcached',
+        'type'     => 'apcu',
         'prefix'   => 'boost',
-        'host'     => '127.0.0.1',
-        'port'     => 11211,
     ],
 
     // example sqlite
@@ -219,6 +218,14 @@ return [
         'port'     => function() { return env('REDIS_PORT'); },
         'database' => function() { return env('REDIS_DATABASE'); },
         'password' => function() { return env('REDIS_PASSWORD'); },
+    ],
+
+    // example memcached
+    'bnomei.boost.cache' => [
+        'type'     => 'memcached',
+        'prefix'   => 'boost',
+        'host'     => '127.0.0.1',
+        'port'     => 11211,
     ],
 ];
 ```
