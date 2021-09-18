@@ -149,12 +149,6 @@ $caches = [
 // run the cachediver benchmark
 var_dump(\Bnomei\CacheBenchmark::run($caches, 1, 1000)); // a rough guess
 var_dump(\Bnomei\CacheBenchmark::run($caches, 1, site()->index()->count())); // more realistic
-
-// first make sure all boosted pages are up-to-date in cache
-// this can be skipped on next benchmark
-site()->boost();
-// run the boost pages benchmark
-var_dump(site()->boostmark());
 ```
 
 - Memory Cache Driver and Null Cache Driver would perform best but it either caches in memory only for current request or not at all and that is not really useful for this plugin. 
@@ -165,9 +159,9 @@ var_dump(site()->boostmark());
 
 But do not take my word for it. Download the plugin, set realistic benchmark options and run the benchmark on your production server.
 
-#### Interactive Demo
+### Interactive Demo
 
-You can find the benchmark and demos running on server sponsored by **Kirbyzone** here:
+I created an interactive demo to compare various cache drivers and prove how much your website can be boosted. It kind of ended up as a love-letter to the <a class="underline" href="https://github.com/getkirby/kql">KQL Plugin</a> as well. You can find the benchmark and interactive demos running on server sponsored by **Kirbyzone** here:
 
 - [Benchmark with all Drivers](https://kirby3-boost.bnomei.com)
 - [Demo using APCu Cache Driver](https://kirby3-boost-apcu.bnomei.com)
@@ -176,14 +170,21 @@ You can find the benchmark and demos running on server sponsored by **Kirbyzone*
 - [Demo using Redis Cache Driver](https://kirby3-boost-redis.bnomei.com)
 - [Demo using SQLite Cache Driver](https://kirby3-boost-sqlite.bnomei.com)
 
-#### Headless Demo
+### Headless Demo
 
-Queries are sent to the public API endpoint of the <a class="underline" href="https://github.com/getkirby/kql">KQL Plugin</a>. You can either use this interactive playground or a tool like HTTPie, Insomnia, PAW or Postman to connect to the API.
+You can either use this interactive playground or a tool like HTTPie, Insomnia, PAW or Postman to connect to the public API of the demos. Queries are sent to the public API endpoint of the <a class="underline" href="https://github.com/getkirby/kql">KQL Plugin</a>. This means you can compare response times between cache drivers easily.
 
 **HTTPie examples**
 ```shell
+# get benchmark comparing the cachedrivers
 http POST https://kirby3-boost.bnomei.com/benchmark --json
+
+# get boostmark for a specific cache driver
+http POST https://kirby3-boost-apcu.bnomei.com/boostmark --json
+
+# compare apcu and sqlite
 http POST https://kirby3-boost-apcu.bnomei.com/api/query -a api@kirby3-boost.bnomei.com:kirby3boost < myquery.json
+http POST https://kirby3-boost-sqlite.bnomei.com/api/query -a api@kirby3-boost.bnomei.com:kirby3boost < myquery.json
 ```
 
 ### Config
@@ -235,6 +236,22 @@ return [
         'port'     => 11211,
     ],
 ];
+```
+
+### Verify with Boostmark
+
+First make sure all boosted pages are up-to-date in cache. Run this in a template or controller once.
+
+```php
+// this can be skipped on next benchmark
+site()->boost();
+```
+
+Then comment out the forced cache update and run the benchmark that tracks how many and how fast your content is loaded.
+
+```php
+// site()->boost();
+var_dump(site()->boostmark());
 ```
 
 ## Tiny-URL
