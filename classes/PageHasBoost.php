@@ -104,13 +104,15 @@ trait PageHasBoost
         // read from file and update boostedCache
         if (! $data) {
             $data = parent::readContent($languageCode);
-            $this->writeContentCache($data, $languageCode);
+            if ($data) {
+                $this->writeContentCache($data, $languageCode);
+            }
         }
 
         return $data;
     }
 
-    public function writeContentCache(array $data, string $languageCode = null): bool
+    public function writeContentCache(?array $data = null, string $languageCode = null): bool
     {
         $cache = BoostCache::singleton();
         if (! $cache) {
