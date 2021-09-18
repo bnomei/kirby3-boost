@@ -18,7 +18,7 @@ final class CacheBenchmark
         $gets = 0;
         $sets = 0;
         $index = 0;
-        $write = intval(ceil($count / ($count * $writeRatio));
+        $write = intval(ceil($count / ($count * $writeRatio)));
         while ($time + $seconds > microtime(true)) {
             if ($v = $cache->get('CacheBenchmark-' . $index)) {
                 // $v
