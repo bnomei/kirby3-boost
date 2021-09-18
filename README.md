@@ -199,29 +199,26 @@ return [
     // other options
 
     // default is file cache driver because it will always work
+    // but performance is not great so set to something else please
     'bnomei.boost.cache' => [
         'type'     => 'file',
-        'prefix'   => 'boost',
     ],
 
     // example apcu
     'bnomei.boost.cache' => [
         'type'     => 'apcu',
-        'prefix'   => 'boost',
     ],
 
     // example sqlite
     // https://github.com/bnomei/kirby3-sqlite-cachedriver
     'bnomei.boost.cache' => [
         'type'     => 'sqlite',
-        'prefix'   => 'boost',
     ],
 
     // example redis
     // https://github.com/bnomei/kirby3-redis-cachedriver
     'bnomei.boost.cache' => [
         'type'     => 'redis',
-        'prefix'   => 'boost',
         'host'     => function() { return env('REDIS_HOST'); },
         'port'     => function() { return env('REDIS_PORT'); },
         'database' => function() { return env('REDIS_DATABASE'); },
@@ -231,7 +228,6 @@ return [
     // example memcached
     'bnomei.boost.cache' => [
         'type'     => 'memcached',
-        'prefix'   => 'boost',
         'host'     => '127.0.0.1',
         'port'     => 11211,
     ],
