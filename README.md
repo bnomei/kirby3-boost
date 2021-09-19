@@ -1,4 +1,4 @@
-# :rocket: Kirby3 Boost <br> up to 300% faster content loading
+# :rocket: Kirby3 Boost <br>⏱️ up to 300% faster content loading<br>🎣 fastest page lookup and resolution of relations
 
 ![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-boost?color=ae81ff)
 ![Downloads](https://flat.badgen.net/packagist/dt/bnomei/kirby3-boost?color=272822)
@@ -11,10 +11,16 @@ Boost the speed of Kirby by having content files of pages cached, with automatic
 
 ## Commerical Usage
 
+> <br>
+> Support open source! Help me feed my family! Thanks.<br>
+> &dash; Bruno<br>
+> &nbsp;
+
 This plugin is free but if you use it in a commercial project please consider to 
 - [make a donation 🍻🍻🍻](https://www.paypal.me/bnomei/15) or
 - [buy me ☕☕☕](https://buymeacoff.ee/bnomei) or
 - [buy a Kirby license using this affiliate link](https://a.paddle.com/v2/click/1129/35731?link=1170)
+
 
 ## Usecase
 
