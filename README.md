@@ -229,6 +229,8 @@ Once you know which driver you want to use you can set the plugin cache options.
 
 return [
     // other options
+    // like Pages Cache
+    // cache type for each plugin you use like the Laspe plugin
 
     // default is file cache driver because it will always work
     // but performance is not great so set to something else please
