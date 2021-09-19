@@ -115,7 +115,7 @@ $pageModifiedTimestampOrNull = modified($somePageId); // faster
 
 ## Caches and Cache Drivers
 
-Kirby has a few usecased for caches in general.
+Within Kirby caches can be used for:
 
 - Kirbys own [Pages Cache](https://getkirby.com/docs/guide/cache#caching-pages) to cache fully rendered HTML code
 - Plugin Caches for each individual plugin
@@ -123,13 +123,13 @@ Kirby has a few usecased for caches in general.
 - Partial Caches like my helper plugin called [Lapse](https://github.com/bnomei/kirby3-lapse)
 - Configuration Caches are not supported [yet](https://kirby.nolt.io/328)
 
-To optimize performance it would make sense to use the same cache driver for all of these.
+To optimize performance it would make sense to use the **same** cache driver for all of these. A cache driver is a piece of code that defines where get/set commands for the key/value store of the cache are directed to. Kirby has [built in support](https://getkirby.com/docs/reference/system/options/cache#cache-driver) for File, Apcu, Memcached and Memory. I have created additional cache drivers for [MySQL ](https://github.com/bnomei/kirby3-mysql-cachedriver), [Redis](https://github.com/bnomei/kirby3-redis-cachedriver) and [SQLite](https://github.com/bnomei/kirby3-sqlite-cachedriver).
 
 ### TL;DR
 
 If you have APCu cache available and your content fits into the defined memory limit use the `apcu` cache driver.
 
-### Debug === read from content file (not from cache)
+### Debug = read from content file (not from cache)
 
 If you set Kirbys global debug option to `true` the plugin will not read the content cache but from the content file on disk. But it will write to the content cache so you can get debug messages if anything goes wrong with that process.
 
@@ -156,8 +156,6 @@ How much and if you gain anything regarding performance depends on the hardware.
 |----|----|----|----|----|----|
 | max memory size | 64MB | 32MB | 0 (none) | 0 (none) | 0 (none) |
 | size of key/value pair | 1MB | 4MB | 512MB | 0 (none) | 0 (none) |
-
-Kirby has [built in support](https://getkirby.com/docs/reference/system/options/cache#cache-driver) for File, Apcu, Memcached and Memory. I have created additional cache drivers for [MySQL](https://github.com/bnomei/kirby3-mysql-cachedriver), [Redis](https://github.com/bnomei/kirby3-redis-cachedriver) and [SQLite](https://github.com/bnomei/kirby3-sqlite-cachedriver).
 
 ### Benchmark
 
