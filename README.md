@@ -58,6 +58,8 @@ fields:
     extends: fields/boostidpages
 ```
 
+> You can create your own fields for related pages [based on the ones this plugins provides](https://github.com/bnomei/kirby3-boost/tree/main/blueprints/fields).
+
 **site/models/default.php**
 ```php
 class DefaultPage extends \Kirby\Cms\Page
@@ -91,6 +93,17 @@ $page = boost($somePageDirUri); // fastest
 $page = boost($boostId); // will use fastest internally
 ```
 
+### Resolving relations
+Fields where defined in the example blueprint above.
+
+```php
+// one
+$pageOrNull = $page->one_relation()->fromBoostID();
+
+// many
+$pagesCollectionOrNull = $page->many_related()->fromBoostIDs();
+```
+
 ### Modified timestamp from cache
 
 This will try to get the modified timestamp from cache. If the page object content can be cached but currently was not, it will force a content cache write. It will return the modified timestamp of a page object or if it does not exist it will return `null`.
@@ -98,6 +111,12 @@ This will try to get the modified timestamp from cache. If the page object conte
 ```php
 $pageModifiedTimestampOrNull = modified($somePageId); // faster
 ```
+
+## Cache
+
+### TL;DR
+
+If you have APCu cache available and your content fits into the defined memory limit use the `apcu` cache driver.
 
 ### Debug === read from content file (not from cache)
 
@@ -117,8 +136,6 @@ $durationOfThisCacheIO = $page->children()->boost();
 // write content cache of all pages in site index
 $durationOfThisCacheIO = site()->boost();
 ```
-
-## Cache
 
 ### Limitations
 
