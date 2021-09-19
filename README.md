@@ -1,4 +1,4 @@
-# Kirby3 Boost
+# :rocket: Kirby3 Boost <br> up to 300% faster content loading
 
 ![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-boost?color=ae81ff)
 ![Downloads](https://flat.badgen.net/packagist/dt/bnomei/kirby3-boost?color=272822)
