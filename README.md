@@ -12,7 +12,7 @@ Boost the speed of Kirby by having content files of pages cached, with automatic
 ## Commerical Usage
 
 > <br>
-><b>Support open source!</b><br><br>
+> <b>Support open source!</b><br><br>
 > This plugin is free but if you use it in a commercial project please consider to sponsor me or make a donation.<br>
 > If my work helped you to make some cash it seems fair to me that I might get a little reward as well, right?<br><br>
 > Be kind. Share a little. Thanks.<br><br>
