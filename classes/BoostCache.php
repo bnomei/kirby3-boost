@@ -28,14 +28,14 @@ final class BoostCache
 
     public static function beginTransaction()
     {
-        if(is_callable([self::singleton(), 'beginTransaction'])) {
+        if (is_callable([self::singleton(), 'beginTransaction'])) {
             self::singleton()->beginTransaction();
         }
     }
 
     public static function endTransaction()
     {
-        if(is_callable([self::singleton(), 'endTransaction'])) {
+        if (is_callable([self::singleton(), 'endTransaction'])) {
             self::singleton()->endTransaction();
         }
     }

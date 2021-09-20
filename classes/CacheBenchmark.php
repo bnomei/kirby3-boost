@@ -10,6 +10,10 @@ final class CacheBenchmark
 {
     private static function benchmark($cache, int $seconds = 1, $count = 1000, $contentLength = 128, $writeRatio = 0.1): array
     {
+        if (is_callable([$cache, 'beginTransaction'])) {
+            $cache->beginTransaction();
+        }
+
         for ($i = 0; $i < $count; $i++) {
             $cache->set('CacheBenchmark-' . $i, Str::random($contentLength), 0);
         }
@@ -38,8 +42,12 @@ final class CacheBenchmark
             $cache->remove('CacheBenchmark-' . $i);
         }
 
+        if (is_callable([$cache, 'endTransaction'])) {
+            $cache->endTransaction();
+        }
+
         return [
-            'gets' => $gets, 
+            'gets' => $gets,
             'sets' => $sets,
             'score' => 0, // will be created later
         ];
@@ -61,8 +69,8 @@ final class CacheBenchmark
             }
         }
 
-        $benchmarks = array_map(function($item) use ($highscore) {
-            $item['score'] = intval(ceil( $item['gets'] / $highscore * 100)). '/100';
+        $benchmarks = array_map(function ($item) use ($highscore) {
+            $item['score'] = intval(ceil($item['gets'] / $highscore * 100)). '/100';
             return $item;
         }, $benchmarks);
 
