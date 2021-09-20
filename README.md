@@ -313,6 +313,7 @@ echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
 | index.generator | callback | the uuid genertor |
 | tinyurl.url | callback | returning `site()->url()`. Use htaccess on that domain to redirect `RewriteRule (.*) http://www.bnomei.com/x/$1 [R=301]` |
 | tinyurl.folder | `x` | Tinyurl format: yourdomain/{folder}/{hash} |
+| updateIndexWithHooks | `true` | disable this when batch creating lots of pages |
 
 ## External changes to content files
 

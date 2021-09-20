@@ -26,6 +26,20 @@ final class BoostCache
         return self::$singleton;
     }
 
+    public static function beginTransaction()
+    {
+        if(is_callable([self::singleton(), 'beginTransaction'])) {
+            self::singleton()->beginTransaction();
+        }
+    }
+
+    public static function endTransaction()
+    {
+        if(is_callable([self::singleton(), 'endTransaction'])) {
+            self::singleton()->endTransaction();
+        }
+    }
+
     public static function nulld(array $options = []): NullCache
     {
         return new NullCache(array_merge([
