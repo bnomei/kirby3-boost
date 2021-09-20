@@ -115,6 +115,8 @@ $pageModifiedTimestampOrNull = modified($somePageId); // faster
 
 ## Caches and Cache Drivers
 
+A cache driver is a piece of code that defines where get/set commands for the key/value store of the cache are directed to. Kirby has [built in support](https://getkirby.com/docs/reference/system/options/cache#cache-driver) for File, Apcu, Memcached and Memory. I have created additional cache drivers for [MySQL ](https://github.com/bnomei/kirby3-mysql-cachedriver), [Redis](https://github.com/bnomei/kirby3-redis-cachedriver) and [SQLite](https://github.com/bnomei/kirby3-sqlite-cachedriver).
+
 Within Kirby caches can be used for:
 
 - Kirbys own [Pages Cache](https://getkirby.com/docs/guide/cache#caching-pages) to cache fully rendered HTML code
@@ -123,7 +125,7 @@ Within Kirby caches can be used for:
 - Partial Caches like my helper plugin called [Lapse](https://github.com/bnomei/kirby3-lapse)
 - Configuration Caches are not supported [yet](https://kirby.nolt.io/328)
 
-To optimize performance it would make sense to use the **same** cache driver for all of these. A cache driver is a piece of code that defines where get/set commands for the key/value store of the cache are directed to. Kirby has [built in support](https://getkirby.com/docs/reference/system/options/cache#cache-driver) for File, Apcu, Memcached and Memory. I have created additional cache drivers for [MySQL ](https://github.com/bnomei/kirby3-mysql-cachedriver), [Redis](https://github.com/bnomei/kirby3-redis-cachedriver) and [SQLite](https://github.com/bnomei/kirby3-sqlite-cachedriver).
+To optimize performance it would make sense to use the **same** cache driver for all but the Pages Cache. The Pages Cache is better of in a file cache than anywhere else.
 
 ### TL;DR
 
