@@ -1,4 +1,4 @@
-# :rocket: Kirby3 Boost <br>⏱️ up to 300% faster content loading<br>🎣 fastest page lookup and resolution of relations
+# :rocket: Kirby3 Boost <br>⏱️ up to 3x faster content loading<br>🎣 fastest page lookup and resolution of relations
 
 ![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-boost?color=ae81ff)
 ![Downloads](https://flat.badgen.net/packagist/dt/bnomei/kirby3-boost?color=272822)
@@ -171,11 +171,11 @@ $caches = [
     // better
     // \Bnomei\BoostCache::null(),
     // \Bnomei\BoostCache::memory(),
-    \Bnomei\BoostCache::apcu(),      //  180
-    \Bnomei\BoostCache::sqlite(),    //  55
+    \Bnomei\BoostCache::apcu(),      // 118
+    \Bnomei\BoostCache::sqlite(),    //  60
+    \Bnomei\BoostCache::redis(),     //  57
     // \Bnomei\BoostCache::file(),   //  44
-    \Bnomei\BoostCache::memcached(), //  14
-    \Bnomei\BoostCache::redis(),     //  11
+    \Bnomei\BoostCache::memcached(), //  11
     // \Bnomei\BoostCache::mysql(),  //  ??
     // worse
 ];
@@ -187,9 +187,10 @@ var_dump(\Bnomei\CacheBenchmark::run($caches, 1, site()->index()->count())); // 
 
 - Memory Cache Driver and Null Cache Driver would perform best but it either caches in memory only for current request or not at all and that is not really useful for this plugin. 
 - APCu Cache can be expected to be very fast but one has to make sure all content fits into the memory limitations.
-- SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34).
+- SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34). Content will be written using transactions.
+- My Redis Cache Driver has smart preloading using the very fast Redis pipeline and will write changes using transactions.
 - The File Cache Driver will perform worse the more page objects you have. You are probably better of with no cache. This is the only driver with this flaw. Benchmarking this driver will also create a lot of file which in total might cause the script to exceed your php execution time.
-- The MySQL Cache Driver is still in development but I expect it to on par with Memcached and Redis.
+- The MySQL Cache Driver is still in development but I expect it to on par with SQLite and Redis.
 
 But do not take my word for it. Download the plugin, set realistic benchmark options and run the benchmark on your production server.
 
