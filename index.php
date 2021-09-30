@@ -100,8 +100,14 @@ Kirby::plugin('bnomei/boost', [
             return $this->boostid();
         },
         'BOOSTID' => function () { // casesensitive
-            \Bnomei\BoostIndex::singleton()->add($this);
+            $this->boostIndexAdd();
             return $this->boostIDField()->value();
+        },
+        'boostIndexAdd' => function () {
+            return Bnomei\BoostIndex::singleton()->add($this);
+        },
+        'boostIndexRemove' => function () {
+           return \Bnomei\BoostIndex::singleton()->remove($this);
         },
         'tinyurl' => function (): string {
             if ($url = \Bnomei\BoostIndex::tinyurl($this->boostIDField())) {
@@ -122,6 +128,20 @@ Kirby::plugin('bnomei/boost', [
                 $count += $page->boost() ? 1 : 0;
             }
             \Bnomei\BoostCache::endTransaction();
+            return round(($time + microtime(true)) * 1000);
+        },
+        'boostIndexAdd' => function () {
+            $time = -microtime(true);
+            foreach ($this as $page) {
+                \Bnomei\BoostIndex::singleton()->add($page);
+            }
+            return round(($time + microtime(true)) * 1000);
+        },
+        'boostIndexRemove' => function () {
+            $time = -microtime(true);
+            foreach ($this as $page) {
+                \Bnomei\BoostIndex::singleton()->remove($page);
+            }
             return round(($time + microtime(true)) * 1000);
         },
         'boostmark' => function (): array {
@@ -185,9 +205,9 @@ Kirby::plugin('bnomei/boost', [
                 'action' => function ($boostid) {
                     $page = boost($boostid);
                     if ($page) {
-                        return \go($page->url(), 302);
+                        return die(\Kirby\Cms\Response::redirect($page->url(), 302));
                     }
-                    return \go(site()->errorPage()->url(), 404);
+                    return die(\Kirby\Cms\Response::redirect(site()->errorPage()->url(), 404));
                 },
             ],
         ];
@@ -197,16 +217,14 @@ Kirby::plugin('bnomei/boost', [
             if ($page->hasBoost() === true) {
                 $page = $page->forceNewBoostId();
                 if (option('bnomei.boost.updateIndexWithHooks')) {
-                    \Bnomei\BoostIndex::singleton()->add($page);
-                    \Bnomei\BoostIndex::singleton()->write();
+                    $page->boostIndexAdd();
                 }
             }
         },
         'page.update:after' => function ($newPage, $oldPage) {
             if ($newPage->hasBoost() === true) {
                 if (option('bnomei.boost.updateIndexWithHooks')) {
-                    \Bnomei\BoostIndex::singleton()->add($newPage);
-                    \Bnomei\BoostIndex::singleton()->write();
+                    $newPage->boostIndexAdd();
                 }
             }
         },
@@ -214,40 +232,39 @@ Kirby::plugin('bnomei/boost', [
             if ($duplicatePage->hasBoost() === true) {
                 $duplicatePage = $duplicatePage->forceNewBoostId();
                 if (option('bnomei.boost.updateIndexWithHooks')) {
-                    \Bnomei\BoostIndex::singleton()->add($duplicatePage);
-                    \Bnomei\BoostIndex::singleton()->write();
+                    $duplicatePage->boostIndexAdd();
                 }
             }
         },
         'page.changeNum:after' => function ($newPage, $oldPage) {
             if ($newPage->hasBoost() === true) {
                 if (option('bnomei.boost.updateIndexWithHooks')) {
-                    \Bnomei\BoostIndex::singleton()->index(true);
-                    \Bnomei\BoostIndex::singleton()->write();
+                    $newPage->boostIndexAdd();
+                    $newPage->children()->boostIndexAdd();
                 }
             }
         },
         'page.changeSlug:after' => function ($newPage, $oldPage) {
             if ($newPage->hasBoost() === true) {
                 if (option('bnomei.boost.updateIndexWithHooks')) {
-                    \Bnomei\BoostIndex::singleton()->index(true);
-                    \Bnomei\BoostIndex::singleton()->write();
+                    $newPage->boostIndexAdd();
+                    $newPage->children()->boostIndexAdd();
                 }
             }
         },
         'page.changeStatus:after' => function ($newPage, $oldPage) {
             if ($newPage->hasBoost() === true) {
                 if (option('bnomei.boost.updateIndexWithHooks')) {
-                    \Bnomei\BoostIndex::singleton()->index(true);
-                    \Bnomei\BoostIndex::singleton()->write();
+                    $newPage->boostIndexAdd();
+                    $newPage->children()->boostIndexAdd();
                 }
             }
         },
         'page.delete:after' => function ($page, $force) {
             if ($page->hasBoost() === true) {
                 if (option('bnomei.boost.updateIndexWithHooks')) {
-                    \Bnomei\BoostIndex::singleton()->index(true);
-                    \Bnomei\BoostIndex::singleton()->write();
+                    $page->boostIndexRemove();
+                    $page->children()->boostIndexRemove();
                 }
             }
         },
