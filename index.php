@@ -82,12 +82,20 @@ Kirby::plugin('bnomei/boost', [
             }
             return true;
         },
+        'unboost' => function () {
+            // has boost?
+            if ($this->hasBoost() === false) {
+                return false;
+            }
+            $this->boostIndexRemove();
+            return $this->deleteContentCache();
+        },
         'isBoosted' => function () {
             // has boost?
             if ($this->hasBoost() === false) {
                 return false;
             }
-            $this->boostIndexAdd();
+            // $this->boostIndexAdd(); // this would trigger content add
             return $this->isContentBoosted(kirby()->languageCode());
         },
         'boostIDField' => function () {
@@ -135,6 +143,16 @@ Kirby::plugin('bnomei/boost', [
             \Bnomei\BoostCache::endTransaction();
             return round(($time + microtime(true)) * 1000);
         },
+        'unboost' => function () {
+            $time = -microtime(true);
+            $count = 0;
+            \Bnomei\BoostCache::beginTransaction();
+            foreach ($this as $page) {
+                $count += $page->unboost() ? 1 : 0;
+            }
+            \Bnomei\BoostCache::endTransaction();
+            return round(($time + microtime(true)) * 1000);
+        },
         'boostIndexAdd' => function () {
             $time = -microtime(true);
             foreach ($this as $page) {
@@ -158,6 +176,7 @@ Kirby::plugin('bnomei/boost', [
                 if ($page->hasBoost()) {
                     // uuid and a field to force reading from cache
                     $str .= $page->diruri() . $page->modified() . $page->boostIDField()->value();
+                    $page->boostIndexAdd();
                     $count++;
                 }
             }

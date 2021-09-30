@@ -146,11 +146,11 @@ trait PageHasBoost
             $this->writeContentCache($data, $languageCode);
     }
 
-    public function delete(bool $force = false): bool
+    public function deleteContentCache(): bool
     {
         $cache = BoostCache::singleton();
         if (! $cache) {
-            return parent::delete($force);
+            return true;
         }
 
         foreach (kirby()->languages() as $language) {
@@ -167,6 +167,18 @@ trait PageHasBoost
         $cache->remove(
             $this->contentBoostedKey().'-modified'
         );
+
+        return true;
+    }
+
+    public function delete(bool $force = false): bool
+    {
+        $cache = BoostCache::singleton();
+        if (! $cache) {
+            return parent::delete($force);
+        }
+
+        $this->deleteContentCache();
 
         return parent::delete($force);
     }

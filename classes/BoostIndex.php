@@ -137,6 +137,11 @@ final class BoostIndex
         return $this->index;
     }
 
+    public function count(): int
+    {
+        return count($this->index);
+    }
+
     private static $singleton;
     public static function singleton(): self
     {
