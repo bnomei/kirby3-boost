@@ -72,6 +72,7 @@ Kirby::plugin('bnomei/boost', [
             if ($this->hasBoost() === false) {
                 return false;
             }
+            $this->boostIndexAdd();
             // needs write?
             $lang = kirby()->languageCode();
             $content = $this->readContentCache($lang);
@@ -82,9 +83,12 @@ Kirby::plugin('bnomei/boost', [
             return true;
         },
         'isBoosted' => function () {
-            return $this->hasBoost() === true &&
-                $this->isContentBoosted(kirby()->languageCode())
-            ;
+            // has boost?
+            if ($this->hasBoost() === false) {
+                return false;
+            }
+            $this->boostIndexAdd();
+            return $this->isContentBoosted(kirby()->languageCode());
         },
         'boostIDField' => function () {
             $fields = option('bnomei.boost.fieldname', []);
@@ -110,7 +114,8 @@ Kirby::plugin('bnomei/boost', [
             return \Bnomei\BoostIndex::singleton()->remove($this);
         },
         'tinyurl' => function (): string {
-            if ($url = \Bnomei\BoostIndex::tinyurl($this->boostIDField())) {
+            if ($this->hasBoost() && $url = \Bnomei\BoostIndex::tinyurl($this->boostIDField())) {
+                $this->boostIndexAdd();
                 return $url;
             }
             return site()->errorPage()->url();
@@ -183,7 +188,6 @@ Kirby::plugin('bnomei/boost', [
                     $pages[] = $page;
                 }
             }
-
             return count($pages) ? new \Kirby\Cms\Pages($pages) : null;
         },
     ],
