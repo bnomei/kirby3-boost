@@ -30,6 +30,11 @@ final class BoostIndex
         }
     }
 
+    public function __destruct()
+    {
+       $this->write();
+    }
+
     private function cache()
     {
         return BoostCache::singleton();
