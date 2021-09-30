@@ -176,6 +176,6 @@ final class BoostIndex
 
     public static function page(string $id): ?Page
     {
-        return static::singleton()->findByBoostId($id);
+        return static::singleton()->findByBoostId($id, false);
     }
 }
