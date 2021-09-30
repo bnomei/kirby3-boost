@@ -95,6 +95,7 @@ final class BoostIndex
                 $page->boostIndexAdd();
                 return $page;
             } elseif ($throwException) {
+                $this->write();
                 throw new \Exception("No page found for BoostID: " . $boostid);
             }
         }
