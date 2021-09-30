@@ -69,7 +69,7 @@ class WithPagesTest extends TestCase
     {
         $boostids = [];
 
-        foreach(site()->index()->filterBy('template', 'default') as $page) {
+        foreach (site()->index()->filterBy('template', 'default') as $page) {
             $boostids[$page->boostid()->value()] = $page->diruri();
         };
 
