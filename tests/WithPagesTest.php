@@ -67,9 +67,11 @@ class WithPagesTest extends TestCase
 
     public function testRelated()
     {
-        $boostids = array_values(site()->index()->filterBy('template', 'default')->toArray(function ($page) {
-            return $page->boostid()->value();
-        }));
+        $boostids = [];
+
+        foreach(site()->index()->filterBy('template', 'default') as $page) {
+            $boostids[$page->boostid()->value()] = $page->diruri();
+        };
 
         $this->assertTrue(count($boostids) > 0);
         $this->assertTrue(site()->index()->count() > 1); // not just home
