@@ -14,7 +14,7 @@ trait PageHasBoost
         if (!A::get($props['content'], 'boostid')) {
             $boostid = option('bnomei.boost.index.generator')();
             // make 100% sure its unique
-            while (BoostIndex::singleton()->findByBoostId($boostid)) {
+            while (BoostIndex::singleton()->findByBoostId($boostid, false)) {
                 $boostid = option('bnomei.boost.index.generator')();
             }
             $props['content']['boostid'] = $boostid;
@@ -43,7 +43,7 @@ trait PageHasBoost
         if ($this->boostIDField()->isEmpty()) {
             $boostid = $id ?? option('bnomei.boost.index.generator')();
             // make 100% sure its unique
-            while (BoostIndex::singleton()->findByBoostId($boostid)) {
+            while (BoostIndex::singleton()->findByBoostId($boostid, false)) {
                 $boostid = option('bnomei.boost.index.generator')();
             }
             return $this->update([

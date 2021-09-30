@@ -32,7 +32,7 @@ final class BoostIndex
 
     public function __destruct()
     {
-       $this->write();
+        $this->write();
     }
 
     private function cache()
@@ -64,8 +64,8 @@ final class BoostIndex
         $this->index = [];
         $count = 0;
         // NOT: index() does not include drafts
-        foreach (site()->index() as $page) {
-            if ($page->hasBoost() === true && $this->add($page)) {
+        foreach (kirby()->collection('boostidpages') as $page) {
+            if ($this->add($page)) {
                 $count++;
             }
         }
@@ -81,12 +81,22 @@ final class BoostIndex
         return true;
     }
 
-    public function findByBoostId(string $boostid): ?Page
+    public function findByBoostId(string $boostid, bool $throwException = true): ?Page
     {
         $boostid = trim($boostid);
         $id = A::get($this->index, $boostid);
         if ($id && $page = bolt($id)) {
             return $page;
+        } else {
+            $crawl = kirby()->collection('boostidpages')->filter(function ($page) use ($boostid) {
+                return $page->boostIDField()->value() === $boostid;
+            });
+            if ($page = $crawl->first()) {
+                $page->boostIndexAdd();
+                return $page;
+            } elseif ($throwException) {
+                throw new \Exception("No page found for BoostID: " . $boostid);
+            }
         }
         return null;
     }

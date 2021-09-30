@@ -107,7 +107,7 @@ Kirby::plugin('bnomei/boost', [
             return Bnomei\BoostIndex::singleton()->add($this);
         },
         'boostIndexRemove' => function () {
-           return \Bnomei\BoostIndex::singleton()->remove($this);
+            return \Bnomei\BoostIndex::singleton()->remove($this);
         },
         'tinyurl' => function (): string {
             if ($url = \Bnomei\BoostIndex::tinyurl($this->boostIDField())) {
