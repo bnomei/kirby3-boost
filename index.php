@@ -69,12 +69,17 @@ Kirby::plugin('bnomei/boost', [
         },
         'boost' => function () {
             // has boost?
+            if ($this->hasBoost() === false) {
+                return false;
+            }
             // needs write?
-            // then write
             $lang = kirby()->languageCode();
-            return $this->hasBoost() === true &&
-                $this->isContentCacheExpiredByModified($lang) &&
-                $this->writeContentCache($lang);
+            $content = $this->readContentCache($lang);
+            if (! $content) {
+                // then write
+                return $this->writeContentCache($this->content()->toArray(), $lang);
+            }
+            return true;
         },
         'isBoosted' => function () {
             return $this->hasBoost() === true &&

@@ -141,7 +141,7 @@ trait PageHasBoost
 
     public function writeContent(array $data, string $languageCode = null): bool
     {
-        // write to file and memcached
+        // write to file and cache
         return parent::writeContent($data, $languageCode) &&
             $this->writeContentCache($data, $languageCode);
     }
