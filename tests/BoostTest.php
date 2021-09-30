@@ -133,15 +133,21 @@ final class BoostTest extends TestCase
     public function testFieldMethodsBoost()
     {
         $randomPage = $this->randomPage();
-        $many = $randomPage->related()->fromBoostIDs();
-        $this->assertNotNull($many);
+        // works only in 2nd test run when kirby process
+        // can read the updated content files from WithPagesTest
+        if ($randomPage->related()->isNotEmpty()) {
+            $many = $randomPage->related()->fromBoostIDs();
+            $this->assertNotNull($many);
 
-        kirby()->impersonate('kirby');
-        $randomPage = $randomPage->update([
-            'related' => $randomPage->related()->split()[0],
-        ]);
-        $one = $randomPage->related()->fromBoostID();
-        $this->assertNotNull($many);
+            kirby()->impersonate('kirby');
+            $randomPage = $randomPage->update([
+                'related' => $randomPage->related()->split()[0],
+            ]);
+            $one = $randomPage->related()->fromBoostID();
+            $this->assertNotNull($one);
+        } else {
+            $this->markTestSkipped();
+        }
     }
 
 }
