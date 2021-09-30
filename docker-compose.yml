@@ -3,8 +3,6 @@ version: '3.8'
 services:
   webserver:
     image: webdevops/php-apache:8.0-alpine
-    depends_on:
-      - memcached
     ports:
       - 8000:80
     environment:
@@ -12,6 +10,3 @@ services:
       WEB_ALIAS_DOMAIN: boost.test
     volumes:
       - .:/app:rw
-
-  memcached:
-    image: memcached:latest
