@@ -9,7 +9,7 @@
 
 Boost the speed of Kirby by having content files of pages cached, with automatic unique ID, fast lookup and Tiny-URL.
 
-## Commerical Usage
+## Commercial Usage
 
 > <br>
 > <b>Support open source!</b><br><br>
