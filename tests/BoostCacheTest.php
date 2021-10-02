@@ -35,4 +35,22 @@ final class BoostCacheTest extends TestCase
         $cache = BoostCache::singleton();
         $this->assertTrue($cache->remove('a'));
     }
+
+    public function testCoreDrivers(): void
+    {
+        $cache = BoostCache::singleton();
+        $this->assertNotNull(BoostCache::nulld());
+        $this->assertNotNull(BoostCache::file());
+        $this->assertNotNull(BoostCache::apcu());
+        $this->assertNotNull(BoostCache::memory());
+    }
+
+    public function testNonCoreDrivers(): void
+    {
+        $cache = BoostCache::singleton();
+        $this->assertNull(BoostCache::memcached());
+        $this->assertNull(BoostCache::sqlite());
+        $this->assertNull(BoostCache::mysql());
+        $this->assertNull(BoostCache::redis());
+    }
 }

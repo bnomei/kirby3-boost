@@ -75,6 +75,7 @@ final class BoostIndex
     public function flush(): bool
     {
         $this->index = [];
+        $this->isDirty = true;
         if ($this->cache()) {
             return $this->cache()->set('index', [], $this->expire);
         }

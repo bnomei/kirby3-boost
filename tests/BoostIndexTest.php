@@ -22,6 +22,11 @@ final class BoostIndexTest extends TestCase
         $triggerContentReadLeadingToCacheWrite = $randomPage->title();
 
         $this->assertEquals($randomPage->modified(), modified($randomPage->id()));
+
+        // get one thats NOT in index
+        $this->assertEquals(site()->homePage()->modified(), modified('home'));
+
+        $this->assertEquals(null, modified('does-not-exist'));
     }
 
     public function testBoostFindById()
@@ -83,5 +88,20 @@ final class BoostIndexTest extends TestCase
             $randomPage->id(),
             $randomPage->boostid()->fromBoostID()->id()
         );
+    }
+
+    public function testWriteOnDestruct()
+    {
+        $index = BoostIndex::singleton();
+        $this->assertTrue($index->flush());
+        $this->assertTrue($index->write());
+
+        $items = $index->index(true);
+        $this->assertTrue($items > 0);
+        unset($index); // trigger write
+
+        $index = BoostIndex::singleton();
+        // create and load
+        $this->assertEquals($items, $index->count());
     }
 }

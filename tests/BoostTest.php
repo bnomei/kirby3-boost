@@ -15,7 +15,7 @@ final class BoostTest extends TestCase
     public function randomPageWithChildren(): ?Page
     {
         $page = null;
-        while(!$page) {
+        while (!$page) {
             $rp = $this->randomPage();
             if ($rp->hasChildren()) {
                 $page = $rp;
@@ -149,5 +149,4 @@ final class BoostTest extends TestCase
             $this->markTestSkipped();
         }
     }
-
 }

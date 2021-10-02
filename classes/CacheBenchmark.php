@@ -63,9 +63,10 @@ final class CacheBenchmark
             if (!$cache) {
                 continue;
             }
-            $benchmarks[$cache::class] = static::benchmark($cache, $seconds, $count, $contentLength, $writeRatio);
-            if ($benchmarks[$cache::class]['gets'] > $highscore) {
-                $highscore = $benchmarks[$cache::class]['gets'];
+            $class = get_class($cache);
+            $benchmarks[$class] = static::benchmark($cache, $seconds, $count, $contentLength, $writeRatio);
+            if ($benchmarks[$class]['gets'] > $highscore) {
+                $highscore = $benchmarks[$class]['gets'];
             }
         }
 

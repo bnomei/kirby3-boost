@@ -9,6 +9,9 @@ use Kirby\Toolkit\A;
 
 trait PageHasBoost
 {
+    /** @var bool */
+    private $boostWillBeDeleted;
+
     public static function create(array $props): Page
     {
         if (!A::get($props['content'], 'boostid')) {
@@ -28,6 +31,11 @@ trait PageHasBoost
         return option('bnomei.boost.fileModifiedCheck');
     }
 
+    public function setBoostWillBeDeleted(bool $value): void
+    {
+        $this->boostWillBeDeleted = $value;
+    }
+
     public function hasBoost(): bool
     {
         return true;
@@ -40,16 +48,14 @@ trait PageHasBoost
 
     public function forceNewBoostId(?string $id = null)
     {
-        if ($this->boostIDField()->isEmpty()) {
-            $boostid = $id ?? option('bnomei.boost.index.generator')();
-            // make 100% sure its unique
-            while (BoostIndex::singleton()->findByBoostId($boostid, false)) {
-                $boostid = option('bnomei.boost.index.generator')();
-            }
-            return $this->update([
-                'boostid' => $boostid,
-            ]);
+        $boostid = $id ?? option('bnomei.boost.index.generator')();
+        // make 100% sure its unique
+        while (BoostIndex::singleton()->findByBoostId($boostid, false)) {
+            $boostid = option('bnomei.boost.index.generator')();
         }
+        return $this->update([
+            'boostid' => $boostid,
+        ]);
 
         return $this;
     }
@@ -111,7 +117,7 @@ trait PageHasBoost
         // read from file and update boostedCache
         if (! $data) {
             $data = parent::readContent($languageCode);
-            if ($data) {
+            if ($data && $this->boostWillBeDeleted !== true) {
                 $this->writeContentCache($data, $languageCode);
             }
         }
@@ -153,6 +159,8 @@ trait PageHasBoost
             return true;
         }
 
+        $this->setBoostWillBeDeleted(true);
+
         foreach (kirby()->languages() as $language) {
             $cache->remove(
                 $this->contentBoostedKey($language->code()) . '-content'
@@ -178,8 +186,9 @@ trait PageHasBoost
             return parent::delete($force);
         }
 
+        $success = parent::delete($force);
         $this->deleteContentCache();
 
-        return parent::delete($force);
+        return $success;
     }
 }

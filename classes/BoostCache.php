@@ -19,9 +19,11 @@ final class BoostCache
         if (! self::$singleton) {
             self::$singleton = kirby()->cache('bnomei.boost');
         }
+        /* DO NOT DO THIS EVER
         if (option('debug')) {
             self::$singleton->flush();
         }
+        */
 
         return self::$singleton;
     }
@@ -59,12 +61,15 @@ final class BoostCache
         ], $options));
     }
 
-    public static function memcached(array $options = []): MemCached
+    public static function memcached(array $options = []): ?MemCached
     {
-        return new Memcached(array_merge([
-            'host' => '127.0.0.1',
-            'port' => 11211,
-        ]));
+        if (class_exists('Memcached')) { // PHP core class
+            return new MemCached(array_merge([
+                'host' => '127.0.0.1',
+                'port' => 11211,
+            ]));
+        }
+        return null;
     }
 
     public static function memory(array $options = []): MemoryCache
