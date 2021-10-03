@@ -46,16 +46,18 @@ trait PageHasBoost
         return $this->readContentCache($languageCode) !== null;
     }
 
-    public function forceNewBoostId(?string $id = null)
+    public function forceNewBoostId(bool $overwrite = false, ?string $id = null)
     {
-        $boostid = $id ?? option('bnomei.boost.index.generator')();
-        // make 100% sure its unique
-        while (BoostIndex::singleton()->findByBoostId($boostid, false)) {
-            $boostid = option('bnomei.boost.index.generator')();
+        if ($overwrite || $this->boostIDField()->isEmpty()) {
+            $boostid = $id ?? option('bnomei.boost.index.generator')();
+            // make 100% sure its unique
+            while (BoostIndex::singleton()->findByBoostId($boostid, false)) {
+                $boostid = option('bnomei.boost.index.generator')();
+            }
+            return $this->update([
+                'boostid' => $boostid,
+            ]);
         }
-        return $this->update([
-            'boostid' => $boostid,
-        ]);
 
         return $this;
     }

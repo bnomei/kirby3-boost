@@ -12,6 +12,12 @@ class BoltTest extends TestCase
         return site()->index()->notTemplate('home')->shuffle()->first();
     }
 
+    public function testIndex()
+    {
+        $index = site()->index()->toArray();
+        $this->assertTrue(count($index) > 0);
+    }
+
     public function testConstruct()
     {
         $bolt = new Bnomei\Bolt();

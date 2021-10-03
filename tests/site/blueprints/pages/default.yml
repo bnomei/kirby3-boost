@@ -5,4 +5,4 @@ fields:
     type: boostid
 
   related:
-    extends: fields/boostidpages
+    extends: fields/boostidkvs

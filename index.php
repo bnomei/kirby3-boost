@@ -238,7 +238,7 @@ Kirby::plugin('bnomei/boost', [
     'hooks' => [
         'page.create:after' => function ($page) {
             if ($page->hasBoost() === true) {
-                $page = $page->forceNewBoostId();
+                $page = $page->forceNewBoostId(false);
                 if (option('bnomei.boost.updateIndexWithHooks')) {
                     $page->boostIndexAdd();
                 }
@@ -253,7 +253,7 @@ Kirby::plugin('bnomei/boost', [
         },
         'page.duplicate:after' => function ($duplicatePage, $originalPage) {
             if ($duplicatePage->hasBoost() === true) {
-                $duplicatePage = $duplicatePage->forceNewBoostId();
+                $duplicatePage = $duplicatePage->forceNewBoostId(true);
                 if (option('bnomei.boost.updateIndexWithHooks')) {
                     $duplicatePage->boostIndexAdd();
                 }

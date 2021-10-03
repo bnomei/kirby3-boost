@@ -53,10 +53,10 @@ fields:
   #  extends: fields/boostid
 
   one_relation:
-    extends: fields/boostidpage
+    extends: fields/boostidkv
 
   many_related:
-    extends: fields/boostidpages
+    extends: fields/boostidkvs
 ```
 
 > You can create your own fields for related pages [based on the ones this plugins provides](https://github.com/bnomei/kirby3-boost/tree/main/blueprints/fields).

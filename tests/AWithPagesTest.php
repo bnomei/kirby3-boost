@@ -6,7 +6,7 @@ use Kirby\Cms\Page;
 use Kirby\Toolkit\Str;
 use PHPUnit\Framework\TestCase;
 
-class WithPagesTest extends TestCase
+class AWithPagesTest extends TestCase
 {
     /**
      * @var int

@@ -1,0 +1,6 @@
+type: multiselect
+options: query
+query:
+  fetch: kirby.collection('boostidkvs')
+  text: "{{ arrayItem.text }}"
+  value: "{{ arrayItem.value }}"

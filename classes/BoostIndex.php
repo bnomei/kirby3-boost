@@ -9,6 +9,8 @@ use Kirby\Toolkit\A;
 
 final class BoostIndex
 {
+    public const SEPERATOR = '|!|';
+
     /** @var array */
     private $index;
 
@@ -86,7 +88,8 @@ final class BoostIndex
     {
         $boostid = trim($boostid);
         $id = A::get($this->index, $boostid);
-        if ($id && $page = bolt($id)) {
+
+        if ($id && $page = bolt(explode(static::SEPERATOR, $id)[0])) {
             return $page;
         } else {
             $crawl = kirby()->collection('boostidpages')->filter(function ($page) use ($boostid) {
@@ -110,11 +113,16 @@ final class BoostIndex
         }
 
         $boostid = $page->boostIDField()->value();
+        $id = $page->diruri() . static::SEPERATOR . $page->title()->value();
+        if (kirby()->multilang()) {
+            $id = $page->diruri() . static::SEPERATOR . $page->content(kirby()->defaultLanguage()->code())->title()->value();
+        }
+
         if (!array_key_exists($boostid, $this->index) ||
-            $this->index[$boostid] !== $page->diruri()
+            $this->index[$boostid] !== $id
         ) {
             $this->isDirty = true;
-            $this->index[$boostid] = $page->diruri();
+            $this->index[$boostid] = $id;
         }
         return true;
     }

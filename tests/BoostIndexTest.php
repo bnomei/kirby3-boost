@@ -13,6 +13,14 @@ final class BoostIndexTest extends TestCase
         return site()->index()->notTemplate('home')->shuffle()->first();
     }
 
+    public function testBoostFlush()
+    {
+        $index = BoostIndex::singleton();
+        $index->flush();
+        $index->write();
+        $this->assertEquals(0, $index->count());
+    }
+
     public function testBoostModified()
     {
         $randomPage = $this->randomPage();

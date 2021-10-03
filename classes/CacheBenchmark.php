@@ -29,7 +29,7 @@ final class CacheBenchmark
             }
             $gets++; // count null caches and fails
             if ($index % $write === 0) {
-                $cache->set('CacheBenchmark-' . $i, Str::random($contentLength), 0);
+                $cache->set('CacheBenchmark-' . $index, Str::random($contentLength), 0);
                 $sets++;
             }
             $index++;
