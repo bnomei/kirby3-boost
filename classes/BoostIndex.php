@@ -78,9 +78,11 @@ final class BoostIndex
     {
         $this->index = [];
         $this->isDirty = true;
+        /* on destruct
         if ($this->cache()) {
             return $this->cache()->set('index', [], $this->expire);
         }
+        */
         return true;
     }
 
