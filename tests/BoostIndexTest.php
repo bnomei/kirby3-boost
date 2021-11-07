@@ -112,4 +112,20 @@ final class BoostIndexTest extends TestCase
         // create and load
         $this->assertEquals($items, $index->count());
     }
+
+    public function testCrawlForMissing()
+    {
+        $index = BoostIndex::singleton();
+        $randomPage = $this->randomPage();
+        $boostid = $randomPage->boostIDField()->value();
+        $randomPage->boostIndexAdd();
+
+        $this->assertTrue($randomPage->boostIndexRemove());
+        $this->assertNull(A::get($index->toArray(), $boostid));
+        $this->assertEquals(
+            $randomPage->id(),
+            $index->findByBoostId($boostid)->id() // will crawl
+        );
+        $this->assertNotNull(A::get($index->toArray(), $boostid));
+    }
 }

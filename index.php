@@ -12,7 +12,7 @@ if (! function_exists('bolt')) {
 }
 
 if (! function_exists('modified')) {
-    function modified(string $id)
+    function modified($id)
     {
         return \Bnomei\BoostIndex::modified($id);
     }

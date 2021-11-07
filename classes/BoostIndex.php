@@ -56,7 +56,7 @@ final class BoostIndex
         return false;
     }
 
-    public function index(bool $force = false): int
+    public function index(bool $force = false, ?Page $target = null): int
     {
         $count = $this->index ? count($this->index) : 0;
         if ($count > 0 && !$force) {
@@ -69,6 +69,15 @@ final class BoostIndex
         foreach (kirby()->collection('boostidpages') as $page) {
             if ($this->add($page)) {
                 $count++;
+            }
+            // save every n steps
+            if ($count % 2000 === 0) {
+                $this->write();
+            }
+            // only search until target is found
+            if ($target && $target->id() === $page->id()) {
+                $this->write();
+                break;   
             }
         }
         return $count;
@@ -94,12 +103,16 @@ final class BoostIndex
         if ($id && $page = bolt(explode(static::SEPERATOR, $id)[0])) {
             return $page;
         } else {
-            $crawl = kirby()->collection('boostidpages')->filter(function ($page) use ($boostid) {
-                return $page->boostIDField()->value() === $boostid;
-            });
-            if ($page = $crawl->first()) {
-                $page->boostIndexAdd();
-                return $page;
+            $crawl = null;
+            foreach (kirby()->collection('boostidpages') as $page) {
+                if ($this->add($page) && $page->boostIDField()->value() === $boostid) {
+                    $crawl = $page;
+                    break;
+                }
+            }
+            $this->write();
+            if ($crawl) {
+                return $crawl;
             } elseif ($throwException) {
                 $this->write();
                 throw new \Exception("No page found for BoostID: " . $boostid);
@@ -175,8 +188,11 @@ final class BoostIndex
         return rtrim($url, '/') . '/' . $id;
     }
 
-    public static function modified(string $id): ?int
+    public static function modified($id): ?int
     {
+        if (is_a($id, \Kirby\Cms\Page::class)) {
+            $id = $id->id();
+        }
         $modified = BoostCache::singleton()->get(crc32($id) . '-modified');
         if ($modified) {
             return $modified;
