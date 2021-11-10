@@ -97,6 +97,26 @@ final class BoostCache
         return null;
     }
 
+    public static function php(array $options = [])//: Cache
+    {
+        if (class_exists('Bnomei\\PHPCache')) {
+            $elephant = \Bnomei\PHPCache::singleton(array_merge([
+            ], $options));
+            return $elephant;
+        }
+        return null;
+    }
+
+    public static function mongodb(array $options = [])//: Cache
+    {
+        if (class_exists('Bnomei\\MongoDBCache')) {
+            $ape = \Bnomei\MongoDBCache::singleton(array_merge([
+            ], $options));
+            return $ape;
+        }
+        return null;
+    }
+
     public static function redis(array $options = [])//: Cache
     {
         if (class_exists('Bnomei\\Redis')) {
