@@ -26,16 +26,26 @@ final class BoostIndex
         $this->isDirty = false;
 
         $this->index = $this->read();
+
+        $cache = $this->cache();
+        if ($cache && method_exists($cache, 'register_shutdown_function')) {
+            $cache->register_shutdown_function(function() {
+                $this->write();
+            });
+        }
+
         if (option('debug') || empty($this->index)) {
             $this->index(true);
             $success = $this->write();
         }
     }
 
+    /** NOTE: register that with cache instead
     public function __destruct()
     {
         $this->write();
     }
+    */
 
     private function cache()
     {
