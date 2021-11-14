@@ -115,7 +115,7 @@ $pageModifiedTimestampOrNull = modified($somePageId); // faster
 
 ## Caches and Cache Drivers
 
-A cache driver is a piece of code that defines where get/set commands for the key/value store of the cache are directed to. Kirby has [built in support](https://getkirby.com/docs/reference/system/options/cache#cache-driver) for File, Apcu, Memcached and Memory. I have created additional cache drivers for [MySQL ](https://github.com/bnomei/kirby3-mysql-cachedriver), [Redis](https://github.com/bnomei/kirby3-redis-cachedriver) and [SQLite](https://github.com/bnomei/kirby3-sqlite-cachedriver).
+A cache driver is a piece of code that defines where get/set commands for the key/value store of the cache are directed to. Kirby has [built in support](https://getkirby.com/docs/reference/system/options/cache#cache-driver) for File, Apcu, Memcached and Memory. I have created additional cache drivers for [MySQL (work in progress)](https://github.com/bnomei/kirby3-mysql-cachedriver), [Redis](https://github.com/bnomei/kirby3-redis-cachedriver), [SQLite](https://github.com/bnomei/kirby3-sqlite-cachedriver) and [PHP](https://github.com/bnomei/kirby3-php-cachedriver).
 
 Within Kirby caches can be used for:
 
@@ -171,6 +171,7 @@ $caches = [
     // better
     // \Bnomei\BoostCache::null(),
     // \Bnomei\BoostCache::memory(),
+    \Bnomei\BoostCache::php(),       // 142
     \Bnomei\BoostCache::apcu(),      // 118
     \Bnomei\BoostCache::sqlite(),    //  60
     \Bnomei\BoostCache::redis(),     //  57
@@ -186,11 +187,12 @@ var_dump(\Bnomei\CacheBenchmark::run($caches, 1, site()->index()->count())); // 
 ```
 
 - Memory Cache Driver and Null Cache Driver would perform best but it either caches in memory only for current request or not at all and that is not really useful for this plugin. 
+- PHP Cache Driver will be the fastest possible solution but you might run out of php app memory. Use this driver if you need best performance and have good control over the size of your cached data.
 - APCu Cache can be expected to be very fast but one has to make sure all content fits into the memory limitations.
 - SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34). Content will be written using transactions.
 - My Redis Cache Driver has smart preloading using the very fast Redis pipeline and will write changes using transactions.
 - The File Cache Driver will perform worse the more page objects you have. You are probably better of with no cache. This is the only driver with this flaw. Benchmarking this driver will also create a lot of file which in total might cause the script to exceed your php execution time.
-- The MySQL Cache Driver is still in development but I expect it to on par with SQLite and Redis.
+- The MySQL Cache Driver is still in development but I expect it to on par with SQLite.
 
 But do not take my word for it. Download the plugin, set realistic benchmark options and run the benchmark on your production server.
 
@@ -199,6 +201,7 @@ But do not take my word for it. Download the plugin, set realistic benchmark opt
 I created an interactive demo to compare various cache drivers and prove how much your website can be boosted. It kind of ended up as a love-letter to the <a class="underline" href="https://github.com/getkirby/kql">KQL Plugin</a> as well. You can find the benchmark and interactive demos running on server sponsored by **Kirbyzone** here:
 
 - [Benchmark with all Drivers](https://kirby3-boost.bnomei.com)
+- [Demo using PHP Cache Driver](https://kirby3-boost-php.bnomei.com)
 - [Demo using APCu Cache Driver](https://kirby3-boost-apcu.bnomei.com)
 - [Demo using MySQL Cache Driver](https://kirby3-boost-mysql.bnomei.com)
 - [Demo using Null Cache Driver](https://kirby3-boost-null.bnomei.com). This setup behaves like having the boost plugin NOT active at all.
@@ -239,6 +242,11 @@ return [
     // but performance is not great so set to something else please
     'bnomei.boost.cache' => [
         'type'     => 'file',
+    ],
+
+    // example php
+    'bnomei.boost.cache' => [
+        'type'     => 'php',
     ],
 
     // example apcu

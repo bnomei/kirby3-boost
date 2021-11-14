@@ -78,6 +78,7 @@
   "suggest": {
     "bnomei/kirby3-boost-demo": "Try boost with a big set of data",
     "bnomei/kirby3-lapse": "Cache any data until set expiration time (with automatic keys)",
+    "bnomei/kirby3-php-cachedriver": "PHP based Cache-Driver",
     "bnomei/kirby3-mysql-cachedriver": "MySQL based Cache-Driver",
     "bnomei/kirby3-redis-cachedriver": "Redis based Cache-Driver",
     "bnomei/kirby3-sqlite-cachedriver": "SQLite based Cache-Driver",
