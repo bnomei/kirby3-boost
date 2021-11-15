@@ -218,6 +218,13 @@ Kirby::plugin('bnomei/boost', [
                 },
             ],
         ],
+        'autoid' => [
+            'props' => [
+                'value' => function (string $value = null) {
+                    return $value;
+                },
+            ],
+        ],
     ],
     'routes' => function ($kirby) {
         $folder = $kirby->option('bnomei.boost.tinyurl.folder');

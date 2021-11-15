@@ -332,11 +332,12 @@ If your content file are written to by any other means than using Kirbys page ob
 
 You can use this plugin instead of AutoID if you did not use autoid in site objects, file objects and structures. This plugin will default to the `boostid` field to get the unique id but it will use the `autoid` field as fallback.
 
-- Setup the models (see above)
-- Keep `autoid` field or replace with `boostid` field
-- Replace `autoid`/`AUTOID` in blueprint queries with `BOOSTID`
-- Replace calls to `autoid()` with `boost()` in php code
-- Replace `->fromAutoID()` with `->fromBoostID()` in php code
+- Uninstall the autoid plugin.
+- Setup the models (see above).
+- Keep `autoid` field or replace with `boostid` field. If you keep the `autoid` as fieldname then set `bnomei.boost.fieldname` to array `['autoid']`.
+- Replace `autoid`/`AUTOID` in blueprint queries with `BOOSTID`.
+- Replace calls to `autoid()` with `boost()` in php code.
+- Replace `->fromAutoID()` with `->fromBoostID()` in php code.
 
 ## History
 

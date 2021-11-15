@@ -14,13 +14,14 @@ trait PageHasBoost
 
     public static function create(array $props): Page
     {
-        if (!A::get($props['content'], 'boostid')) {
+        $fieldname = option('bnomei.boost.fieldname', ['boostid'])[0];
+        if (!A::get($props['content'], $fieldname)) {
             $boostid = option('bnomei.boost.index.generator')();
             // make 100% sure its unique
             while (BoostIndex::singleton()->findByBoostId($boostid, false)) {
                 $boostid = option('bnomei.boost.index.generator')();
             }
-            $props['content']['boostid'] = $boostid;
+            $props['content'][$fieldname] = $boostid;
         }
 
         return parent::create($props);
@@ -54,8 +55,9 @@ trait PageHasBoost
             while (BoostIndex::singleton()->findByBoostId($boostid, false)) {
                 $boostid = option('bnomei.boost.index.generator')();
             }
+            $fieldname = option('bnomei.boost.fieldname', ['boostid'])[0];
             return $this->update([
-                'boostid' => $boostid,
+                $fieldname => $boostid,
             ]);
         }
 
