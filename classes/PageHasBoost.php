@@ -14,7 +14,7 @@ trait PageHasBoost
 
     public static function create(array $props): Page
     {
-        $fieldname = option('bnomei.boost.fieldname', ['boostid'])[0];
+        $fieldname = option('bnomei.boost.fieldname');
         if (!A::get($props['content'], $fieldname)) {
             $boostid = option('bnomei.boost.index.generator')();
             // make 100% sure its unique
@@ -55,7 +55,7 @@ trait PageHasBoost
             while (BoostIndex::singleton()->findByBoostId($boostid, false)) {
                 $boostid = option('bnomei.boost.index.generator')();
             }
-            $fieldname = option('bnomei.boost.fieldname', ['boostid'])[0];
+            $fieldname = option('bnomei.boost.fieldname');
             return $this->update([
                 $fieldname => $boostid,
             ]);

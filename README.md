@@ -316,7 +316,7 @@ echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
 
 | bnomei.boost.            | Default        | Description               |            
 |---------------------------|----------------|---------------------------|
-| fieldname | `['boostid', 'autoid']` | change name of loaded fields |
+| fieldname | `'boostid'` | change name of loaded field |
 | expire | `0` | expire in minutes for all caches created |
 | fileModifiedCheck | `false` | expects file to not be altered outside of kirby |
 | index.generator | callback | the uuid genertor |
@@ -330,11 +330,11 @@ If your content file are written to by any other means than using Kirbys page ob
 
 ## Migration from AutoID
 
-You can use this plugin instead of AutoID if you did not use autoid in site objects, file objects and structures. This plugin will default to the `boostid` field to get the unique id but it will use the `autoid` field as fallback.
+You can use this plugin instead of AutoID if you did not use autoid in site objects, file objects and structures. This plugin will default to the `boostid` field to get the unique id but can be set to use the `autoid` field as well.
 
 - Uninstall the autoid plugin.
 - Setup the models (see above).
-- Keep `autoid` field or replace with `boostid` field. If you keep the `autoid` as fieldname then set `bnomei.boost.fieldname` to array `['autoid']`.
+- Keep `autoid` field or replace with `boostid` field. If you keep the `autoid` as fieldname then set `bnomei.boost.fieldname` to array `'autoid'`.
 - Replace `autoid`/`AUTOID` in blueprint queries with `BOOSTID`.
 - Replace calls to `autoid()` with `boost()` in php code.
 - Replace `->fromAutoID()` with `->fromBoostID()` in php code.

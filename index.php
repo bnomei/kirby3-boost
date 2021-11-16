@@ -40,11 +40,7 @@ if (! function_exists('boost')) {
 Kirby::plugin('bnomei/boost', [
     'options' => [
         'cache' => true,
-        'fieldname' => [
-            'boostid',
-            // provide drop-in support for autoid (page objects only)
-            'autoid',
-        ],
+        'fieldname' => 'boostid', // autoid
         'expire' => 0,
         'fileModifiedCheck' => false, // expects file to not be altered outside of kirby
         'index' => [
@@ -99,14 +95,9 @@ Kirby::plugin('bnomei/boost', [
             return $this->isContentBoosted(kirby()->languageCode());
         },
         'boostIDField' => function () {
-            $fields = option('bnomei.boost.fieldname', []);
-            if (is_string($fields)) {
-                $fields = [$fields];
-            }
-            foreach ($fields as $field) {
-                if ($this->{$field}()->isNotEmpty()) {
-                    return $this->{$field}();
-                }
+            $fieldname = option('bnomei.boost.fieldname');
+            if ($this->{$fieldname}()->isNotEmpty()) {
+                return $this->{$fieldname}();
             }
             // default
             return $this->boostid();
