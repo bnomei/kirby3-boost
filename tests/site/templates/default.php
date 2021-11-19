@@ -7,6 +7,9 @@
 <h3>debug</h3>
 <?php var_dump(option('debug')); ?>
 
+<h3>modified</h3>
+<?php var_dump($page->modified('c')); ?>
+
 <h3>Memcached</h3>
 <?php
 $pmk = $page->contentBoostedKey();

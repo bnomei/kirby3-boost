@@ -67,11 +67,11 @@ trait PageHasBoost
     public function contentBoostedKey(string $languageCode = null): string
     {
         $key = strval(crc32($this->id()));
-        if (!$languageCode) {
+        if (! $languageCode) {
             $languageCode = kirby()->languages()->count() ? kirby()->language()->code() : null;
-            if ($languageCode) {
-                $key = $key . '-' .  $languageCode;
-            }
+        }
+        if ($languageCode) {
+            $key = $key . '-' .  $languageCode;
         }
 
         return $key;
@@ -84,7 +84,6 @@ trait PageHasBoost
             return true;
         }
 
-        $modified = $this->modified();
         $modifiedCache = $cache->get(
             $this->contentBoostedKey($languageCode).'-modified',
             null
@@ -92,6 +91,13 @@ trait PageHasBoost
         if (!$modifiedCache) {
             return true;
         }
+
+        $modified = $this->modified();
+        // in rare case the file does not exist or is not readable
+        if ($modified === false) {
+            return true;
+        }
+        // otherwise compare
         if ($modifiedCache && intval($modifiedCache) < intval($modified)) {
             return true;
         }
@@ -116,7 +122,7 @@ trait PageHasBoost
     public function readContent(string $languageCode = null): array
     {
         // read from boostedCache if exists
-        $data = option('debug') ? null : $this->readContentCache($languageCode);
+        $data = option('bnomei.boost.read') === false || option('debug') ? null : $this->readContentCache($languageCode);
 
         // read from file and update boostedCache
         if (! $data) {
@@ -132,13 +138,20 @@ trait PageHasBoost
     public function writeContentCache(?array $data = null, string $languageCode = null): bool
     {
         $cache = BoostCache::singleton();
-        if (! $cache) {
+        if (! $cache || option('bnomei.boost.write') === false) {
             return true;
+        }
+
+        $modified = $this->modified();
+
+        // in rare case file does not exists or is not readable
+        if ($modified === false) {
+            return false; // try again another time
         }
 
         $cache->set(
             $this->contentBoostedKey($languageCode) . '-modified',
-            $this->modified(),
+            $modified,
             option('bnomei.boost.expire')
         );
 

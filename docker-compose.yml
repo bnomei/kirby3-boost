@@ -7,6 +7,6 @@ services:
       - 8000:80
     environment:
       WEB_DOCUMENT_ROOT: /app/tests/
-      WEB_ALIAS_DOMAIN: boost.test
+      WEB_ALIAS_DOMAIN: localhost
     volumes:
       - .:/app:rw

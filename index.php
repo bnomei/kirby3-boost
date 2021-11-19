@@ -43,6 +43,8 @@ Kirby::plugin('bnomei/boost', [
         'fieldname' => 'boostid', // autoid
         'expire' => 0,
         'fileModifiedCheck' => false, // expects file to not be altered outside of kirby
+        'read' => true, // read from cache
+        'write' => true, // write to cache
         'index' => [
             'generator' => function (?string $seed = null) {
                 // override with custom callback if needed

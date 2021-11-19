@@ -29,7 +29,7 @@ final class BoostIndex
 
         $cache = $this->cache();
         if ($cache && method_exists($cache, 'register_shutdown_function')) {
-            $cache->register_shutdown_function(function() {
+            $cache->register_shutdown_function(function () {
                 $this->write();
             });
         }
@@ -87,7 +87,7 @@ final class BoostIndex
             // only search until target is found
             if ($target && $target->id() === $page->id()) {
                 $this->write();
-                break;   
+                break;
             }
         }
         return $count;
