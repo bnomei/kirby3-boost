@@ -75,7 +75,6 @@ final class BoostIndex
 
         $this->index = [];
         $count = 0;
-        // NOT: index() does not include drafts
         foreach (kirby()->collection('boostidpages') as $page) {
             if ($this->add($page)) {
                 $count++;
@@ -124,7 +123,6 @@ final class BoostIndex
             if ($crawl) {
                 return $crawl;
             } elseif ($throwException) {
-                $this->write();
                 throw new \Exception("No page found for BoostID: " . $boostid);
             }
         }

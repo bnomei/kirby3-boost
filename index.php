@@ -30,7 +30,8 @@ if (! function_exists('boost')) {
     /*
     function siteIndexFilterByBoostID(string $id): ?\Kirby\Cms\Page
     {
-        return site()->index()->filter(function ($page) use ($id) {
+        $drafts = option('bnomei.boost.drafts');
+        return site()->index($drafts)->filter(function ($page) use ($id) {
             return $page->boostIDField()->value() === $id;
         })->first();
     }
@@ -45,6 +46,7 @@ Kirby::plugin('bnomei/boost', [
         'fileModifiedCheck' => false, // expects file to not be altered outside of kirby
         'read' => true, // read from cache
         'write' => true, // write to cache
+        'drafts' => true, // index drafts as well
         'index' => [
             'generator' => function (?string $seed = null) {
                 // override with custom callback if needed
@@ -183,10 +185,12 @@ Kirby::plugin('bnomei/boost', [
     ],
     'siteMethods' => [
         'boost' => function () {
-            return site()->index()->boost();
+            $drafts = option('bnomei.boost.drafts');
+            return site()->index($drafts)->boost();
         },
         'boostmark' => function () {
-            return site()->index()->boostmark();
+            $drafts = option('bnomei.boost.drafts');
+            return site()->index($drafts)->boostmark();
         },
     ],
     'fieldMethods' => [

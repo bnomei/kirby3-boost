@@ -320,6 +320,7 @@ echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
 | expire | `0` | expire in minutes for all caches created |
 | read | `true` | read from cache |
 | write | `true` | write to cache |
+| drafts | `true` | index drafts |
 | fileModifiedCheck | `false` | expects file to not be altered outside of kirby |
 | index.generator | callback | the uuid genertor |
 | tinyurl.url | callback | returning `site()->url()`. Use htaccess on that domain to redirect `RewriteRule (.*) http://www.bnomei.com/x/$1 [R=301]` |
