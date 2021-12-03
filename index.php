@@ -68,17 +68,27 @@ Kirby::plugin('bnomei/boost', [
             return \Bnomei\Bolt::page($id, $this);
         },
         'boost' => function () {
+            $page = $this;
+
             // has boost?
-            if ($this->hasBoost() === false) {
+            if ($page->hasBoost() === false) {
                 return false;
             }
-            $this->boostIndexAdd();
+
+            // if not has an id force one
+            $page = $page->forceNewBoostId();
+
             // needs write?
             $lang = kirby()->languageCode();
-            $content = $this->readContentCache($lang);
+            $content = $page->readContentCache($lang);
+
+            // add after cache was read and id exists
+            $page->boostIndexAdd();
+
+            // if needs write
             if (! $content) {
                 // then write
-                return $this->writeContentCache($this->content()->toArray(), $lang);
+                return $page->writeContentCache($page->content()->toArray(), $lang);
             }
             return true;
         },
