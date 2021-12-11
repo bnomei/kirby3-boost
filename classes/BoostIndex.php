@@ -75,7 +75,13 @@ final class BoostIndex
 
         $this->index = [];
         $count = 0;
-        foreach (kirby()->collection('boostidpages') as $page) {
+        foreach (kirby()->collection('siteindexfolders') as $page) {
+            // save memory when indexing
+            $page = bolt($page, null, false, false);
+            if (!$page || $page->hasBoost() !== true) {
+                $page = null; // free memory, do not use unset()
+                continue;
+            }
             if ($this->add($page)) {
                 $count++;
             }
@@ -88,6 +94,7 @@ final class BoostIndex
                 $this->write();
                 break;
             }
+            $page = null; // free memory, do not use unset()
         }
         return $count;
     }

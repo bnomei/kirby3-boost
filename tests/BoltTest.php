@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Kirby\Toolkit\Str;
 use PHPUnit\Framework\TestCase;
 use Kirby\Cms\Page;
 
@@ -33,7 +34,7 @@ class BoltTest extends TestCase
         $randomPage = $this->randomPage();
         site()->prune();
 
-        $page = \bolt($randomPage->id());
+        $page = bolt($randomPage->id());
 
         // bolt page is lazy loaded
         $this->assertNotEquals($randomPage, $page);
@@ -45,7 +46,7 @@ class BoltTest extends TestCase
         $this->assertEquals($randomPage->title()->value(), $page->title()->value());
         $this->assertEquals($randomPage->diruri(), $page->diruri());
         if ($randomPage->parent()) {
-            $this->assertEquals($randomPage->parent()->root(), $page->parent()->root());
+            $this->assertEquals(Str::slug($randomPage->parent()->root()), Str::slug($page->parent()->root()));
             $this->assertEquals($randomPage->siblings()->count(), $page->siblings()->count());
             $this->assertEquals($randomPage->siblings()->first()->id(), $page->siblings()->first()->id());
         }
@@ -56,8 +57,8 @@ class BoltTest extends TestCase
         $randomPage = $this->randomPage();
         site()->prune();
 
-        $page = \bolt($randomPage->id());
-        $page2 = \bolt($randomPage->id());
+        $page = bolt($randomPage->id());
+        $page2 = bolt($randomPage->id());
         $this->assertEquals($page, $page2);
     }
 
@@ -73,8 +74,8 @@ class BoltTest extends TestCase
         }
         site()->prune();
 
-        $page = \bolt($randomPage->id());
-        $page2 = \bolt($randomSibl->id());
+        $page = bolt($randomPage->id());
+        $page2 = bolt($randomSibl->id());
         $this->assertEquals($page->parent()->id(), $page2->parent()->id());
     }
 
@@ -99,9 +100,18 @@ class BoltTest extends TestCase
         $randomPageDiruri = $randomPage->diruri();
         site()->prune();
 
-        $page = \bolt($randomPageDiruri);
+        $page = bolt($randomPageDiruri);
 
         $this->assertEquals($randomPageDiruri, $page->diruri());
         $this->assertEquals($randomPage->id(), $page->id());
+    }
+
+    public function testBoltIndex()
+    {
+        $count = 0;
+        \Bnomei\Bolt::index(function ($page) use (&$count) {
+            $count += 1;
+        });
+        $this->assertEquals(site()->index(true)->count(), $count);
     }
 }

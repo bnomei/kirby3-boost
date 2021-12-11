@@ -12,12 +12,16 @@ final class Autoloader
     // exclude files like filename.config.(php|yml)
     public const PHP = '/^[\w\d\-\_]+\.php$/';
     public const ANY_PHP = '/^[\w\d\-\_\.]+\.php$/';
+    public const BLOCK_PHP = '/^[\w\d\-\_]+(Block)\.php$/';
     public const PAGE_PHP = '/^[\w\d\-\_]+(Page)\.php$/';
     public const USER_PHP = '/^[\w\d\-\_]+(User)\.php$/';
     public const YML = '/^[\w\d\-\_]+\.yml$/';
+    public const ANY_YML = '/^[\w\d\-\_\.]+\.yml$/';
     public const PHP_OR_HTMLPHP = '/^[\w\d\-\_]+(\.html)?\.php$/';
     public const PHP_OR_YML = '/^[\w\d\-\_]+\.(php|yml)$/';
+    public const ANY_PHP_OR_YML = '/^[\w\d\-\_\.]+\.(php|yml)$/';
     public const PHP_OR_YML_OR_JSON = '/^[\w\d\-\_]+\.(php|yml|json)$/';
+    public const ANY_PHP_OR_YML_OR_JSON = '/^[\w\d\-\_\.]+\.(php|yml|json)$/';
 
     /** @var self */
     private static $singleton;
@@ -33,7 +37,7 @@ final class Autoloader
         $this->options = array_merge_recursive([
             'blueprints' => [
                 'folder' => 'blueprints',
-                'name' => static::PHP_OR_YML,
+                'name' => static::ANY_PHP_OR_YML,
                 'key' => 'relativepath',
                 'require' => false,
                 'lowercase' => true,
@@ -48,7 +52,7 @@ final class Autoloader
             ],
             'collections' => [
                 'folder' => 'collections',
-                'name' => static::PHP,
+                'name' => static::ANY_PHP,
                 'key' => 'relativepath',
                 'require' => true,
                 'lowercase' => false,
@@ -59,6 +63,14 @@ final class Autoloader
                 'key' => 'filename',
                 'require' => true,
                 'lowercase' => true,
+            ],
+            'blockmodels' => [
+                'folder' => 'models',
+                'name' => static::BLOCK_PHP,
+                'key' => 'classname',
+                'require' => false,
+                'lowercase' => true,
+                'map' => [],
             ],
             'pagemodels' => [
                 'folder' => 'models',
@@ -78,7 +90,7 @@ final class Autoloader
             ],
             'snippets' => [
                 'folder' => 'snippets',
-                'name' => static::PHP_OR_HTMLPHP,
+                'name' => static::ANY_PHP,
                 'key' => 'relativepath',
                 'require' => false,
                 'lowercase' => false,
@@ -92,7 +104,7 @@ final class Autoloader
             ],
         	'translations' => [
         		'folder' => 'translations',
-        		'name' => static::PHP_OR_YML_OR_JSON,
+        		'name' => static::ANY_PHP_OR_YML_OR_JSON,
         		'key' => 'filename',
         		'require' => true,
                 'lowercase' => true,
@@ -154,11 +166,11 @@ final class Autoloader
                     if (preg_match('/^namespace (.*);$/im', $classFile, $matches) === 1) {
                         $class = str_replace($matches[1] . '\\', '', $class);
                         $class = $matches[1] . '\\' . $class;
-                    }    
+                    }
                 }
                 $this->registry[$type]['map'][$class] = $file->getRelativePathname();
-                
-                foreach(['Page', 'User'] as $suffix) {
+
+                foreach(['Page', 'User', 'Block'] as $suffix) {
                     $at = strpos($key, $suffix);
                     if ($at === strlen($key) - strlen($suffix)) {
                         $key = substr($key, 0, -strlen($suffix));
@@ -174,7 +186,7 @@ final class Autoloader
             } else {
                 $key = strval($key); // in case key looks like a number but should be a string
             }
-            
+
             if ($options['key'] === 'classname') {
                 $this->registry[$type][$key] = $class;
             } elseif ($options['require'] && $extension && strtolower($extension) === 'php') {
@@ -206,7 +218,7 @@ final class Autoloader
                     return $alpha[0] === $a ? -1 : 1;
                 }
                 return $ca < $cb ? 1 : -1;
-                
+
             });
             $map = array_flip($map);
             $this->load($map, $this->options['dir'] . '/' . $options['folder']);
@@ -237,6 +249,11 @@ final class Autoloader
     public function controllers(): array
     {
         return $this->registry('controllers');
+    }
+
+    public function blockModels(): array
+    {
+        return $this->registry('blockmodels');
     }
 
     public function pageModels(): array

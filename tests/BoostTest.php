@@ -101,7 +101,7 @@ final class BoostTest extends TestCase
         $this->assertEquals($after, $before + $randomPage->children()->count());
 
         $this->assertIsFloat($randomPage->children()->boost());
-        $this->assertIsFloat(site()->boost());
+        $this->assertIsInt(site()->boost());
     }
 
     public function testPagesMethodBoostmark()
@@ -148,5 +148,15 @@ final class BoostTest extends TestCase
         } else {
             $this->markTestSkipped();
         }
+    }
+
+    public function testBoostSiteIndex()
+    {
+        $index = \Bnomei\BoostIndex::singleton();
+        $index->index(true);
+        $index->flush();
+        $count = site()->boost();
+        $this->assertCount(kirby()->collection('boostidpages')->count(), $index->toArray());
+        $this->assertCount($count, $index->toArray());
     }
 }

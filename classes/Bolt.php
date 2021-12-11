@@ -106,7 +106,7 @@ final class Bolt
         return static::$idToPage;
     }
 
-    public function findByID(string $id, bool $cache = true): ?Page
+    public function findByID(string $id, bool $cache = true, bool $extend = true): ?Page
     {
         $page = $this->lookup($id, $cache);
         if ($page) {
@@ -121,12 +121,12 @@ final class Bolt
         foreach ($parts as $part) {
             if ($part === '_drafts') {
                 $draft = true;
-                $this->root .= '/_drafts';
+                $this->root .= '/' . '_drafts';
                 continue;
             }
             $numSplit = array_reverse(explode(Dir::$numSeparator, $part));
             $partWithoutNum = $numSplit[0];
-            $num = count($numSplit) > 1 ? $numSplit[1] : null;
+            $num = count($numSplit) > 1 ? intval($numSplit[1]) : null;
             $treeid = $treeid ? $treeid . '/' . $partWithoutNum : $partWithoutNum;
             $page = $this->lookup($treeid, $cache);
             if ($page) {
@@ -157,37 +157,35 @@ final class Bolt
                     }
                 }
             } else { // search for dir
-                $directory = opendir($this->root);
-                while ($file = readdir($directory)) {
-                    if (strpos($file, '.') !== false) {
-                        continue;
-                    }
-                    $_part = Dir::$numSeparator . $part;
-//                    if ($file === $part) {
-//                        $params['root'] = $this->root . '/' . $file;
-//                        $params['diruri'] = $this->diruri . '/' . $part;
-//                    } else
-                    if (substr($file, -strlen($_part)) === $_part) {
-                        $params['root'] = $this->root . '/' . $file;
-                        $params['diruri'] = $file;
-                        if (preg_match('/^([0-9]+)' . Dir::$numSeparator . '(.*)$/', $file, $match)) {
-                            $params['num'] = intval($match[1]);
-                            $params['slug'] = $match[2];
+                $directory = @opendir($this->root);
+                if ($directory) {
+                    while ($file = readdir($directory)) {
+                        if (strpos($file, '.') !== false) {
+                            continue;
                         }
-                    }
-                    if ($params['root']) {
-                        foreach ($this->modelFiles as $modelFile) {
-                            if (file_exists($params['root'] . '/' . $modelFile)) {
-                                $template = str_replace('.' . $this->extension, '', $modelFile);
-                                $params['template'] = $template;
-                                $params['model'] = $template;
-                                break;
+                        $_part = Dir::$numSeparator . $part;
+                        if (substr($file, -strlen($_part)) === $_part) {
+                            $params['root'] = $this->root . '/' . $file;
+                            $params['diruri'] = $file;
+                            if (preg_match('/^([0-9]+)' . Dir::$numSeparator . '(.*)$/', $file, $match)) {
+                                $params['num'] = intval($match[1]);
+                                $params['slug'] = $match[2];
                             }
                         }
-                        break;
+                        if ($params['root']) {
+                            foreach ($this->modelFiles as $modelFile) {
+                                if (file_exists($params['root'] . '/' . $modelFile)) {
+                                    $template = str_replace('.' . $this->extension, '', $modelFile);
+                                    $params['template'] = $template;
+                                    $params['model'] = $template;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
                     }
+                    closedir($directory);
                 }
-                closedir($directory);
             }
 
             if (! $params['root']) {
@@ -202,9 +200,12 @@ final class Bolt
             if (! $page) {
                 $page = Page::factory($params);
                 $this->pushLookup($treeid, $page);
-                kirby()->extend([
-                    'pages' => [$this->root => $page,]
-                ]);
+
+                if ($extend) {
+                    kirby()->extend([
+                        'pages' => [$this->root => $page,]
+                    ]);
+                }
             }
             $parent = $page;
             $this->root = $params['root']; // loop
@@ -212,8 +213,23 @@ final class Bolt
         return $page;
     }
 
-    public static function page(string $id, ?Page $parent = null): ?Page
+    public static function page(string $id, ?Page $parent = null, bool $cache = true, bool $extend = true): ?Page
     {
-        return (new self($parent))->findByID($id);
+        return (new self($parent))->findByID($id, $cache, $extend);
+    }
+
+    public static function index($callback)
+    {
+        $count = 0;
+        foreach (kirby()->collection('siteindexfolders') as $page) {
+            // save memory when indexing
+            $page = bolt($page, null, false, false);
+            if (!is_string($callback) && is_callable($callback)) {
+                $callback($page);
+            }
+            $count++;
+            $page = null; // free memory, do not use unset()
+        }
+        return $count;
     }
 }

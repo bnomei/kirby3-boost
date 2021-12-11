@@ -5,9 +5,9 @@
 autoloader(__DIR__)->classes();
 
 if (! function_exists('bolt')) {
-    function bolt(string $id)
+    function bolt(string $id, ?\Kirby\Cms\Page $parent = null, bool $cache = true, bool $extend = true)
     {
-        return \Bnomei\Bolt::page($id);
+        return \Bnomei\Bolt::page($id, $parent, $cache, $extend);
     }
 }
 
@@ -71,7 +71,7 @@ Kirby::plugin('bnomei/boost', [
             $page = $this;
 
             // has boost?
-            if ($page->hasBoost() === false) {
+            if ($page->hasBoost() !== true) {
                 return false;
             }
 
@@ -94,7 +94,7 @@ Kirby::plugin('bnomei/boost', [
         },
         'unboost' => function () {
             // has boost?
-            if ($this->hasBoost() === false) {
+            if ($this->hasBoost() !== true) {
                 return false;
             }
             $this->boostIndexRemove();
@@ -102,7 +102,7 @@ Kirby::plugin('bnomei/boost', [
         },
         'isBoosted' => function () {
             // has boost?
-            if ($this->hasBoost() === false) {
+            if ($this->hasBoost() !== true) {
                 return false;
             }
             // $this->boostIndexAdd(); // this would trigger content add
@@ -127,7 +127,7 @@ Kirby::plugin('bnomei/boost', [
             return \Bnomei\BoostIndex::singleton()->remove($this);
         },
         'tinyurl' => function (): string {
-            if ($this->hasBoost() && $url = \Bnomei\BoostIndex::tinyurl($this->boostIDField())) {
+            if ($this->hasBoost() === true && $url = \Bnomei\BoostIndex::tinyurl($this->boostIDField())) {
                 $this->boostIndexAdd();
                 return $url;
             }
@@ -178,7 +178,7 @@ Kirby::plugin('bnomei/boost', [
             $count = 0;
             \Bnomei\BoostCache::beginTransaction();
             foreach ($this as $page) {
-                if ($page->hasBoost()) {
+                if ($page->hasBoost() === true) {
                     // uuid and a field to force reading from cache
                     $str .= $page->diruri() . $page->modified() . $page->boostIDField()->value();
                     $page->boostIndexAdd();
@@ -195,8 +195,11 @@ Kirby::plugin('bnomei/boost', [
     ],
     'siteMethods' => [
         'boost' => function () {
-            $drafts = option('bnomei.boost.drafts');
-            return site()->index($drafts)->boost();
+            $count = 0;
+            \Bnomei\Bolt::index(function ($page) use (&$count) {
+                $count += $page->boost() ? 1 : 0;
+            });
+            return $count;
         },
         'boostmark' => function () {
             $drafts = option('bnomei.boost.drafts');

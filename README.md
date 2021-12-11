@@ -281,7 +281,7 @@ return [
 
 ### Verify with Boostmark
 
-First make sure all boosted pages are up-to-date in cache. Run this in a template or controller once.
+First make sure all boosted pages are up-to-date in cache. Run this in a template or controller once. This will also add an unique id to boosted pages that do not have one yet (reindexing).
 
 ```php
 // this can be skipped on next benchmark
@@ -310,6 +310,20 @@ This plugin allows you to use the BoostID value in a shortend URL. It also regis
 echo $page->url(); // https://devkit.bnomei.com/test-43422931f00e27337311/test-2efd96419d8ebe1f3230/test-32f6d90bd02babc5cbc3
 echo $page->boostIDField()->value(); // 8j5g64hh
 echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
+```
+
+## Site Index with lower memory footprint
+
+Using `site()->index()` in Kirby will load all Pages into memory at the same time. This plugin provides a way to iterate over the index with having only one page loaded at a time.
+
+```php
+$boostedCount = 0;
+$indexCount = \Bnomei\Bolt::index(function ($page) use (&$boostedCount) {
+    // do something with that $page like...
+    $boostedCount += $page->boost() ? 1 : 0;
+});
+// or just
+$boostedCount = site()->boost();
 ```
 
 ## Settings

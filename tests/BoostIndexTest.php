@@ -4,6 +4,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Kirby\Cms\Page;
 use Bnomei\BoostIndex;
+use Kirby\Toolkit\A;
 use PHPUnit\Framework\TestCase;
 
 final class BoostIndexTest extends TestCase
@@ -40,7 +41,7 @@ final class BoostIndexTest extends TestCase
     public function testBoostFindById()
     {
         $this->assertFalse(option('debug'));
-        
+
         $index = BoostIndex::singleton();
         $index->index(true);
 
@@ -105,6 +106,7 @@ final class BoostIndexTest extends TestCase
         $this->assertTrue($index->write());
 
         $items = $index->index(true);
+
         $this->assertTrue($items > 0);
         unset($index); // trigger write
 

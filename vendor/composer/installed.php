@@ -1,7 +1,7 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => '1.7.1',
-        'version' => '1.7.1.0',
+        'pretty_version' => '1.8.0',
+        'version' => '1.8.0.0',
         'type' => 'kirby-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,17 +11,17 @@
     ),
     'versions' => array(
         'bnomei/autoloader-for-kirby' => array(
-            'pretty_version' => '1.2.9',
-            'version' => '1.2.9.0',
+            'pretty_version' => '1.4.0',
+            'version' => '1.4.0.0',
             'type' => 'project',
             'install_path' => __DIR__ . '/../bnomei/autoloader-for-kirby',
             'aliases' => array(),
-            'reference' => '37637d1b8416cf4de76d7c5f0f865ea9365a642a',
+            'reference' => 'cd512a25af2efcc031db42aa7794a0da2e8f401e',
             'dev_requirement' => false,
         ),
         'bnomei/kirby3-boost' => array(
-            'pretty_version' => '1.7.1',
-            'version' => '1.7.1.0',
+            'pretty_version' => '1.8.0',
+            'version' => '1.8.0.0',
             'type' => 'kirby-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
