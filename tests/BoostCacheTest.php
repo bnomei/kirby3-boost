@@ -43,12 +43,12 @@ final class BoostCacheTest extends TestCase
         $this->assertNotNull(BoostCache::file());
         $this->assertNotNull(BoostCache::apcu());
         $this->assertNotNull(BoostCache::memory());
+        $this->assertNotNull(BoostCache::memcached());
     }
 
     public function testNonCoreDrivers(): void
     {
         $cache = BoostCache::singleton();
-        $this->assertNull(BoostCache::memcached());
         $this->assertNull(BoostCache::sqlite());
         $this->assertNull(BoostCache::mysql());
         $this->assertNull(BoostCache::redis());
