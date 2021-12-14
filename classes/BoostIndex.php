@@ -205,17 +205,31 @@ final class BoostIndex
 
     public static function modified($id): ?int
     {
-        if (is_a($id, \Kirby\Cms\Page::class)) {
+        $modified = null;
+
+        if ($id instanceof \Kirby\Cms\Page) {
+            $id = $id->id();
+            $modified = BoostCache::singleton()->get(crc32($id) . '-modified');
+        }
+        elseif ($id instanceof \Kirby\Cms\File) {
+            $modified = $id->modified();
             $id = $id->id();
         }
-        $modified = BoostCache::singleton()->get(crc32($id) . '-modified');
-        if ($modified) {
+        elseif ($id instanceof \Kirby\Cms\Site) {
+            $modified = filemtime($id->contentFile());
+            $id = '$';
+        }
+
+        if ($modified) { // could be false
             return $modified;
         }
 
         if ($page = \bolt($id)) {
             $page->boost(); // force cache update
-            return $page->modified();
+            $modified = $page->modified();
+            if ($modified) { // could be false
+                return $modified;
+            }
         }
 
         return null;
