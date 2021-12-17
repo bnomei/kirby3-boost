@@ -59,7 +59,7 @@ fields:
     extends: fields/boostidkvs
 ```
 
-> You can create your own fields for related pages [based on the ones this plugins provides](https://github.com/bnomei/kirby3-boost/tree/main/blueprints/fields).
+> You can create your own fields for related pages based on the [fields](https://github.com/bnomei/kirby3-boost/tree/main/blueprints/fields) and [collections](https://github.com/bnomei/kirby3-boost/tree/main/collections/example_static_cached_collection.php) this plugins provides.
 
 **site/models/default.php**
 ```php
@@ -75,6 +75,17 @@ class DefaultPage extends \Bnomei\BoostPage
     
 }
 ```
+
+As a last step fill the boost cache in calling the following in a template or controller. You only have to do this once (not on every request).
+
+```php
+// allow updates to pages so missing boostids can be set
+kirby()->impersonate('kirby');
+// add missing boostids and fill cache
+site()->boost();
+```
+
+Congratulations! Now your project is boosted.
 
 ## Usage
 
