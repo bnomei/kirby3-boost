@@ -85,7 +85,7 @@ final class Bolt
                     $this->pushLookup($id, $page);
                     $lookup = $page;
                 } else {
-                    $this->cache()->remove(crc32($id) . '-bolt');
+                    static::cache()->remove(crc32($id) . '-bolt');
                 }
             }
         }
@@ -95,7 +95,12 @@ final class Bolt
     public function pushLookup(string $id, Page $page): void
     {
         static::$idToPage[$id] = $page;
-        $this->cache()->set(crc32($id) . '-bolt', $page->diruri(), option('bnomei.boost.expire'));
+
+        // only update if necessary
+        $diruri = $page->diruri();
+        if ($diruri !== static::cache()->get(crc32($id) . '-bolt')) {
+            static::cache()->set(crc32($id) . '-bolt', $diruri, option('bnomei.boost.expire'));
+        }
     }
 
     public static function toArray(): array
