@@ -126,7 +126,7 @@ $pageModifiedTimestampOrNull = modified($somePageId); // faster
 
 ## Caches and Cache Drivers
 
-A cache driver is a piece of code that defines where get/set commands for the key/value store of the cache are directed to. Kirby has [built in support](https://getkirby.com/docs/reference/system/options/cache#cache-driver) for File, Apcu, Memcached and Memory. I have created additional cache drivers for [MySQL (work in progress)](https://github.com/bnomei/kirby3-mysql-cachedriver), [Redis](https://github.com/bnomei/kirby3-redis-cachedriver), [SQLite](https://github.com/bnomei/kirby3-sqlite-cachedriver) and [PHP](https://github.com/bnomei/kirby3-php-cachedriver).
+A cache driver is a piece of code that defines where get/set commands for the key/value store of the cache are directed to. Kirby has [built in support](https://getkirby.com/docs/reference/system/options/cache#cache-driver) for File, Apcu, Memcached and Memory. I have created additional cache drivers for [MySQL](https://github.com/bnomei/kirby3-mysql-cachedriver), [Redis](https://github.com/bnomei/kirby3-redis-cachedriver), [SQLite](https://github.com/bnomei/kirby3-sqlite-cachedriver) and [PHP](https://github.com/bnomei/kirby3-php-cachedriver).
 
 Within Kirby caches can be used for:
 
