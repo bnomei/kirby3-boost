@@ -229,7 +229,7 @@ final class Bolt
         foreach (kirby()->collection('siteindexfolders') as $page) {
             // save memory when indexing
             $page = bolt($page, null, false, false);
-            if (!is_string($callback) && is_callable($callback)) {
+            if ($page && !is_string($callback) && is_callable($callback)) {
                 $callback($page);
             }
             $count++;
