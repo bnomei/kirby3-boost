@@ -280,7 +280,7 @@ Kirby::plugin('bnomei/boost', [
             if ($newPage->hasBoost() === true) {
                 if (option('bnomei.boost.updateIndexWithHooks')) {
                     $newPage->boostIndexAdd();
-                    $newPage->children()->boostIndexAdd();
+                    $newPage->index(option('bnomei.boost.drafts'))->boostIndexAdd();
                 }
             }
         },
@@ -288,7 +288,7 @@ Kirby::plugin('bnomei/boost', [
             if ($newPage->hasBoost() === true) {
                 if (option('bnomei.boost.updateIndexWithHooks')) {
                     $newPage->boostIndexAdd();
-                    $newPage->children()->boostIndexAdd();
+                    $newPage->index(option('bnomei.boost.drafts'))->boostIndexAdd();
                 }
             }
         },
@@ -296,7 +296,7 @@ Kirby::plugin('bnomei/boost', [
             if ($newPage->hasBoost() === true) {
                 if (option('bnomei.boost.updateIndexWithHooks')) {
                     $newPage->boostIndexAdd();
-                    $newPage->children()->boostIndexAdd();
+                    $newPage->index(option('bnomei.boost.drafts'))->boostIndexAdd();
                 }
             }
         },
@@ -304,7 +304,7 @@ Kirby::plugin('bnomei/boost', [
             if ($page->hasBoost() === true) {
                 if (option('bnomei.boost.updateIndexWithHooks')) {
                     $page->boostIndexRemove();
-                    $page->children()->boostIndexRemove();
+                    $page->index(option('bnomei.boost.drafts'))->boostIndexRemove();
                 }
             }
         },

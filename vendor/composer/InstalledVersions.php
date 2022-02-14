@@ -20,13 +20,15 @@ use Composer\Semver\VersionParser;
 
 
 
+
+
 class InstalledVersions
 {
 private static $installed = array (
   'root' => 
   array (
-    'pretty_version' => '1.8.2',
-    'version' => '1.8.2.0',
+    'pretty_version' => '1.8.5',
+    'version' => '1.8.5.0',
     'aliases' => 
     array (
     ),
@@ -46,8 +48,8 @@ private static $installed = array (
     ),
     'bnomei/kirby3-boost' => 
     array (
-      'pretty_version' => '1.8.2',
-      'version' => '1.8.2.0',
+      'pretty_version' => '1.8.5',
+      'version' => '1.8.5.0',
       'aliases' => 
       array (
       ),
@@ -73,21 +75,21 @@ private static $installed = array (
     ),
     'symfony/finder' => 
     array (
-      'pretty_version' => 'v4.4.30',
-      'version' => '4.4.30.0',
+      'pretty_version' => 'v4.4.37',
+      'version' => '4.4.37.0',
       'aliases' => 
       array (
       ),
-      'reference' => '70362f1e112280d75b30087c7598b837c1b468b6',
+      'reference' => 'b17d76d7ed179f017aad646e858c90a2771af15d',
     ),
     'symfony/polyfill-php80' => 
     array (
-      'pretty_version' => 'v1.23.1',
-      'version' => '1.23.1.0',
+      'pretty_version' => 'v1.24.0',
+      'version' => '1.24.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => '1100343ed1a92e3a38f9ae122fc0eb21602547be',
+      'reference' => '57b712b08eddb97c762a8caa32c84e037892d2e9',
     ),
   ),
 );
@@ -106,7 +108,6 @@ $packages = array();
 foreach (self::getInstalled() as $installed) {
 $packages[] = array_keys($installed['versions']);
 }
-
 
 if (1 === \count($packages)) {
 return $packages[0];
@@ -299,6 +300,7 @@ public static function reload($data)
 self::$installed = $data;
 self::$installedByVendor = array();
 }
+
 
 
 
