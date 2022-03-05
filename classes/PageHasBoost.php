@@ -56,6 +56,7 @@ trait PageHasBoost
                 $boostid = option('bnomei.boost.index.generator')();
             }
             $fieldname = option('bnomei.boost.fieldname');
+            kirby()->impersonate('kirby');
             return $this->update([
                 $fieldname => $boostid,
             ]);
