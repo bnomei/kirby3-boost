@@ -19,8 +19,11 @@ if (! function_exists('modified')) {
 }
 
 if (! function_exists('boost')) {
-    function boost(string $id): ?\Kirby\Cms\Page
+    function boost(?string $id = null): ?\Kirby\Cms\Page
     {
+        if (!$id) {
+            return null;
+        }
         $page = \Bnomei\BoostIndex::page($id);
         if (!$page) {
             $page = \Bnomei\Bolt::page($id);
