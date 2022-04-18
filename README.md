@@ -76,13 +76,16 @@ class DefaultPage extends \Bnomei\BoostPage
 }
 ```
 
+> Since in most cases you will be using Kirbys autoloading for the [pagemodels](https://getkirby.com/docs/guide/templates/page-models) your classname needs to end in `Page`. Like `site/models/article.php` and `ArticlePage` or `site/models/blogpost.php` and `BlogpostPage`.
+
 As a last step fill the boost cache in calling the following in a template or controller. You only have to do this once (not on every request).
 
 ```php
 // allow updates to pages so missing boostids can be set
 kirby()->impersonate('kirby');
 // add missing boostids and fill cache
-site()->boost();
+$count = site()->boost();
+echo $count . ' Pages have been boosted.';
 ```
 
 Congratulations! Now your project is boosted.
