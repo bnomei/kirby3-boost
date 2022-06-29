@@ -80,6 +80,20 @@ final class Autoloader
                 'lowercase' => true,
                 'map' => [],
             ],
+            'routes' => [
+                'folder' => 'routes',
+                'name' => static::ANY_PHP,
+                'key' => 'route',
+                'require' => true,
+                'lowercase' => false,
+            ],
+            'apiroutes' => [
+                'folder' => 'api/routes',
+                'name' => static::ANY_PHP,
+                'key' => 'route',
+                'require' => true,
+                'lowercase' => false,
+            ],
             'usermodels' => [
                 'folder' => 'models',
                 'name' => static::USER_PHP,
@@ -102,13 +116,13 @@ final class Autoloader
                 'require' => false,
                 'lowercase' => true,
             ],
-        	'translations' => [
-        		'folder' => 'translations',
-        		'name' => static::ANY_PHP_OR_YML_OR_JSON,
-        		'key' => 'filename',
-        		'require' => true,
+            'translations' => [
+                'folder' => 'translations',
+                'name' => static::ANY_PHP_OR_YML_OR_JSON,
+                'key' => 'filename',
+                'require' => true,
                 'lowercase' => true,
-        	],
+            ],
         ], $options);
 
         if (!array_key_exists('dir', $this->options)) {
@@ -146,9 +160,10 @@ final class Autoloader
             $class = '';
             $split = explode('.', $file->getPathname());
             $extension = array_pop($split);
-            if ($options['key'] === 'relativepath') {
+            if ($options['key'] === 'relativepath' || $options['key'] === 'route') {
                 $key = $file->getRelativePathname();
                 $key = str_replace('.' . $extension, '', $key);
+                $key = str_replace('\\', '/', $key); // windows
                 if ($options['lowercase']) {
                     $key = strtolower($key);
                 }
@@ -170,7 +185,7 @@ final class Autoloader
                 }
                 $this->registry[$type]['map'][$class] = $file->getRelativePathname();
 
-                foreach(['Page', 'User', 'Block'] as $suffix) {
+                foreach (['Page', 'User', 'Block'] as $suffix) {
                     $at = strpos($key, $suffix);
                     if ($at === strlen($key) - strlen($suffix)) {
                         $key = substr($key, 0, -strlen($suffix));
@@ -189,6 +204,24 @@ final class Autoloader
 
             if ($options['key'] === 'classname') {
                 $this->registry[$type][$key] = $class;
+            } elseif ($options['key'] === 'route') {
+                // Author: @tobimori
+                $pattern = strtolower($file->getRelativePathname());
+                $pattern = preg_replace('~(.*)' . preg_quote('.php', '~') . '~', '$1' . '', $pattern, 1); // replace extension at end
+                $pattern = preg_replace('~(.*)' . preg_quote('index', '~') . '~', '$1' . '', $pattern, 1); // replace index at end, for root of folder, but not in paths etc.
+
+                $route = require $file->getRealPath();
+
+                // check if return is actually an array (if additional stuff is specified, e.g. method or language) or returns a function
+                if (is_array($route) || $route instanceof \Closure) {
+                    $this->registry[$type][] = array_merge(
+                        [
+                            'pattern' => /*'/' . */ $pattern,
+                            'action' => $route instanceof \Closure ? $route : null
+                        ],
+                        is_array($route) ? $route : []
+                    );
+                }
             } elseif ($options['require'] && $extension && strtolower($extension) === 'php') {
                 $path = $file->getPathname();
                 $this->registry[$type][$key] = require_once $path;
@@ -197,7 +230,7 @@ final class Autoloader
                 $this->registry[$type][$key] = json_decode(file_get_contents($path), true);
             } elseif ($options['require'] && $extension && strtolower($extension) === 'yml') {
                 $path = $file->getPathname();
-                 // remove BOM
+                // remove BOM
                 $yaml = str_replace("\xEF\xBB\xBF", '', file_get_contents($path));
                 $this->registry[$type][$key] = Spyc::YAMLLoadString($yaml);
             } else {
@@ -209,7 +242,7 @@ final class Autoloader
             // sort by \ in FQCN count desc
             // within same count sort alpha
             $map = array_flip($this->registry[$type]['map']);
-            uasort($map, function($a, $b) {
+            uasort($map, function ($a, $b) {
                 $ca = substr_count($a, '\\');
                 $cb = substr_count($b, '\\');
                 if ($ca === $cb) {
@@ -218,7 +251,6 @@ final class Autoloader
                     return $alpha[0] === $a ? -1 : 1;
                 }
                 return $ca < $cb ? 1 : -1;
-
             });
             $map = array_flip($map);
             $this->load($map, $this->options['dir'] . '/' . $options['folder']);
@@ -261,6 +293,16 @@ final class Autoloader
         return $this->registry('pagemodels');
     }
 
+    public function routes(): array
+    {
+        return $this->registry('routes');
+    }
+
+    public function apiRoutes(): array
+    {
+        return $this->registry('apiroutes');
+    }
+
     public function userModels(): array
     {
         return $this->registry('usermodels');
@@ -279,6 +321,26 @@ final class Autoloader
     public function translations(): array
     {
         return $this->registry('translations');
+    }
+
+    public function toArray(array $merge = []): array
+    {
+        $this->classes();
+
+        return array_merge_recursive([
+            'blueprints' => $this->blueprints(),
+            'collections' => $this->collections(),
+            'controllers' => $this->controllers(),
+            'blockModels' => $this->blockModels(),
+            'pageModels' => $this->pageModels(),
+            'userModels' => $this->userModels(),
+            'snippets' => $this->snippets(),
+            'templates' => $this->templates(),
+            'translations' => $this->translations(),
+
+            'api' => ['routes' => $this->routes('api')],
+            'routes' => $this->routes(),
+        ], $merge);
     }
 
     public static function singleton(array $options = []): self

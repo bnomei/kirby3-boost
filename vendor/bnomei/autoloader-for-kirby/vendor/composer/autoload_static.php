@@ -4,9 +4,10 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit1ac0a0189216f01acd281a1ae90a9487
+class ComposerStaticInit18a534cd2ffba7e85b28267a44ec90f9
 {
     public static $files = array (
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '04c6c5c2f7095ccf6c481d3e53e1776f' => __DIR__ . '/..' . '/mustangostang/spyc/Spyc.php',
         '8d45f37583b137896354a61f45ecc27e' => __DIR__ . '/../..' . '/helpers.php',
@@ -43,6 +44,7 @@ class ComposerStaticInit1ac0a0189216f01acd281a1ae90a9487
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Bnomei\\Autoloader' => __DIR__ . '/../..' . '/classes/Autoloader.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'Symfony\\Component\\Finder\\Comparator\\Comparator' => __DIR__ . '/..' . '/symfony/finder/Comparator/Comparator.php',
         'Symfony\\Component\\Finder\\Comparator\\DateComparator' => __DIR__ . '/..' . '/symfony/finder/Comparator/DateComparator.php',
@@ -65,8 +67,10 @@ class ComposerStaticInit1ac0a0189216f01acd281a1ae90a9487
         'Symfony\\Component\\Finder\\Iterator\\RecursiveDirectoryIterator' => __DIR__ . '/..' . '/symfony/finder/Iterator/RecursiveDirectoryIterator.php',
         'Symfony\\Component\\Finder\\Iterator\\SizeRangeFilterIterator' => __DIR__ . '/..' . '/symfony/finder/Iterator/SizeRangeFilterIterator.php',
         'Symfony\\Component\\Finder\\Iterator\\SortableIterator' => __DIR__ . '/..' . '/symfony/finder/Iterator/SortableIterator.php',
+        'Symfony\\Component\\Finder\\Iterator\\VcsIgnoredFilterIterator' => __DIR__ . '/..' . '/symfony/finder/Iterator/VcsIgnoredFilterIterator.php',
         'Symfony\\Component\\Finder\\SplFileInfo' => __DIR__ . '/..' . '/symfony/finder/SplFileInfo.php',
         'Symfony\\Polyfill\\Php80\\Php80' => __DIR__ . '/..' . '/symfony/polyfill-php80/Php80.php',
+        'Symfony\\Polyfill\\Php80\\PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/PhpToken.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
     );
@@ -74,9 +78,9 @@ class ComposerStaticInit1ac0a0189216f01acd281a1ae90a9487
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit1ac0a0189216f01acd281a1ae90a9487::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit1ac0a0189216f01acd281a1ae90a9487::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit1ac0a0189216f01acd281a1ae90a9487::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit18a534cd2ffba7e85b28267a44ec90f9::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit18a534cd2ffba7e85b28267a44ec90f9::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit18a534cd2ffba7e85b28267a44ec90f9::$classMap;
 
         }, null, ClassLoader::class);
     }
