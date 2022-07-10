@@ -10,6 +10,8 @@ use Kirby\Cache\ApcuCache;
 use Kirby\Cache\MemoryCache;
 use Kirby\Cache\MemCached;
 use Kirby\Cache\NullCache;
+use Kirby\Filesystem\F;
+use Kirby\Toolkit\Str;
 
 final class BoostCache
 {
@@ -24,6 +26,7 @@ final class BoostCache
             self::$singleton->flush();
         }
         */
+        self::patchFilesClass();
 
         return self::$singleton;
     }
@@ -126,5 +129,18 @@ final class BoostCache
             ], $options));
         }
         return null;
+    }
+
+    public static function patchFilesClass() {
+        if (option('bnomei.boost.patch.files')) {
+            $filesClass = kirby()->roots()->kirby() . '/src/Cms/Files.php';
+            if (F::exists($filesClass) && F::isWritable($filesClass)) {
+                $code = F::read($filesClass);
+                if (Str::contains($code, '\Bnomei\BoostFile::factory') === false) {
+                    $code = str_replace('File::factory(', '\Bnomei\BoostFile::factory(', $code);
+                    F::write($filesClass, $code);
+                }
+            }
+        }
     }
 }

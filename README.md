@@ -7,7 +7,7 @@
 [![Maintainability](https://flat.badgen.net/codeclimate/maintainability/bnomei/kirby3-boost)](https://codeclimate.com/github/bnomei/kirby3-boost) 
 [![Twitter](https://flat.badgen.net/badge/twitter/bnomei?color=66d9ef)](https://twitter.com/bnomei)
 
-Boost the speed of Kirby by having content files of pages cached, with automatic unique ID, fast lookup and Tiny-URL.
+Boost the speed of Kirby by having content files of files/pages/users cached, with automatic unique ID for pages, fast lookup and Tiny-URL.
 
 ## Commercial Usage
 
@@ -89,6 +89,40 @@ echo $count . ' Pages have been boosted.';
 ```
 
 Congratulations! Now your project is boosted.
+
+### User Models
+
+Starting with version 1.9 you can also cache the content files of user models using the respective traits/extends in your custom models via a custom plugin.
+
+```php
+class AdminUser extends \Kirby\Cms\User
+{
+    use \Bnomei\UserHasBoost;
+}
+
+Kirby::plugin('myplugin/user', [
+    'userModels' => [
+        'admin' => AdminUser::class, // admin is default role
+    ],
+]);
+```
+
+### File Models
+
+Starting with version 1.9 you can use a setting to tell the plugin to monkey patch the core `Files` class with content cache support. You can only turn this on for all files at once since Kirby does not allow custom File models. It would need to read content file first which would defeat the purpose for a content cache anyway.
+
+**site/config/config.php**
+```php
+<?php
+
+return [
+    // other options
+    'bnomei.boost.patch.files' => true, // default: false
+```
+
+### Easier loading of custom models, blueprints, ...
+
+When you use boost your project you might end up with a couple of custom models in a plugin. You can use my [autoloader helper](https://github.com/bnomei/autoloader-for-kirby) to make registering these classes a bit easier. It can also load blueprints, classes, collections, controllers, blockModels, pageModels, routes, api/routes, userModels, snippets, templates and translation files.
 
 ## Usage
 
@@ -342,18 +376,19 @@ $boostedCount = site()->boost();
 
 ## Settings
 
-| bnomei.boost.            | Default        | Description               |            
-|---------------------------|----------------|---------------------------|
-| fieldname | `'boostid'` | change name of loaded field |
-| expire | `0` | expire in minutes for all caches created |
-| read | `true` | read from cache |
-| write | `true` | write to cache |
-| drafts | `true` | index drafts |
-| fileModifiedCheck | `false` | expects file to not be altered outside of kirby |
-| index.generator | callback | the uuid genertor |
-| tinyurl.url | callback | returning `site()->url()`. Use htaccess on that domain to redirect `RewriteRule (.*) http://www.bnomei.com/x/$1 [R=301]` |
-| tinyurl.folder | `x` | Tinyurl format: yourdomain/{folder}/{hash} |
-| updateIndexWithHooks | `true` | disable this when batch creating lots of pages |
+| bnomei.boost.            | Default     | Description                                                                                                              |            
+|---------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------|
+| fieldname | `'boostid'` | change name of loaded field                                                                                              |
+| expire | `0`         | expire in minutes for all caches created                                                                                 |
+| read | `true`      | read from cache                                                                                                          |
+| write | `true`      | write to cache                                                                                                           |
+| drafts | `true`      | index drafts                                                                                                             |
+| patch.files | `false`     | monkey patch Files Class to do content caching                                                                           |
+| fileModifiedCheck | `false`     | expects file to not be altered outside of kirby                                                                          |
+| index.generator | callback    | the uuid genertor                                                                                                        |
+| tinyurl.url | callback    | returning `site()->url()`. Use htaccess on that domain to redirect `RewriteRule (.*) http://www.bnomei.com/x/$1 [R=301]` |
+| tinyurl.folder | `x`         | Tinyurl format: yourdomain/{folder}/{hash}                                                                               |
+| updateIndexWithHooks | `true`      | disable this when batch creating lots of pages                                                                           |
 
 ## External changes to content files
 

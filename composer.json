@@ -1,8 +1,8 @@
 {
   "name": "bnomei/kirby3-boost",
   "type": "kirby-plugin",
-  "version": "1.8.9",
-  "description": "Boost the speed of Kirby by having content files of pages cached, with automatic unique ID, fast lookup and Tiny-URL.",
+  "version": "1.9.0",
+  "description": "Boost the speed of Kirby by having content files of files/pages/users cached, with automatic unique ID for pages, fast lookup and Tiny-URL.",
   "license": "MIT",
   "authors": [
     {
