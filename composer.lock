@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "81ebdc07a8e8ba43c57424d487dc98eb",
+    "content-hash": "d4c732342acccbe2c1ec7d5cdbfddede",
     "packages": [
         {
             "name": "bnomei/autoloader-for-kirby",
@@ -4576,7 +4576,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.4.0"
+        "php": ">=8.1.0"
     },
     "platform-dev": [],
     "plugin-api-version": "2.3.0"

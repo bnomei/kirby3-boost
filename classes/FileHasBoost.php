@@ -71,7 +71,7 @@ trait FileHasBoost
 
     public function contentBoostedKey(string $languageCode = null): string
     {
-        $key = strval(crc32($this->id()));
+        $key = strval(hash('xxh3', $this->id()));
         if (! $languageCode) {
             $languageCode = kirby()->languages()->count() ? kirby()->language()->code() : null;
         }

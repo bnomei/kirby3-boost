@@ -209,7 +209,7 @@ final class BoostIndex
 
         if ($id instanceof \Kirby\Cms\Page) {
             $id = $id->id();
-            $modified = BoostCache::singleton()->get(crc32($id) . '-modified');
+            $modified = BoostCache::singleton()->get(hash('xxh3', $id) . '-modified');
         }
         elseif ($id instanceof \Kirby\Cms\File) {
             $modified = $id->modified();

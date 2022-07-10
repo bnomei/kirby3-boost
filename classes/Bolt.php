@@ -78,14 +78,14 @@ final class Bolt
     {
         $lookup = A::get(static::$idToPage, $id);
         if (!$lookup && $cache && static::cache()) {
-            if ($diruri = static::cache()->get(crc32($id) . '-bolt')) {
+            if ($diruri = static::cache()->get(hash('xxh3', $id) . '-bolt')) {
                 // bolt will ignore caches with invalid paths and update them automatically
                 // it does not need to be flushed ever
                 if ($page = $this->findByID($diruri, false)) {
                     $this->pushLookup($id, $page);
                     $lookup = $page;
                 } else {
-                    static::cache()->remove(crc32($id) . '-bolt');
+                    static::cache()->remove(hash('xxh3', $id) . '-bolt');
                 }
             }
         }
@@ -98,8 +98,8 @@ final class Bolt
 
         // only update if necessary
         $diruri = $page->diruri();
-        if ($diruri !== static::cache()->get(crc32($id) . '-bolt')) {
-            static::cache()->set(crc32($id) . '-bolt', $diruri, option('bnomei.boost.expire'));
+        if ($diruri !== static::cache()->get(hash('xxh3', $id) . '-bolt')) {
+            static::cache()->set(hash('xxh3', $id) . '-bolt', $diruri, option('bnomei.boost.expire'));
         }
     }
 

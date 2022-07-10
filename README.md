@@ -122,7 +122,7 @@ return [
 
 ### Easier loading of custom models, blueprints, ...
 
-When you use boost your project you might end up with a couple of custom models in a plugin. You can use my [autoloader helper](https://github.com/bnomei/autoloader-for-kirby) to make registering these classes a bit easier. It can also load blueprints, classes, collections, controllers, blockModels, pageModels, routes, api/routes, userModels, snippets, templates and translation files.
+When you use boost your project you might end up with a couple of custom models in a plugin. You can use my [autoloader helper](https://github.com/bnomei/autoloader-for-kirby) to make registering these classes a bit easier. It can also load blueprints, classes, collections, controllers, blockModels, pageModels, routes, api/routes, userModels, snippets, templates and translation files. If you installed the Boost plugin via composer the autoloader helper was installed as a dependency, and you can start using it straight way.
 
 ## Usage
 
