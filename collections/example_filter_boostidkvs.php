@@ -7,8 +7,10 @@ return fn() => lapseStatic(__FILE__, function () {
     return array_filter(
         collection('boostidkvs'),
         function ($kvObject) {
-            $page = boost($kvObject->value);
-            return $page && $page->intendedTemplate()->name() === 'post';
+            if ($kvObject->template === 'post') {
+                return boost($kvObject->value);
+            };
+            return null;
         }
     );
 });

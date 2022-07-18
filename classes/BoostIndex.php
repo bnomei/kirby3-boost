@@ -47,6 +47,14 @@ final class BoostIndex
     }
     */
 
+    public function __destruct()
+    {
+        $cache = $this->cache();
+        if ($cache && method_exists($cache, 'register_shutdown_function') === false) {
+            $this->write();
+        }
+    }
+
     private function cache()
     {
         return BoostCache::singleton();
@@ -77,7 +85,7 @@ final class BoostIndex
         $count = 0;
         foreach (kirby()->collection('siteindexfolders') as $page) {
             // save memory when indexing
-            $page = bolt($page, null, false, false);
+            $page = \Bnomei\Bolt::page($page, null, false, false);
             if (!$page || $page->hasBoost() !== true) {
                 $page = null; // free memory, do not use unset()
                 continue;
@@ -111,61 +119,94 @@ final class BoostIndex
         return true;
     }
 
-    public function findByBoostId(string $boostid, bool $throwException = true): ?Page
+    public function find(string $uuid, bool $throwException = true): ?Page
     {
-        $boostid = trim($boostid);
-        $id = A::get($this->index, $boostid);
+        $uuid = trim($uuid);
+        $diruri = $this->diruri($uuid);
 
-        if ($id && $page = bolt(explode(static::SEPERATOR, $id)[0])) {
+        if ($diruri && $page = \Bnomei\Bolt::page($diruri)) {
             return $page;
         } else {
             $crawl = null;
-            foreach (kirby()->collection('boostidpages') as $page) {
-                if ($this->add($page) && $page->boostIDField()->value() === $boostid) {
-                    $crawl = $page;
-                    break;
+
+            // try UUID cache first
+            $pageIdFromUuidCache = \Kirby\Cms\Uuid::cache()->get('page://' . $uuid);
+            if ($pageIdFromUuidCache && $page = \Bnomei\Bolt::page($pageIdFromUuidCache)) {
+                $this->add($page);
+                $crawl = $page;
+            }
+
+            if (!$crawl) {
+                // then try crawling index
+                foreach (site()->index(option('bnomei.boost.drafts')) as $page) {
+                    if ($this->add($page) && $page->uuid() === $uuid) {
+                        $crawl = $page;
+                        break;
+                    }
                 }
             }
+
             $this->write();
             if ($crawl) {
                 return $crawl;
             } elseif ($throwException) {
-                throw new \Exception("No page found for BoostID: " . $boostid);
+                throw new \Exception("No page found for uuid: " . $uuid);
             }
         }
         return null;
     }
 
+    public function data(string $uuid): ?array
+    {
+        if ($data = A::get($this->index(), $uuid)) {
+            list($diruri, $title, $template) = explode(static::SEPERATOR, $data);
+            $data = [
+                'diruri' => $diruri,
+                'template' => $template,
+                'title' => $title,
+                'uuid' => $uuid,
+            ];
+        }
+
+        return $data ?? null;
+    }
+
+    public function diruri(string $uuid)
+    {
+        $data = $this->data($uuid);
+        return A::get($data, 'diruri');
+    }
+
     public function add(Page $page): bool
     {
-        if ($page->boostIDField()->isEmpty()) {
+        $uuid = $page->uuid();
+        if (empty($uuid)) {
             return false;
         }
 
-        $boostid = $page->boostIDField()->value();
-        $id = $page->diruri() . static::SEPERATOR . $page->title()->value();
+        $id = $page->diruri() . static::SEPERATOR . $page->title()->value() . static::SEPERATOR . $page->template()->name();
         if (kirby()->multilang()) {
-            $id = $page->diruri() . static::SEPERATOR . $page->content(kirby()->defaultLanguage()->code())->title()->value();
+            $id = $page->diruri() . static::SEPERATOR . $page->content(kirby()->defaultLanguage()->code())->title()->value() . static::SEPERATOR . $page->template()->name();
         }
 
-        if (!array_key_exists($boostid, $this->index) ||
-            $this->index[$boostid] !== $id
+        if (!array_key_exists($uuid, $this->index) ||
+            $this->index[$uuid] !== $id
         ) {
             $this->isDirty = true;
-            $this->index[$boostid] = $id;
+            $this->index[$uuid] = $id;
         }
         return true;
     }
 
     public function remove(Page $page): bool
     {
-        if ($page->boostIDField()->isEmpty()) {
+        $uuid = $page->uuid();
+        if (empty($uuid)) {
             return false;
         }
 
-        $boostid = $page->boostIDField()->value();
-        if (array_key_exists($boostid, $this->index)) {
-            unset($this->index[$boostid]);
+        if (array_key_exists($uuid, $this->index)) {
+            unset($this->index[$uuid]);
             $this->isDirty = true;
         }
         return true;
@@ -174,6 +215,30 @@ final class BoostIndex
     public function toArray(): array
     {
         return $this->index;
+    }
+
+    public function toKVs(): array
+    {
+        $kv = [];
+        foreach ($this->toArray() as $uuid => $data) {
+            list($diruri, $title, $template) = explode(\Bnomei\BoostIndex::SEPERATOR, $data);
+            $kv[] = [
+                'diruri' => $diruri,
+                'template' => $template,
+                'text' => $title,
+                'value' => $uuid,
+            ];
+        }
+        usort($kv, function ($a, $b) {
+            if ($a['diruri'] == $b['diruri']) {
+                return 0;
+            }
+            return ($a['diruri'] < $b['diruri']) ? -1 : 1;
+        });
+        $kv = array_map(function ($item) {
+            return new \Kirby\Toolkit\Obj($item);
+        }, $kv);
+        return $kv;
     }
 
     public function count(): int
@@ -203,40 +268,8 @@ final class BoostIndex
         return rtrim($url, '/') . '/' . $id;
     }
 
-    public static function modified($id): ?int
-    {
-        $modified = null;
-
-        if ($id instanceof \Kirby\Cms\Page) {
-            $id = $id->id();
-            $modified = BoostCache::singleton()->get(hash('xxh3', $id) . '-modified');
-        }
-        elseif ($id instanceof \Kirby\Cms\File) {
-            $modified = $id->modified();
-            $id = $id->id();
-        }
-        elseif ($id instanceof \Kirby\Cms\Site) {
-            $modified = filemtime($id->contentFile());
-            $id = '$';
-        }
-
-        if ($modified) { // could be false
-            return $modified;
-        }
-
-        if ($page = \bolt($id)) {
-            $page->boost(); // force cache update
-            $modified = $page->modified();
-            if ($modified) { // could be false
-                return $modified;
-            }
-        }
-
-        return null;
-    }
-
     public static function page(string $id): ?Page
     {
-        return static::singleton()->findByBoostId($id, false);
+        return static::singleton()->find($id, false);
     }
 }

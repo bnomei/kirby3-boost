@@ -228,7 +228,7 @@ final class Bolt
         $count = 0;
         foreach (kirby()->collection('siteindexfolders') as $page) {
             // save memory when indexing
-            $page = bolt($page, null, false, false);
+            $page = \Bnomei\Bolt::page($page, null, false, false);
             if ($page && !is_string($callback) && is_callable($callback)) {
                 $callback($page);
             }

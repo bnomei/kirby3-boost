@@ -32,7 +32,7 @@ class PagesThatCanBeReferencedWithoutIndex
 
         // use bolt from autoid/boost to get pages quickly
         $pages = array_map(function($diruri) {
-            return bolt($diruri);
+            return \Bnomei\Bolt::page($diruri);
         }, $cachedDirUris);
         // remove those that bolt did not find
         $pages = array_filter($pages, function($page) {

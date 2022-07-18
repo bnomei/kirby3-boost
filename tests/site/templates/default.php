@@ -41,7 +41,7 @@ var_dump(count(Bnomei\Bolt::toArray()));
 ?>
 
 <h3>boostid</h3>
-<?php var_dump($page->boostIDField()->value()); ?>
+<?php var_dump($page->uuid()); ?>
 
 <h3>boostindex</h3>
 <?php var_dump(Bnomei\BoostIndex::singleton()->toArray()); ?>
@@ -51,16 +51,16 @@ var_dump(count(Bnomei\Bolt::toArray()));
 // TODO: resolve a lot of relations and track time
 $before = microtime(true);
 $count = 0;
-$pages = $page->related()->fromBoostIDs();
+$pages = $page->related()->toPages();
 if ($pages) {
     foreach ($pages as $rel) {
         var_dump($rel->title()->value());
         $count++;
-        $pages2 = $rel->related()->fromBoostIDs();
+        $pages2 = $rel->related()->toPages();
         foreach ($pages2 as $rel2) {
             var_dump($rel2->title()->value());
             $count++;
-            $pages3 = $rel2->related()->fromBoostIDs();
+            $pages3 = $rel2->related()->toPages();
             foreach ($pages3 as $rel3) {
                 var_dump($rel3->title()->value());
                 $count++;

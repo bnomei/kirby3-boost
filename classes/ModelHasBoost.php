@@ -4,27 +4,16 @@ declare(strict_types=1);
 
 namespace Bnomei;
 
-use Kirby\Cms\Page;
 use Kirby\Toolkit\A;
 
-trait PageHasBoost
+trait ModelHasBoost
 {
     /** @var bool */
     private $boostWillBeDeleted;
 
-    public static function create(array $props): Page
+    public function hasBoost(): bool
     {
-        $fieldname = option('bnomei.boost.fieldname');
-        if (!A::get($props['content'], $fieldname)) {
-            $boostid = option('bnomei.boost.index.generator')();
-            // make 100% sure its unique
-            while (BoostIndex::singleton()->findByBoostId($boostid, false)) {
-                $boostid = option('bnomei.boost.index.generator')();
-            }
-            $props['content'][$fieldname] = $boostid;
-        }
-
-        return parent::create($props);
+        return true;
     }
 
     public function checkModifiedTimestampForContentBoost(): bool
@@ -37,37 +26,15 @@ trait PageHasBoost
         $this->boostWillBeDeleted = $value;
     }
 
-    public function hasBoost(): bool
-    {
-        return true;
-    }
-
     public function isContentBoosted(string $languageCode = null): bool
     {
         return $this->readContentCache($languageCode) !== null;
     }
 
-    public function forceNewBoostId(bool $overwrite = false, ?string $id = null)
-    {
-        if ($overwrite || $this->boostIDField()->isEmpty()) {
-            $boostid = $id ?? option('bnomei.boost.index.generator')();
-            // make 100% sure its unique
-            while (BoostIndex::singleton()->findByBoostId($boostid, false)) {
-                $boostid = option('bnomei.boost.index.generator')();
-            }
-            $fieldname = option('bnomei.boost.fieldname');
-            kirby()->impersonate('kirby');
-            return $this->update([
-                $fieldname => $boostid,
-            ]);
-        }
-
-        return $this;
-    }
 
     public function contentBoostedKey(string $languageCode = null): string
     {
-        $key = strval(hash('xxh3', $this->id()));
+        $key = strval(hash('xxh3', $this->uuid()));
         if (! $languageCode) {
             $languageCode = kirby()->languages()->count() ? kirby()->language()->code() : null;
         }

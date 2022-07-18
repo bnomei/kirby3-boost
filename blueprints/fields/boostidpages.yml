@@ -1,9 +1,0 @@
-type: multiselect
-options: query
-query:
-  fetch: kirby.collection('boostidpages')
-  text: "{{ page.title }}"
-  value: "{{ page.BOOSTID }}"
-search:
-  min: 3
-  display: 10

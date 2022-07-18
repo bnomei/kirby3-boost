@@ -45,6 +45,38 @@ final class BoostCache
         }
     }
 
+    public static function modified($model)
+    {
+        if ($model instanceof \Kirby\Cms\Page ||
+            $model instanceof \Kirby\Cms\File ||
+            $model instanceof \Kirby\Cms\User) {
+            $modified = static::singleton()->get($model->contentBoostedKey() . '-modified');
+            if ($modified) { // could be false
+                return $modified;
+            } else {
+                return $model->modified();
+            }
+        }
+        elseif ($model instanceof \Kirby\Cms\Site) {
+            return filemtime($model->contentFile());
+        }
+
+        return null;
+    }
+
+    public static function patchFilesClass() {
+        if (option('bnomei.boost.patch.files')) {
+            $filesClass = kirby()->roots()->kirby() . '/src/Cms/Files.php';
+            if (F::exists($filesClass) && F::isWritable($filesClass)) {
+                $code = F::read($filesClass);
+                if (Str::contains($code, '\Bnomei\BoostFile::factory') === false) {
+                    $code = str_replace('File::factory(', '\Bnomei\BoostFile::factory(', $code);
+                    F::write($filesClass, $code);
+                }
+            }
+        }
+    }
+
     public static function nulld(array $options = []): NullCache
     {
         return new NullCache(array_merge([
@@ -129,18 +161,5 @@ final class BoostCache
             ], $options));
         }
         return null;
-    }
-
-    public static function patchFilesClass() {
-        if (option('bnomei.boost.patch.files')) {
-            $filesClass = kirby()->roots()->kirby() . '/src/Cms/Files.php';
-            if (F::exists($filesClass) && F::isWritable($filesClass)) {
-                $code = F::read($filesClass);
-                if (Str::contains($code, '\Bnomei\BoostFile::factory') === false) {
-                    $code = str_replace('File::factory(', '\Bnomei\BoostFile::factory(', $code);
-                    F::write($filesClass, $code);
-                }
-            }
-        }
     }
 }

@@ -6,5 +6,5 @@ namespace Bnomei;
 
 class BoostFile extends \Kirby\Cms\File
 {
-    use FileHasBoost;
+    use ModelHasBoost;
 }
