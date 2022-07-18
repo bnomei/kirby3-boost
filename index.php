@@ -1,5 +1,7 @@
 <?php
 
+use Bnomei\BoostIndex;
+
 @include_once __DIR__ . '/vendor/autoload.php';
 
 autoloader(__DIR__)->classes();
@@ -125,6 +127,26 @@ Kirby::plugin('bnomei/boost', [
                 $this->diruri(),
                 option('bnomei.boost.expire')
             );
+        },
+        'forceNewBoostId' => function (bool $overwrite = false, ?string $id = null) {
+            $isEmpty = false;
+            $u = $this->uuid();
+            if ($u instanceof \Kirby\Cms\Field) {
+                $isEmpty = $this->uuid()->isEmpty();
+            }
+            if (($overwrite || $isEmpty) && !is_string($u)) {
+                $uuid = $id ?? token();
+                // make 100% sure its unique
+                while (BoostIndex::singleton()->find($uuid, false)) {
+                    $uuid = token();
+                }
+                kirby()->impersonate('kirby');
+                return $this->update([
+                    'uuid' => $uuid,
+                ]);
+            }
+
+            return $this;
         },
         'searchForTemplate' => function (string $template): \Kirby\Cms\Pages
         {
@@ -260,6 +282,7 @@ Kirby::plugin('bnomei/boost', [
     'hooks' => [
         'page.create:after' => function ($page) {
             if (option('bnomei.boost.helper')) {
+                $page = $page->forceNewBoostId(false);
                 $page->boostIndexAdd();
             }
         },
@@ -270,6 +293,7 @@ Kirby::plugin('bnomei/boost', [
         },
         'page.duplicate:after' => function ($duplicatePage, $originalPage) {
             if (option('bnomei.boost.helper')) {
+                $duplicatePage = $duplicatePage->forceNewBoostId(true);
                 $duplicatePage->boostIndexAdd();
             }
         },

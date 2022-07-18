@@ -50,6 +50,7 @@ For each template you want to be cached you need to use a model to add the conte
 ```php
 class DefaultPage extends \Kirby\Cms\Page
 {
+    use \Bnomei\PageHasUuid; // only use this until Kirby has its own UUIDs
     use \Bnomei\ModelHasBoost;
 }
 ```
