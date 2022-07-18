@@ -59,9 +59,7 @@ class DefaultPage extends \Kirby\Cms\Page
 As a last step fill the boost cache in calling the following in a template or controller. You only have to do this once (not on every request).
 
 ```php
-// allow updates to pages so missing boostids can be set
-kirby()->impersonate('kirby');
-// add missing boostids and fill cache
+// fill cache
 $count = site()->boost();
 echo $count . ' Pages have been boosted.';
 ```
