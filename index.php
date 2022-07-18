@@ -28,7 +28,7 @@ if (! function_exists('token')) {
 if (! function_exists('boost')) {
     function boost($id)
     {
-        if (!$id) {
+        if (!$id || !option('bnomei.boost.helper')) {
             return null;
         }
 
@@ -126,10 +126,16 @@ Kirby::plugin('bnomei/boost', [
                 option('bnomei.boost.expire')
             );
         },
-        'searchForTemplate' => function (string $template, $root = null): \Kirby\Cms\Pages
+        'searchForTemplate' => function (string $template): \Kirby\Cms\Pages
         {
-            // TODO:
-            return new \Kirby\Cms\Pages([]);
+            $pages = [];
+            foreach(\Bnomei\BoostIndex::singleton()->toKVs() as $data) {
+                $diruri = $data['diruri'];
+                if($data['template'] === $template && Str::contains($diruri, $this->diruri())) {
+                    $pages[] = bolt($diruri);
+                }
+            }
+            return new \Kirby\Cms\Pages($pages);
         },
         'tinyurl' => function (): string {
             if ($this->hasBoost() === true && $url = \Bnomei\BoostIndex::tinyurl($this->uuid())) {
@@ -210,10 +216,15 @@ Kirby::plugin('bnomei/boost', [
             $drafts = option('bnomei.boost.drafts');
             return site()->index($drafts)->boostmark();
         },
-        'searchForTemplate' => function (string $template, $root = null): \Kirby\Cms\Pages
+        'searchForTemplate' => function (string $template): \Kirby\Cms\Pages
         {
-            // TODO:
-            return new \Kirby\Cms\Pages([]);
+            $pages = [];
+            foreach(\Bnomei\BoostIndex::singleton()->toKVs() as $data) {
+                if($data['template'] === $template) {
+                    $pages[] = bolt($data['diruri']);
+                }
+            }
+            return new \Kirby\Cms\Pages($pages);
         },
     ],
     'fieldMethods' => [

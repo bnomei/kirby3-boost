@@ -138,6 +138,12 @@ $page = page($uuid); // slower
 $page = boost($uuid); // will use fastest internally
 ```
 
+### Pages from uuids
+```php
+$pages = pages([$uuid1, $uuid2, ...]); // slower
+$pages = boost([$uuid1, $uuid2, ...]); // will use fastest internally
+```
+
 ### Resolving relations
 Fields where defined in the example blueprint above.
 
