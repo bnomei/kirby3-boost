@@ -12,9 +12,9 @@ if (! function_exists('bolt')) {
 }
 
 if (! function_exists('modified')) {
-    function modified($id)
+    function modified($model)
     {
-
+        return \Bnomei\BoostCache::modified($model);
     }
 }
 

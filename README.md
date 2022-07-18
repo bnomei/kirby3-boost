@@ -93,7 +93,7 @@ Starting with version 2.0 the plugin to monkey patch the core `Files` class with
 
 return [
     // other options
-    'bnomei.boost.patch.files' => true, // default: false
+    'bnomei.boost.patch.files' => true, // default: true
 ```
 
 ### Pages Field Alternative
@@ -164,10 +164,10 @@ It will return a collection page object(s) and you can expect this to be a lot f
 
 ```php
  // in full site index
-$allPagesWithTemplatePost = searchForTemplate('post');
+$allPagesWithTemplatePost = site()->searchForTemplate('post');
 
  // starting with blog as parent
-$pagesWithTemplatePostInBlog = searchForTemplate('post', page('blog'));
+$pagesWithTemplatePostInBlog = page('blog')->searchForTemplate('post');
 ```
 
 ## Caches and Cache Drivers

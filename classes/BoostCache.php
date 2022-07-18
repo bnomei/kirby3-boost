@@ -60,6 +60,14 @@ final class BoostCache
         elseif ($model instanceof \Kirby\Cms\Site) {
             return filemtime($model->contentFile());
         }
+        elseif (is_string($model)) {
+            $key = strval(hash('xxh3', $model));
+            $languageCode = kirby()->languages()->count() ? kirby()->language()->code() : null;
+            if ($languageCode) {
+                $key = $key . '-' .  $languageCode;
+            }
+            return static::singleton()->get($key . '-modified');
+        }
 
         return null;
     }
