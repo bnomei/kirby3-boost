@@ -23,6 +23,12 @@ Boost the speed of Kirby by having content files of files/pages/users cached, wi
 |---|----|---|---|---|
 | [Github sponsor](https://github.com/sponsors/bnomei) | [Patreon](https://patreon.com/bnomei) | [Buy Me a Coffee](https://buymeacoff.ee/bnomei) | [Paypal dontation](https://www.paypal.me/bnomei/15) | [Hire me](mailto:b@bnomei.com?subject=Kirby) |
 
+## Installation
+
+- unzip [master.zip](https://github.com/bnomei/kirby3-boost/archive/master.zip) as folder `site/plugins/kirby3-boost` or
+- `git submodule add https://github.com/bnomei/kirby3-boost.git site/plugins/kirby3-boost` or
+- `composer require bnomei/kirby3-boost`
+
 ## Usecase
 
 If you have to process within a single request a lot of page objects (1000+) or if you have a lot of relations between page objects to resolve then consider using this plugin. With less page objects you will probably not gain enough to justify the overhead.
