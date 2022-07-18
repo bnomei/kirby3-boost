@@ -134,6 +134,7 @@ $page = boost($somePageDirUri); // fastest
 
 ### Page from uuid
 ```php
+$page = page($uuid); // slower
 $page = boost($uuid); // will use fastest internally
 ```
 
