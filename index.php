@@ -36,7 +36,7 @@ if (! function_exists('boost')) {
 
         if (is_array($id)) {
             $pages = [];
-            foreach($id as $uuid) {
+            foreach ($id as $uuid) {
                 $pages[] = boost($uuid);
             }
             return new \Kirby\Cms\Pages($pages);
@@ -102,7 +102,8 @@ Kirby::plugin('bnomei/boost', [
         'unboost' => function () {
             // has boost?
             if ($this->hasBoost() === true) {
-                $this->deleteContentCache();;
+                $this->deleteContentCache();
+                ;
             }
 
             $this->boostIndexRemove();
@@ -121,7 +122,7 @@ Kirby::plugin('bnomei/boost', [
         'boostIndexRemove' => function () {
             return \Bnomei\BoostIndex::singleton()->remove($this);
         },
-        'boostCacheDirUri' => function() {
+        'boostCacheDirUri' => function () {
             \Bnomei\BoostCache::singleton()->set(
                 hash('xxh3', $this->uuid()) . '-diruri',
                 $this->diruri(),
@@ -148,12 +149,11 @@ Kirby::plugin('bnomei/boost', [
 
             return $this;
         },
-        'searchForTemplate' => function (string $template): \Kirby\Cms\Pages
-        {
+        'searchForTemplate' => function (string $template): \Kirby\Cms\Pages {
             $pages = [];
-            foreach(\Bnomei\BoostIndex::singleton()->toKVs() as $data) {
+            foreach (\Bnomei\BoostIndex::singleton()->toKVs() as $data) {
                 $diruri = $data['diruri'];
-                if($data['template'] === $template && Str::contains($diruri, $this->diruri())) {
+                if ($data['template'] === $template && Str::contains($diruri, $this->diruri())) {
                     $pages[] = bolt($diruri);
                 }
             }
@@ -238,11 +238,10 @@ Kirby::plugin('bnomei/boost', [
             $drafts = option('bnomei.boost.drafts');
             return site()->index($drafts)->boostmark();
         },
-        'searchForTemplate' => function (string $template): \Kirby\Cms\Pages
-        {
+        'searchForTemplate' => function (string $template): \Kirby\Cms\Pages {
             $pages = [];
-            foreach(\Bnomei\BoostIndex::singleton()->toKVs() as $data) {
-                if($data['template'] === $template) {
+            foreach (\Bnomei\BoostIndex::singleton()->toKVs() as $data) {
+                if ($data['template'] === $template) {
                     $pages[] = bolt($data['diruri']);
                 }
             }

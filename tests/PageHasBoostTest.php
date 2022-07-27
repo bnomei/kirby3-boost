@@ -89,7 +89,7 @@ final class PageHasBoostTest extends TestCase
         $randomPage = $this->randomPage();
         $key = $randomPage->contentBoostedKey();
         $cache = BoostCache::singleton();
-        
+
         // fake outdated modified value
         $this->assertTrue($cache->set($key . '-modified', $randomPage->modified() - 1));
         $this->assertTrue($randomPage->isContentCacheExpiredByModified());

@@ -56,11 +56,9 @@ final class BoostCache
             } else {
                 return $model->modified();
             }
-        }
-        elseif ($model instanceof \Kirby\Cms\Site) {
+        } elseif ($model instanceof \Kirby\Cms\Site) {
             return filemtime($model->contentFile());
-        }
-        elseif (is_string($model)) {
+        } elseif (is_string($model)) {
             $key = strval(hash('xxh3', $model));
             $languageCode = kirby()->languages()->count() ? kirby()->language()->code() : null;
             if ($languageCode) {
@@ -72,7 +70,8 @@ final class BoostCache
         return null;
     }
 
-    public static function patchFilesClass() {
+    public static function patchFilesClass()
+    {
         if (option('bnomei.boost.patch.files')) {
             $filesClass = kirby()->roots()->kirby() . '/src/Cms/Files.php';
             if (F::exists($filesClass) && F::isWritable($filesClass)) {

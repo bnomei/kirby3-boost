@@ -2,10 +2,12 @@
 
 class StaticBoostIdKVs
 {
-    static $cache = null;
-    static function load(): ?array
+    public static $cache = null;
+    public static function load(): ?array
     {
-        if(static::$cache) return static::$cache;
+        if (static::$cache) {
+            return static::$cache;
+        }
 
         static::$cache = \Bnomei\BoostIndex::singleton()->toKVs();
 
