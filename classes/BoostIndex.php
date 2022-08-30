@@ -43,9 +43,17 @@ final class BoostIndex
     /** NOTE: register that with cache instead
     public function __destruct()
     {
-        $this->write();
+    $this->write();
     }
-    */
+     */
+
+    public function __destruct()
+    {
+        $cache = $this->cache();
+        if ($cache && method_exists($cache, 'register_shutdown_function') === false) {
+            $this->write();
+        }
+    }
 
     private function cache()
     {
