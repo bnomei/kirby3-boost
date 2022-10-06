@@ -32,12 +32,12 @@ trait ModelHasBoost
 
     public function contentBoostedKey(string $languageCode = null): string
     {
-        $key = $this->uuid()->id();
+        $key = hash('xxh3', $this->id()); // can not use UUID since content not loaded yet
         if (! $languageCode) {
             $languageCode = kirby()->languages()->count() ? kirby()->language()->code() : null;
         }
         if ($languageCode) {
-            $key = $key . '/' .  $languageCode;
+            $key = $key . '-' .  $languageCode;
         }
 
         return $key;
@@ -51,7 +51,7 @@ trait ModelHasBoost
         }
 
         $modifiedCache = $cache->get(
-            $this->contentBoostedKey($languageCode) . '/modified',
+            $this->contentBoostedKey($languageCode) . '-modified',
             null
         );
         if (!$modifiedCache) {
@@ -80,7 +80,7 @@ trait ModelHasBoost
         }
 
         return BoostCache::singleton()->get(
-            $this->contentBoostedKey($languageCode) . '/content',
+            $this->contentBoostedKey($languageCode) . '-content',
             null
         );
     }
@@ -94,7 +94,7 @@ trait ModelHasBoost
         if (! $data) {
             $data = parent::readContent($languageCode);
             if ($data && $this->boostWillBeDeleted !== true) {
-                $this->writeContentCache($data, $languageCode);
+                 $this->writeContentCache($data, $languageCode);
             }
         }
 
@@ -116,13 +116,13 @@ trait ModelHasBoost
         }
 
         $cache->set(
-            $this->contentBoostedKey($languageCode) . '/modified',
+            $this->contentBoostedKey($languageCode) . '-modified',
             $modified,
             option('bnomei.boost.expire')
         );
 
         return $cache->set(
-            $this->contentBoostedKey($languageCode) . '/content',
+            $this->contentBoostedKey($languageCode) . '-content',
             $data,
             option('bnomei.boost.expire')
         );
@@ -146,17 +146,17 @@ trait ModelHasBoost
 
         foreach (kirby()->languages() as $language) {
             $cache->remove(
-                $this->contentBoostedKey($language->code()) . '/content'
+                $this->contentBoostedKey($language->code()) . '-content'
             );
             $cache->remove(
-                $this->contentBoostedKey($language->code()) . '/modified'
+                $this->contentBoostedKey($language->code()) . '-modified'
             );
         }
         $cache->remove(
-            $this->contentBoostedKey() . '/content'
+            $this->contentBoostedKey() . '-content'
         );
         $cache->remove(
-            $this->contentBoostedKey() . '/modified'
+            $this->contentBoostedKey() . '-modified'
         );
 
         return true;

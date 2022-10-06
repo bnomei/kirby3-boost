@@ -99,7 +99,7 @@ final class Bolt
         // only update if necessary
         $diruri = $page->diruri();
         if ($diruri !== static::cache()->get('bolt/' . hash('xxh3', $id))) {
-            static::cache()->set('bolt/' . hash('xxh3', $id), $diruri, option('bnomei.boost.expire'));
+            static::cache()->set(hash('xxh3', $id) . '-bolt', $diruri, option('bnomei.boost.expire'));
         }
     }
 

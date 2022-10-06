@@ -79,16 +79,12 @@ final class BoostIndex
         $this->index = [];
         $count = 0;
         foreach (kirby()->collection('siteindexfolders') as $page) {
-            echo $page;
             // save memory when indexing
             $page = \Bnomei\Bolt::page($page, null, false, false);
-            var_dump($page->root());
-//            if (!$page || $page->hasBoost() !== true) {
-//                $page = null; // free memory, do not use unset()
-//                continue;
-//            }
-            var_dump($page->hasBoost() ? '1' : '0');
-
+            if (!$page || $page->hasBoost() !== true) {
+                $page = null; // free memory, do not use unset()
+                continue;
+            }
 
             if ($this->add($page)) {
                 $count++;

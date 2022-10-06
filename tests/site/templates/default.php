@@ -22,7 +22,7 @@ var_dump($m->get('a'));
 
 <h3>bolt</h3>
 <?php
-var_dump($m->get($pmk . '/bolt'));
+var_dump($m->get(hash('xxh3', $page->id()) . '-bolt'));
 var_dump(count(Bnomei\Bolt::toArray()));
 bolt($page->id());
 var_dump(count(Bnomei\Bolt::toArray()));
@@ -35,9 +35,9 @@ var_dump(count(Bnomei\Bolt::toArray()));
 
 <h3>isBoosted</h3>
 <?php
-    var_dump($m->get($pmk . '/modified'));
-var_dump($m->get($pmk . '/content'));
-var_dump($page->isBoosted());
+    var_dump($m->get($pmk . '-modified'));
+    var_dump($m->get($pmk . '-content'));
+    var_dump($page->isBoosted());
 ?>
 
 <h3>boostid</h3>
@@ -51,16 +51,16 @@ var_dump($page->isBoosted());
 // TODO: resolve a lot of relations and track time
 $before = microtime(true);
 $count = 0;
-$pages = $page->related()->toPages();
+$pages = $page->related()->toPagesBoosted();
 if ($pages) {
     foreach ($pages as $rel) {
         var_dump($rel->title()->value());
         $count++;
-        $pages2 = $rel->related()->toPages();
+        $pages2 = $rel->related()->toPagesBoosted();
         foreach ($pages2 as $rel2) {
             var_dump($rel2->title()->value());
             $count++;
-            $pages3 = $rel2->related()->toPages();
+            $pages3 = $rel2->related()->toPagesBoosted();
             foreach ($pages3 as $rel3) {
                 var_dump($rel3->title()->value());
                 $count++;
