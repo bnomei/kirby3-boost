@@ -71,12 +71,6 @@ final class BoostTest extends TestCase
         $this->assertTrue($randomPage->isBoosted());
     }
 
-    public function testPageMethodTinyUrl()
-    {
-        $randomPage = $this->randomPage();
-        $this->assertStringEndsWith('/x/' . $randomPage->boostid()->value(), $randomPage->tinyUrl());
-    }
-
     public function testPagesMethodBoost()
     {
         $randomPage = $this->randomPageWithChildren();

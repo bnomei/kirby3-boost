@@ -50,7 +50,7 @@ final class BoostCache
         if ($model instanceof \Kirby\Cms\Page ||
             $model instanceof \Kirby\Cms\File ||
             $model instanceof \Kirby\Cms\User) {
-            $modified = static::singleton()->get($model->contentBoostedKey() . '-modified');
+            $modified = static::singleton()->get($model->contentBoostedKey() . '/modified');
             if ($modified) { // could be false
                 return $modified;
             } else {
@@ -59,12 +59,12 @@ final class BoostCache
         } elseif ($model instanceof \Kirby\Cms\Site) {
             return filemtime($model->contentFile());
         } elseif (is_string($model)) {
-            $key = strval(hash('xxh3', $model));
+            $key = $model;
             $languageCode = kirby()->languages()->count() ? kirby()->language()->code() : null;
             if ($languageCode) {
-                $key = $key . '-' .  $languageCode;
+                $key = $key . '/' .  $languageCode;
             }
-            return static::singleton()->get($key . '-modified');
+            return static::singleton()->get($key . '/modified');
         }
 
         return null;

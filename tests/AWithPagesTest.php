@@ -32,7 +32,7 @@ class AWithPagesTest extends TestCase
 
     public function createPage($parent, int $idx, int $depth = 3): Page
     {
-        $id = 'Test ' . abs(hash('xxh3', microtime() . $idx . $depth));
+        $id = 'Test ' . hash('xxh3', microtime() . $idx . $depth);
         /* @var $page Page */
         kirby()->impersonate('kirby');
 
@@ -70,7 +70,8 @@ class AWithPagesTest extends TestCase
         $boostids = [];
 
         foreach (site()->index()->filterBy('template', 'default') as $page) {
-            $boostids[$page->boostid()->value()] = $page->diruri();
+            $boostids[$page->uuid()->id()] = $page->diruri();
+//            $boostids[$page->uuid()->toString()] = $page->diruri(); // TODO: make it work with page:// as well
         };
 
         $this->assertTrue(count($boostids) > 0);

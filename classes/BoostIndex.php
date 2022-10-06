@@ -6,6 +6,7 @@ namespace Bnomei;
 
 use Kirby\Cms\Page;
 use Kirby\Toolkit\A;
+use Kirby\Toolkit\Str;
 
 final class BoostIndex
 {
@@ -40,13 +41,6 @@ final class BoostIndex
         }
     }
 
-    /** NOTE: register that with cache instead
-    public function __destruct()
-    {
-        $this->write();
-    }
-    */
-
     public function __destruct()
     {
         $cache = $this->cache();
@@ -76,6 +70,7 @@ final class BoostIndex
 
     public function index(bool $force = false, ?Page $target = null): int
     {
+
         $count = $this->index ? count($this->index) : 0;
         if ($count > 0 && !$force) {
             return $count;
@@ -84,15 +79,21 @@ final class BoostIndex
         $this->index = [];
         $count = 0;
         foreach (kirby()->collection('siteindexfolders') as $page) {
+            echo $page;
             // save memory when indexing
             $page = \Bnomei\Bolt::page($page, null, false, false);
-            if (!$page || $page->hasBoost() !== true) {
-                $page = null; // free memory, do not use unset()
-                continue;
-            }
+            var_dump($page->root());
+//            if (!$page || $page->hasBoost() !== true) {
+//                $page = null; // free memory, do not use unset()
+//                continue;
+//            }
+            var_dump($page->hasBoost() ? '1' : '0');
+
+
             if ($this->add($page)) {
                 $count++;
             }
+
             // save every n steps
             if ($count % 2000 === 0) {
                 $this->write();
@@ -121,7 +122,7 @@ final class BoostIndex
 
     public function find(string $uuid, bool $throwException = true): ?Page
     {
-        $uuid = trim($uuid);
+        $uuid = str_replace('page://','', trim($uuid));
         $diruri = $this->diruri($uuid);
 
         if ($diruri && $page = \Bnomei\Bolt::page($diruri)) {
@@ -129,9 +130,8 @@ final class BoostIndex
         } else {
             $crawl = null;
 
-            // try UUID cache first
-            $pageIdFromUuidCache = \Kirby\Cms\Uuid::cache()->get('page://' . $uuid);
-            if ($pageIdFromUuidCache && $page = \Bnomei\Bolt::page($pageIdFromUuidCache)) {
+            // try UUID cache via bolt first
+            if ($page = \Bnomei\Bolt::page($uuid)) {
                 $this->add($page);
                 $crawl = $page;
             }
@@ -139,7 +139,7 @@ final class BoostIndex
             if (!$crawl) {
                 // then try crawling index
                 foreach (site()->index(option('bnomei.boost.drafts')) as $page) {
-                    if ($this->add($page) && $page->uuid() === $uuid) {
+                    if ($this->add($page) && $page->uuid()->id() === $uuid) {
                         $crawl = $page;
                         break;
                     }
@@ -158,14 +158,16 @@ final class BoostIndex
 
     public function data(string $uuid): ?array
     {
-        if ($data = A::get($this->index(), $uuid)) {
-            list($diruri, $title, $template) = explode(static::SEPERATOR, $data);
-            $data = [
-                'diruri' => $diruri,
-                'template' => $template,
-                'title' => $title,
-                'uuid' => $uuid,
-            ];
+        if ($data = A::get($this->index, $uuid)) {
+            if (Str::contains($data, static::SEPERATOR)) {
+                list($diruri, $title, $template) = explode(static::SEPERATOR, $data);
+                $data = [
+                    'diruri' => $diruri,
+                    'template' => $template,
+                    'title' => $title,
+                    'uuid' => $uuid,
+                ];
+            }
         }
 
         return $data ?? null;
@@ -179,7 +181,8 @@ final class BoostIndex
 
     public function add(Page $page): bool
     {
-        $uuid = $page->uuid();
+        $uuid = $page->uuid()->id();
+
         if (empty($uuid)) {
             return false;
         }
@@ -200,7 +203,7 @@ final class BoostIndex
 
     public function remove(Page $page): bool
     {
-        $uuid = $page->uuid();
+        $uuid = $page->uuid()->id();
         if (empty($uuid)) {
             return false;
         }
@@ -254,18 +257,6 @@ final class BoostIndex
         }
 
         return static::$singleton;
-    }
-
-    public static function tinyurl($id): string
-    {
-        $url = option('bnomei.boost.tinyurl.url');
-        if ($url && !is_string($url) && is_callable($url)) {
-            $url = $url();
-        }
-        if ($url === kirby()->url('index')) {
-            $url = rtrim($url, '/') . '/' . option('bnomei.boost.tinyurl.folder');
-        }
-        return rtrim($url, '/') . '/' . $id;
     }
 
     public static function page(string $id): ?Page

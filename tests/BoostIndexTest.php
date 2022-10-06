@@ -50,7 +50,7 @@ final class BoostIndexTest extends TestCase
 
         $this->assertEquals(
             $randomPage->id(),
-            boost($randomPage->id())->id()
+            boost($randomPage->uuid()->id())->id()
         );
     }
 
@@ -61,7 +61,7 @@ final class BoostIndexTest extends TestCase
 
         $randomPage = $this->randomPage();
         //site()->prune();
-        //if (!$randomPage->uuid()) var_dump($randomPage);
+        //if (!$randomPage->uuid()->id()) var_dump($randomPage);
 
 
         $this->assertEquals(
@@ -79,7 +79,7 @@ final class BoostIndexTest extends TestCase
         $randomPage = $this->randomPage();
         //site()->prune();
 
-        $this->assertNotEmpty($randomPage->uuid());
+        $this->assertNotEmpty($randomPage->uuid()->id());
         $this->assertTrue($index->add($randomPage));
         //$index->write();
         $this->assertCount(1, $index->toArray());
@@ -95,7 +95,7 @@ final class BoostIndexTest extends TestCase
 
         $this->assertEquals(
             $randomPage->id(),
-            $randomPage->uuid()->toPageBoosted()->id()
+            $randomPage->someUuidRelationField()->toPageBoosted()->id()
         );
     }
 
@@ -119,7 +119,7 @@ final class BoostIndexTest extends TestCase
     {
         $index = BoostIndex::singleton();
         $randomPage = $this->randomPage();
-        $boostid = $randomPage->uuid();
+        $boostid = $randomPage->uuid()->id();
         $randomPage->boostIndexAdd();
 
         $this->assertTrue($randomPage->boostIndexRemove());

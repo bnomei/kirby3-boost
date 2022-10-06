@@ -80,8 +80,8 @@ final class PageHasBoostTest extends TestCase
 
         //$this->assertNull($newPage->readContentCache()); // this would create again
         $cache = BoostCache::singleton();
-        $this->assertNull($cache->get($key . '-content'));
-        $this->assertNull($cache->get($key . '-modified'));
+        $this->assertNull($cache->get($key . '/content'));
+        $this->assertNull($cache->get($key . '/modified'));
     }
 
     public function testExpiredByModified()
@@ -91,15 +91,15 @@ final class PageHasBoostTest extends TestCase
         $cache = BoostCache::singleton();
 
         // fake outdated modified value
-        $this->assertTrue($cache->set($key . '-modified', $randomPage->modified() - 1));
+        $this->assertTrue($cache->set($key . '/modified', $randomPage->modified() - 1));
         $this->assertTrue($randomPage->isContentCacheExpiredByModified());
 
         // fake in future
-        $this->assertTrue($cache->set($key . '-modified', $randomPage->modified() + 1));
+        $this->assertTrue($cache->set($key . '/modified', $randomPage->modified() + 1));
         $this->assertFalse($randomPage->isContentCacheExpiredByModified());
 
         // fake current (to reset for next tests)
-        $this->assertTrue($cache->set($key . '-modified', $randomPage->modified() + 0));
+        $this->assertTrue($cache->set($key . '/modified', $randomPage->modified() + 0));
         $this->assertFalse($randomPage->isContentCacheExpiredByModified());
     }
 }

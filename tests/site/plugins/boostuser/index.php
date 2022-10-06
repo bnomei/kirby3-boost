@@ -1,7 +1,9 @@
 <?php
 
-class AdminUser extends \Bnomei\BoostUser
+class AdminUser extends \Kirby\Cms\User
 {
+    use \Bnomei\ModelHasBoost;
+
     public function hello(): string
     {
         return 'world';

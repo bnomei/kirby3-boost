@@ -7,7 +7,7 @@
 [![Maintainability](https://flat.badgen.net/codeclimate/maintainability/bnomei/kirby3-boost)](https://codeclimate.com/github/bnomei/kirby3-boost) 
 [![Twitter](https://flat.badgen.net/badge/twitter/bnomei?color=66d9ef)](https://twitter.com/bnomei)
 
-Boost the speed of Kirby by having content files of files/pages/users cached, with fast lookup based on uuid and Tiny-URL.
+Boost the speed of Kirby by having content files of files/pages/users cached, with fast lookup based on uuid.
 
 ## Commercial Usage
 
@@ -39,7 +39,6 @@ If you have to process within a single request a lot of page objects (1000+) or 
 - It provides a benchmark to help you decide which cachedriver to use.
 - It will use Kirby's uuid (unique id) for page objects to create relations that do not break even if the slug or directory of a page object changes.
 - It provides a very fast lookup for page objects via id, diruri or the uuid.
-- It provides you with a tiny-url for page objects that have an unique id.
 
 ## Setup
 
@@ -50,7 +49,6 @@ For each template you want to be cached you need to use a model to add the conte
 ```php
 class DefaultPage extends \Kirby\Cms\Page
 {
-    use \Bnomei\PageHasUuid; // only use this until Kirby has its own UUIDs
     use \Bnomei\ModelHasBoost;
 }
 ```
@@ -253,7 +251,7 @@ var_dump(\Bnomei\CacheBenchmark::run($caches, 1, site()->index()->count())); // 
 
 - Memory Cache Driver and Null Cache Driver would perform best but it either caches in memory only for current request or not at all and that is not really useful for this plugin. 
 - PHP Cache Driver will be the fastest possible solution but you might run out of php app memory. Use this driver if you need best performance and have good control over the size of your cached data.
-- APCu Cache can be expected to be very fast but one has to make sure all content fits into the memory limitations.
+- APCu Cache can be expected to be very fast but one has to make sure all content fits into the memory limitations. You can also use my [apcu cachedriver with garbage collection ](https://github.com/bnomei/kirby3-apcu-cachedriver)
 - SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34). Content will be written using transactions.
 - My Redis Cache Driver has smart preloading using the very fast Redis pipeline and will write changes using transactions.
 - The File Cache Driver will perform worse the more page objects you have. You are probably better of with no cache. This is the only driver with this flaw. Benchmarking this driver will also create a lot of file which in total might cause the script to exceed your php execution time.
@@ -318,6 +316,11 @@ return [
     'bnomei.boost.cache' => [
         'type'     => 'apcu',
     ],
+    
+    // example apcu with garbage collection
+    'bnomei.boost.cache' => [
+        'type'     => 'apcugc',
+    ],
 
     // example sqlite
     // https://github.com/bnomei/kirby3-sqlite-cachedriver
@@ -367,16 +370,6 @@ If you are interested in how fast a certain pages collection loads you can do th
 var_dump(page('blog/2021')->children()->listed()->boostmark());
 ```
 
-## Tiny-URL
-
-This plugin allows you to use the BoostID value in a shortend URL. It also registers a route to redirect from the shortend URL to the actual page. Retrieve the shortend URL it with the `tinyurl()` Page-Method. 
-
-```php
-echo $page->uuid(); // 8j5g64hh
-echo $page->url(); // https://devkit.bnomei.com/test-43422931f00e27337311/test-2efd96419d8ebe1f3230/test-32f6d90bd02babc5cbc3
-echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
-```
-
 ## Site Index with lower memory footprint
 
 Using `site()->index()` in Kirby will load all Pages into memory at the same time. This plugin provides a way to iterate over the index with having only one page loaded at a time.
@@ -401,8 +394,6 @@ $boostedCount = site()->boost();
 | drafts | `true`   | index drafts                                                                                                             |
 | patch.files | `true`   | monkey patch Files Class to do content caching                                                                           |
 | fileModifiedCheck | `false`  | expects file to not be altered outside of kirby                                                                          |                                                                                                     |
-| tinyurl.url | callback | returning `site()->url()`. Use htaccess on that domain to redirect `RewriteRule (.*) http://www.bnomei.com/x/$1 [R=301]` |
-| tinyurl.folder | `x`      | Tinyurl format: yourdomain/{folder}/{hash}                                                                               |
 | helper | `true`   | allow usage of boost() helper                                                                                            |
 
 ## External changes to content files

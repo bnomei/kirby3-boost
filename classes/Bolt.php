@@ -78,14 +78,14 @@ final class Bolt
     {
         $lookup = A::get(static::$idToPage, $id);
         if (!$lookup && $cache && static::cache()) {
-            if ($diruri = static::cache()->get(hash('xxh3', $id) . '-bolt')) {
+            if ($diruri = static::cache()->get('bolt/' . hash('xxh3', $id))) {
                 // bolt will ignore caches with invalid paths and update them automatically
                 // it does not need to be flushed ever
                 if ($page = $this->findByID($diruri, false)) {
                     $this->pushLookup($id, $page);
                     $lookup = $page;
                 } else {
-                    static::cache()->remove(hash('xxh3', $id) . '-bolt');
+                    static::cache()->remove('bolt/' . hash('xxh3', $id));
                 }
             }
         }
@@ -98,8 +98,8 @@ final class Bolt
 
         // only update if necessary
         $diruri = $page->diruri();
-        if ($diruri !== static::cache()->get(hash('xxh3', $id) . '-bolt')) {
-            static::cache()->set(hash('xxh3', $id) . '-bolt', $diruri, option('bnomei.boost.expire'));
+        if ($diruri !== static::cache()->get('bolt/' . hash('xxh3', $id))) {
+            static::cache()->set('bolt/' . hash('xxh3', $id), $diruri, option('bnomei.boost.expire'));
         }
     }
 
@@ -113,10 +113,12 @@ final class Bolt
 
     public function findByID(string $id, bool $cache = true, bool $extend = true): ?Page
     {
+
         $page = $this->lookup($id, $cache);
         if ($page) {
             return $page;
         }
+
 
         $draft = false;
         $treeid = null;
