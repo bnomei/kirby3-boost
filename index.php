@@ -80,7 +80,7 @@ Kirby::plugin('bnomei/boost', [
             $page = $this;
 
             // has boost?
-            if ($page->hasBoost() !== true) {
+            if ($page->hasBoost() === true) {
                 // needs write?
                 $lang = kirby()->languageCode();
 

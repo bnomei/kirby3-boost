@@ -298,7 +298,7 @@ Once you know which driver you want to use you can set the plugin cache options.
 
 return [
     // other options
-    // like Pages Cache
+    // like Pages or UUID Cache
     // cache type for each plugin you use like the Laspe plugin
 
     // default is file cache driver because it will always work
@@ -311,21 +311,41 @@ return [
     'bnomei.boost.cache' => [
         'type'     => 'php',
     ],
+    'cache' => [
+        'uuid' => [
+            'type' => 'php',
+        ],
+    ],
 
     // example apcu
     'bnomei.boost.cache' => [
         'type'     => 'apcu',
+    ],
+    'cache' => [
+        'uuid' => [
+            'type' => 'apcu',
+        ],
     ],
     
     // example apcu with garbage collection
     'bnomei.boost.cache' => [
         'type'     => 'apcugc',
     ],
+    'cache' => [
+        'uuid' => [
+            'type' => 'apcugc',
+        ],
+    ],
 
     // example sqlite
     // https://github.com/bnomei/kirby3-sqlite-cachedriver
     'bnomei.boost.cache' => [
         'type'     => 'sqlite',
+    ],
+    'cache' => [
+        'uuid' => [
+            'type' => 'sqlite',
+        ],
     ],
 
     // example redis
@@ -337,12 +357,22 @@ return [
         'database' => function() { return env('REDIS_DATABASE'); },
         'password' => function() { return env('REDIS_PASSWORD'); },
     ],
+    'cache' => [
+        'uuid' => [
+            // do same as boost
+        ],
+    ],
 
     // example memcached
     'bnomei.boost.cache' => [
         'type'     => 'memcached',
         'host'     => '127.0.0.1',
         'port'     => 11211,
+    ],
+    'cache' => [
+        'uuid' => [
+            // do same as boost
+        ],
     ],
 ];
 ```
