@@ -1,8 +1,8 @@
 {
   "name": "bnomei/kirby3-boost",
   "type": "kirby-plugin",
-  "version": "1.9.2",
-  "description": "Boost the speed of Kirby by having content files of files/pages/users cached, with automatic unique ID for pages, fast lookup and Tiny-URL.",
+  "version": "2.0.0",
+  "description": "Boost the speed of Kirby by having content files of files/pages/users cached, with fast lookup based on uuid.",
   "license": "MIT",
   "authors": [
     {
@@ -23,7 +23,6 @@
     "lookup",
     "cache",
     "performance",
-    "tiny-url",
     "memcache",
     "memcached",
     "memory",
@@ -46,12 +45,12 @@
     }
   },
   "require": {
-    "php": ">=7.4.0",
+    "php": ">=8.1.0",
     "bnomei/autoloader-for-kirby": "^1.2",
     "getkirby/composer-installer": "^1.2"
   },
   "require-dev": {
-    "getkirby/cms": ">3.5 <3.8",
+    "getkirby/cms": ">=3.8.0",
     "php-coveralls/php-coveralls": "^2.4",
     "phpunit/phpunit": "^9.5"
   },
@@ -81,8 +80,9 @@
   "suggest": {
     "bnomei/kirby3-boost-demo": "Try boost with a big set of data",
     "bnomei/kirby3-lapse": "Cache any data until set expiration time (with automatic keys)",
-    "bnomei/kirby3-php-cachedriver": "PHP based Cache-Driver",
+    "bnomei/kirby3-apcu-cachedriver": "APCu based Cache-Driver (with garbage collection)",
     "bnomei/kirby3-mysql-cachedriver": "MySQL based Cache-Driver",
+    "bnomei/kirby3-php-cachedriver": "PHP based Cache-Driver",
     "bnomei/kirby3-redis-cachedriver": "Redis based Cache-Driver",
     "bnomei/kirby3-sqlite-cachedriver": "SQLite based Cache-Driver",
     "getkirby/kql": "Kirby's Query Language API combines the flexibility of Kirby's data structures, the power of GraphQL and the simplicity of REST"

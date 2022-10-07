@@ -50,23 +50,23 @@ final class BoostIndexTest extends TestCase
 
         $this->assertEquals(
             $randomPage->id(),
-            boost($randomPage->id())->id()
+            boost($randomPage->uuid()->id())->id()
         );
     }
 
-    public function testBoostFindByBoostId()
+    public function testBoostFind()
     {
         $index = BoostIndex::singleton();
         $index->index(true);
 
         $randomPage = $this->randomPage();
         //site()->prune();
-        //if (!$randomPage->boostIDField()->value()) var_dump($randomPage);
+        //if (!$randomPage->uuid()->id()) var_dump($randomPage);
 
 
         $this->assertEquals(
             $randomPage->id(),
-            boost($randomPage->boostIDField()->value())->id()
+            boost($randomPage->uuid())->id()
         );
     }
 
@@ -79,13 +79,13 @@ final class BoostIndexTest extends TestCase
         $randomPage = $this->randomPage();
         //site()->prune();
 
-        $this->assertTrue($randomPage->boostIDField()->isNotEmpty());
+        $this->assertNotEmpty($randomPage->uuid()->id());
         $this->assertTrue($index->add($randomPage));
         //$index->write();
         $this->assertCount(1, $index->toArray());
     }
 
-    public function testFromBoostID()
+    public function testToPageBoosted()
     {
         $index = BoostIndex::singleton();
         $index->index(true);
@@ -95,7 +95,7 @@ final class BoostIndexTest extends TestCase
 
         $this->assertEquals(
             $randomPage->id(),
-            $randomPage->boostid()->fromBoostID()->id()
+            $randomPage->someUuidRelationField()->toPageBoosted()->id()
         );
     }
 
@@ -119,14 +119,14 @@ final class BoostIndexTest extends TestCase
     {
         $index = BoostIndex::singleton();
         $randomPage = $this->randomPage();
-        $boostid = $randomPage->boostIDField()->value();
+        $boostid = $randomPage->uuid()->id();
         $randomPage->boostIndexAdd();
 
         $this->assertTrue($randomPage->boostIndexRemove());
         $this->assertNull(A::get($index->toArray(), $boostid));
         $this->assertEquals(
             $randomPage->id(),
-            $index->findByBoostId($boostid)->id() // will crawl
+            $index->find($boostid)->id() // will crawl
         );
         $this->assertNotNull(A::get($index->toArray(), $boostid));
     }

@@ -7,7 +7,7 @@
 [![Maintainability](https://flat.badgen.net/codeclimate/maintainability/bnomei/kirby3-boost)](https://codeclimate.com/github/bnomei/kirby3-boost) 
 [![Twitter](https://flat.badgen.net/badge/twitter/bnomei?color=66d9ef)](https://twitter.com/bnomei)
 
-Boost the speed of Kirby by having content files of files/pages/users cached, with automatic unique ID for pages, fast lookup and Tiny-URL.
+Boost the speed of Kirby by having content files of files/pages/users cached, with fast lookup based on uuid.
 
 ## Commercial Usage
 
@@ -23,56 +23,33 @@ Boost the speed of Kirby by having content files of files/pages/users cached, wi
 |---|----|---|---|---|
 | [Github sponsor](https://github.com/sponsors/bnomei) | [Patreon](https://patreon.com/bnomei) | [Buy Me a Coffee](https://buymeacoff.ee/bnomei) | [Paypal dontation](https://www.paypal.me/bnomei/15) | [Hire me](mailto:b@bnomei.com?subject=Kirby) |
 
+## Installation
+
+- unzip [master.zip](https://github.com/bnomei/kirby3-boost/archive/master.zip) as folder `site/plugins/kirby3-boost` or
+- `git submodule add https://github.com/bnomei/kirby3-boost.git site/plugins/kirby3-boost` or
+- `composer require bnomei/kirby3-boost`
+
 ## Usecase
 
-If you have to process within a single request a lot of page objects (1000+) or if you have a lot of relations between page objects to resolve then consider using this plugin. With less page objects you will propably not gain enough to justify the overhead.
+If you have to process within a single request a lot of page objects (1000+) or if you have a lot of relations between page objects to resolve then consider using this plugin. With less page objects you will probably not gain enough to justify the overhead.
 
 ## How does this plugin work?
 
 - It caches all content files and keeps the cache up to date when you add or modify content. This cache will be used when constructing page objects making everything that involves page objects faster (even the Panel).
 - It provides a benchmark to help you decide which cachedriver to use.
-- It can add an unique ID for page objects that can be used create relations that do not break even if the slug or directory of a page object changes.
-- It provides a very fast lookup for page objects via id, diruri or the unique id.
-- It provides you with a tiny-url for page objects that have an unique id.
+- It will use Kirby's uuid (unique id) for page objects to create relations that do not break even if the slug or directory of a page object changes.
+- It provides a very fast lookup for page objects via id, diruri or the uuid.
 
 ## Setup
 
-For each template you want to be cached you need to add the field to your blueprint AND use a model to add the content cache logic.
-
-**site/blueprints/pages/default.yml**
-```yml
-preset: page
-
-fields:
-  # visible field
-  boostid:
-    type: boostid
-  
-  # hidden field
-  #boostid:
-  #  extends: fields/boostid
-
-  one_relation:
-    extends: fields/boostidkv
-
-  many_related:
-    extends: fields/boostidkvs
-```
-
-> You can create your own fields for related pages based on the [fields](https://github.com/bnomei/kirby3-boost/tree/main/blueprints/fields) and [collections](https://github.com/bnomei/kirby3-boost/tree/main/collections/example_static_cached_collection.php) this plugins provides.
+For each template you want to be cached you need to use a model to add the content cache logic using a trait.
 
 **site/models/default.php**
+
 ```php
 class DefaultPage extends \Kirby\Cms\Page
 {
-    use \Bnomei\PageHasBoost;
-}
-
-// or
-
-class DefaultPage extends \Bnomei\BoostPage
-{
-    
+    use \Bnomei\ModelHasBoost;
 }
 ```
 
@@ -81,9 +58,7 @@ class DefaultPage extends \Bnomei\BoostPage
 As a last step fill the boost cache in calling the following in a template or controller. You only have to do this once (not on every request).
 
 ```php
-// allow updates to pages so missing boostids can be set
-kirby()->impersonate('kirby');
-// add missing boostids and fill cache
+// fill cache
 $count = site()->boost();
 echo $count . ' Pages have been boosted.';
 ```
@@ -97,7 +72,7 @@ Starting with version 1.9 you can also cache the content files of user models us
 ```php
 class AdminUser extends \Kirby\Cms\User
 {
-    use \Bnomei\UserHasBoost;
+    use \Bnomei\ModelHasBoost;
 }
 
 Kirby::plugin('myplugin/user', [
@@ -109,7 +84,7 @@ Kirby::plugin('myplugin/user', [
 
 ### File Models
 
-Starting with version 1.9 you can use a setting to tell the plugin to monkey patch the core `Files` class with content cache support. You can only turn this on for all files at once since Kirby does not allow custom File models. It would need to read content file first which would defeat the purpose for a content cache anyway.
+Starting with version 2.0 the plugin to monkey patch the core `Files` class with content cache support. You can only turn this on or off for all files at once since Kirby does not allow custom File models. It would need to read content file first which would defeat the purpose for a content cache anyway.
 
 **site/config/config.php**
 ```php
@@ -117,16 +92,35 @@ Starting with version 1.9 you can use a setting to tell the plugin to monkey pat
 
 return [
     // other options
-    'bnomei.boost.patch.files' => true, // default: false
+    'bnomei.boost.patch.files' => true, // default: true
 ```
+
+### Pages Field Alternative
+
+This plugin provided a pages field alternative based on the multiselect field and optimized for performance.
+
+**site/blueprints/pages/default.yml**
+```yml
+preset: page
+
+fields:
+  one_relation:
+    extends: fields/boostidkv
+
+  many_related:
+    extends: fields/boostidkvs
+```
+
+> You can create your own fields for related pages based on the [fields](https://github.com/bnomei/kirby3-boost/tree/main/blueprints/fields) and [collections](https://github.com/bnomei/kirby3-boost/tree/main/collections/example_static_cached_collection.php) this plugins provides.
+
 
 ### Easier loading of custom models, blueprints, ...
 
-When you use boost your project you might end up with a couple of custom models in a plugin. You can use my [autoloader helper](https://github.com/bnomei/autoloader-for-kirby) to make registering these classes a bit easier. It can also load blueprints, classes, collections, controllers, blockModels, pageModels, routes, api/routes, userModels, snippets, templates and translation files.
+When you use boost your project you might end up with a couple of custom models in a plugin. You can use my [autoloader helper](https://github.com/bnomei/autoloader-for-kirby) to make registering these classes a bit easier. It can also load blueprints, classes, collections, controllers, blockModels, pageModels, routes, api/routes, userModels, snippets, templates and translation files. If you installed the Boost plugin via composer the autoloader helper was installed as a dependency, and you can start using it straight way.
 
 ## Usage
 
-### Page from Id
+### Page from PageId
 ```php
 $page = page($somePageId); // slower
 $page = boost($somePageId); // faster
@@ -137,9 +131,16 @@ $page = boost($somePageId); // faster
 $page = boost($somePageDirUri); // fastest
 ```
 
-### Page from BoostID
+### Page from uuid
 ```php
-$page = boost($boostId); // will use fastest internally
+$page = page($uuid); // slower
+$page = boost($uuid); // will use fastest internally
+```
+
+### Pages from uuids
+```php
+$pages = pages([$uuid1, $uuid2, ...]); // slower
+$pages = boost([$uuid1, $uuid2, ...]); // will use fastest internally
 ```
 
 ### Resolving relations
@@ -147,10 +148,12 @@ Fields where defined in the example blueprint above.
 
 ```php
 // one
-$pageOrNull = $page->one_relation()->fromBoostID();
+$pageOrNull = $page->one_relation()->toPage(); // slower
+$pageOrNull = $page->one_relation()->toPageBoosted(); // faster
 
 // many
-$pagesCollectionOrNull = $page->many_related()->fromBoostIDs();
+$pagesCollectionOrNull = $page->many_related()->toPages(); // slower
+$pagesCollectionOrNull = $page->many_related()->toPagesBoosted(); // faster
 ```
 
 ### Modified timestamp from cache
@@ -158,7 +161,19 @@ $pagesCollectionOrNull = $page->many_related()->fromBoostIDs();
 This will try to get the modified timestamp from cache. If the page object content can be cached but currently was not, it will force a content cache write. It will return the modified timestamp of a page object or if it does not exist it will return `null`.
 
 ```php
-$pageModifiedTimestampOrNull = modified($somePageId); // faster
+$pageModifiedTimestampOrNull = modified($someUuidOrPageId); // faster
+```
+
+### Search for Template from cache
+
+It will return a collection page object(s) and you can expect this to be a lot faster than calling `site()->index()->template('myTemplateName')`
+
+```php
+ // in full site index
+$allPagesWithTemplatePost = site()->searchForTemplate('post');
+
+ // starting with blog as parent
+$pagesWithTemplatePostInBlog = page('blog')->searchForTemplate('post');
 ```
 
 ## Caches and Cache Drivers
@@ -236,7 +251,7 @@ var_dump(\Bnomei\CacheBenchmark::run($caches, 1, site()->index()->count())); // 
 
 - Memory Cache Driver and Null Cache Driver would perform best but it either caches in memory only for current request or not at all and that is not really useful for this plugin. 
 - PHP Cache Driver will be the fastest possible solution but you might run out of php app memory. Use this driver if you need best performance and have good control over the size of your cached data.
-- APCu Cache can be expected to be very fast but one has to make sure all content fits into the memory limitations.
+- APCu Cache can be expected to be very fast but one has to make sure all content fits into the memory limitations. You can also use my [apcu cachedriver with garbage collection ](https://github.com/bnomei/kirby3-apcu-cachedriver)
 - SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34). Content will be written using transactions.
 - My Redis Cache Driver has smart preloading using the very fast Redis pipeline and will write changes using transactions.
 - The File Cache Driver will perform worse the more page objects you have. You are probably better of with no cache. This is the only driver with this flaw. Benchmarking this driver will also create a lot of file which in total might cause the script to exceed your php execution time.
@@ -283,7 +298,7 @@ Once you know which driver you want to use you can set the plugin cache options.
 
 return [
     // other options
-    // like Pages Cache
+    // like Pages or UUID Cache
     // cache type for each plugin you use like the Laspe plugin
 
     // default is file cache driver because it will always work
@@ -296,16 +311,41 @@ return [
     'bnomei.boost.cache' => [
         'type'     => 'php',
     ],
+    'cache' => [
+        'uuid' => [
+            'type' => 'php',
+        ],
+    ],
 
     // example apcu
     'bnomei.boost.cache' => [
         'type'     => 'apcu',
+    ],
+    'cache' => [
+        'uuid' => [
+            'type' => 'apcu',
+        ],
+    ],
+    
+    // example apcu with garbage collection
+    'bnomei.boost.cache' => [
+        'type'     => 'apcugc',
+    ],
+    'cache' => [
+        'uuid' => [
+            'type' => 'apcugc',
+        ],
     ],
 
     // example sqlite
     // https://github.com/bnomei/kirby3-sqlite-cachedriver
     'bnomei.boost.cache' => [
         'type'     => 'sqlite',
+    ],
+    'cache' => [
+        'uuid' => [
+            'type' => 'sqlite',
+        ],
     ],
 
     // example redis
@@ -317,12 +357,22 @@ return [
         'database' => function() { return env('REDIS_DATABASE'); },
         'password' => function() { return env('REDIS_PASSWORD'); },
     ],
+    'cache' => [
+        'uuid' => [
+            // do same as boost
+        ],
+    ],
 
     // example memcached
     'bnomei.boost.cache' => [
         'type'     => 'memcached',
         'host'     => '127.0.0.1',
         'port'     => 11211,
+    ],
+    'cache' => [
+        'uuid' => [
+            // do same as boost
+        ],
     ],
 ];
 ```
@@ -350,16 +400,6 @@ If you are interested in how fast a certain pages collection loads you can do th
 var_dump(page('blog/2021')->children()->listed()->boostmark());
 ```
 
-## Tiny-URL
-
-This plugin allows you to use the BoostID value in a shortend URL. It also registers a route to redirect from the shortend URL to the actual page. Retrieve the shortend URL it with the `tinyurl()` Page-Method. 
-
-```php
-echo $page->url(); // https://devkit.bnomei.com/test-43422931f00e27337311/test-2efd96419d8ebe1f3230/test-32f6d90bd02babc5cbc3
-echo $page->boostIDField()->value(); // 8j5g64hh
-echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
-```
-
 ## Site Index with lower memory footprint
 
 Using `site()->index()` in Kirby will load all Pages into memory at the same time. This plugin provides a way to iterate over the index with having only one page loaded at a time.
@@ -376,42 +416,19 @@ $boostedCount = site()->boost();
 
 ## Settings
 
-| bnomei.boost.            | Default     | Description                                                                                                              |            
-|---------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------|
-| fieldname | `'boostid'` | change name of loaded field                                                                                              |
-| expire | `0`         | expire in minutes for all caches created                                                                                 |
-| read | `true`      | read from cache                                                                                                          |
-| write | `true`      | write to cache                                                                                                           |
-| drafts | `true`      | index drafts                                                                                                             |
-| patch.files | `false`     | monkey patch Files Class to do content caching                                                                           |
-| fileModifiedCheck | `false`     | expects file to not be altered outside of kirby                                                                          |
-| index.generator | callback    | the uuid genertor                                                                                                        |
-| tinyurl.url | callback    | returning `site()->url()`. Use htaccess on that domain to redirect `RewriteRule (.*) http://www.bnomei.com/x/$1 [R=301]` |
-| tinyurl.folder | `x`         | Tinyurl format: yourdomain/{folder}/{hash}                                                                               |
-| updateIndexWithHooks | `true`      | disable this when batch creating lots of pages                                                                           |
+| bnomei.boost.            | Default  | Description                                                                                                              |            
+|---------------------------|----------|--------------------------------------------------------------------------------------------------------------------------|
+| expire | `0`      | expire in minutes for all caches created                                                                                 |
+| read | `true`   | read from cache                                                                                                          |
+| write | `true`   | write to cache                                                                                                           |
+| drafts | `true`   | index drafts                                                                                                             |
+| patch.files | `true`   | monkey patch Files Class to do content caching                                                                           |
+| fileModifiedCheck | `false`  | expects file to not be altered outside of kirby                                                                          |                                                                                                     |
+| helper | `true`   | allow usage of boost() helper                                                                                            |
 
 ## External changes to content files
 
 If your content file are written to by any other means than using Kirbys page object methods you need to enable the `bnomei.boost.fileModifiedCheck` option or overwrite the `checkModifiedTimestampForContentBoost(): bool` method on a model basis. This will reduce performance by about 1/3 but still be faster than without using a cache at all.
-
-## Migration from AutoID
-
-You can use this plugin instead of AutoID if you did not use autoid in site objects, file objects and structures. This plugin will default to the `boostid` field to get the unique id but can be set to use the `autoid` field as well.
-
-- Uninstall the autoid plugin.
-- Setup the models (see above).
-- Keep `autoid` field or replace with `boostid` field. If you keep the `autoid` as fieldname then set `bnomei.boost.fieldname` to array `'autoid'`.
-- Replace `autoid`/`AUTOID` in blueprint queries with `BOOSTID`.
-- Replace calls to `autoid()` with `boost()` in php code.
-- Replace `->fromAutoID()` with `->fromBoostID()` in php code.
-
-## History
-
-This plugin is an enhanced combination of 
-- [Page Memcached](https://github.com/bnomei/kirby3-page-memcached), 
-- [Page SQLite](https://github.com/bnomei/kirby3-page-sqlite), 
-- [AutoID](https://github.com/bnomei/kirby3-autoid/) and 
-- [Bolt](https://github.com/bnomei/kirby3-bolt). 
 
 ## Disclaimer
 

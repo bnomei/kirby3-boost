@@ -1,5 +1,7 @@
 <?php
 
+use Bnomei\BoostIndex;
+
 @include_once __DIR__ . '/vendor/autoload.php';
 
 autoloader(__DIR__)->classes();
@@ -7,62 +9,66 @@ autoloader(__DIR__)->classes();
 if (! function_exists('bolt')) {
     function bolt(string $id, ?\Kirby\Cms\Page $parent = null, bool $cache = true, bool $extend = true)
     {
+        $id = str_replace('page://', '', $id);
+        $cacheKey = 'page/' . Str::substr($id, 0, 2) . '/' . Str::substr($id, 2);
+        if ($pageIdFromUuidCache = \Kirby\Uuid\Uuids::cache()->get($cacheKey)) {
+            $id = $pageIdFromUuidCache;
+        }
+
         return \Bnomei\Bolt::page($id, $parent, $cache, $extend);
     }
 }
 
 if (! function_exists('modified')) {
-    function modified($id)
+    function modified($model)
     {
-        return \Bnomei\BoostIndex::modified($id);
+        return \Bnomei\BoostCache::modified($model);
     }
 }
 
 if (! function_exists('boost')) {
-    function boost(?string $id = null): ?\Kirby\Cms\Page
+    function boost($id)
     {
-        if (!$id) {
+        if (!$id || !option('bnomei.boost.helper')) {
             return null;
         }
-        $page = \Bnomei\BoostIndex::page($id);
-        if (!$page) {
-            $page = \Bnomei\Bolt::page($id);
+
+        if (is_array($id)) {
+            $pages = [];
+            foreach ($id as $uuid) {
+                $pages[] = boost($uuid);
+            }
+            return new \Kirby\Cms\Pages($pages);
         }
-        return $page;
+
+        if ($id instanceof \Kirby\Uuid\Uuid) {
+            $id = $id->id();
+        }
+
+        if (is_string($id)) {
+            $page = \Bnomei\BoostIndex::page($id);
+            if (!$page) {
+                $page = \Bnomei\Bolt::page($id);
+            }
+            return $page;
+        }
+
+        return null;
     }
-    /*
-    function siteIndexFilterByBoostID(string $id): ?\Kirby\Cms\Page
-    {
-        $drafts = option('bnomei.boost.drafts');
-        return site()->index($drafts)->filter(function ($page) use ($id) {
-            return $page->boostIDField()->value() === $id;
-        })->first();
-    }
-    */
 }
 
 Kirby::plugin('bnomei/boost', [
     'options' => [
         'cache' => true,
-        'fieldname' => 'boostid', // autoid
         'expire' => 0,
-        'fileModifiedCheck' => false, // expects file to not be altered outside of kirby
+        'fileModifiedCheck' => false, // expects content file to not be altered outside of kirby
         'read' => true, // read from cache
         'write' => true, // write to cache
         'drafts' => true, // index drafts as well
-        'index' => [
-            'generator' => function (?string $seed = null) {
-                // override with custom callback if needed
-                return (new \Bnomei\TokenGenerator($seed))->generate();
-            },
+        'patch' => [
+            'files' => true, // monkey patch files class
         ],
-        'tinyurl' => [
-            'url' => function () {
-                return kirby()->url('index');
-            },
-            'folder' => 'x',
-        ],
-        'updateIndexWithHooks' => true, // disable this when batch creating pages
+        'helper' => true, // use boost helper
     ],
     'blueprints' => autoloader(__DIR__)->blueprints(),
     'collections' => autoloader(__DIR__)->collections(),
@@ -74,34 +80,30 @@ Kirby::plugin('bnomei/boost', [
             $page = $this;
 
             // has boost?
-            if ($page->hasBoost() !== true) {
-                return false;
+            if ($page->hasBoost() === true) {
+                // needs write?
+                $lang = kirby()->languageCode();
+
+                // if needs write
+                if (!($page->readContentCache($lang))) {
+                    // then write
+                    $page->writeContentCache($page->content()->toArray(), $lang);
+                }
             }
-
-            // if not has an id force one
-            $page = $page->forceNewBoostId();
-
-            // needs write?
-            $lang = kirby()->languageCode();
-            $content = $page->readContentCache($lang);
 
             // add after cache was read and id exists
             $page->boostIndexAdd();
 
-            // if needs write
-            if (! $content) {
-                // then write
-                return $page->writeContentCache($page->content()->toArray(), $lang);
-            }
             return true;
         },
         'unboost' => function () {
             // has boost?
-            if ($this->hasBoost() !== true) {
-                return false;
+            if ($this->hasBoost() === true) {
+                $this->deleteContentCache();
+                ;
             }
+
             $this->boostIndexRemove();
-            return $this->deleteContentCache();
         },
         'isBoosted' => function () {
             // has boost?
@@ -111,33 +113,28 @@ Kirby::plugin('bnomei/boost', [
             // $this->boostIndexAdd(); // this would trigger content add
             return $this->isContentBoosted(kirby()->languageCode());
         },
-        'boostIDField' => function () {
-            $fieldname = option('bnomei.boost.fieldname');
-            if ($this->{$fieldname}()->isNotEmpty()) {
-                return $this->{$fieldname}();
-            }
-            // default
-            return $this->boostid();
-        },
-        'BOOSTID' => function () { // casesensitive
-            $this->boostIndexAdd();
-            return $this->boostIDField()->value();
-        },
         'boostIndexAdd' => function () {
             return Bnomei\BoostIndex::singleton()->add($this);
         },
         'boostIndexRemove' => function () {
             return \Bnomei\BoostIndex::singleton()->remove($this);
         },
-        'tinyurl' => function (): string {
-            if ($this->hasBoost() === true && $url = \Bnomei\BoostIndex::tinyurl($this->boostIDField())) {
-                $this->boostIndexAdd();
-                return $url;
-            }
-            return site()->errorPage()->url();
+        'boostCacheDirUri' => function () {
+            \Bnomei\BoostCache::singleton()->set(
+                $this->uuid()->id() . '/diruri',
+                $this->diruri(),
+                option('bnomei.boost.expire')
+            );
         },
-        'tinyUrl' => function (): string {
-            return $this->tinyurl();
+        'searchForTemplate' => function (string $template): \Kirby\Cms\Pages {
+            $pages = [];
+            foreach (\Bnomei\BoostIndex::singleton()->toKVs() as $data) {
+                $diruri = $data['diruri'];
+                if ($data['template'] === $template && Str::contains($diruri, $this->diruri())) {
+                    $pages[] = bolt($diruri);
+                }
+            }
+            return new \Kirby\Cms\Pages($pages);
         },
     ],
     'pagesMethods' => [ // PAGES
@@ -182,8 +179,8 @@ Kirby::plugin('bnomei/boost', [
             \Bnomei\BoostCache::beginTransaction();
             foreach ($this as $page) {
                 if ($page->hasBoost() === true) {
-                    // uuid and a field to force reading from cache
-                    $str .= $page->diruri() . $page->modified() . $page->boostIDField()->value();
+                    // uuid and a field to force reading from cache calling the uuid & title from content file
+                    $str .= $page->diruri() . $page->modified() . $page->uuid()->id()  . $page->title()->value();
                     $page->boostIndexAdd();
                     $count++;
                 }
@@ -208,107 +205,73 @@ Kirby::plugin('bnomei/boost', [
             $drafts = option('bnomei.boost.drafts');
             return site()->index($drafts)->boostmark();
         },
+        'searchForTemplate' => function (string $template): \Kirby\Cms\Pages {
+            $pages = [];
+            foreach (\Bnomei\BoostIndex::singleton()->toKVs() as $data) {
+                if ($data['template'] === $template) {
+                    $pages[] = bolt($data['diruri']);
+                }
+            }
+            return new \Kirby\Cms\Pages($pages);
+        },
     ],
     'fieldMethods' => [
-        'fromBoostID' => function ($field): ?\Kirby\Cms\Page {
+        'toPageBoosted' => function ($field): ?\Kirby\Cms\Page {
             return boost($field->value);
         },
-        'fromBoostIDs' => function ($field): ?\Kirby\Cms\Pages {
+        'toPagesBoosted' => function ($field): \Kirby\Cms\Pages {
             $pages = [];
             foreach (explode(',', $field->value) as $value) {
                 if ($page = boost($value)) {
                     $pages[] = $page;
                 }
             }
-            return count($pages) ? new \Kirby\Cms\Pages($pages) : null;
+            return new \Kirby\Cms\Pages($pages);
         },
     ],
-    'fields' => [
-        'boostid' => [
-            'props' => [
-                'value' => function (string $value = null) {
-                    return $value;
-                },
-            ],
-        ],
-        'autoid' => [
-            'props' => [
-                'value' => function (string $value = null) {
-                    return $value;
-                },
-            ],
-        ],
-    ],
-    'routes' => function ($kirby) {
-        $folder = $kirby->option('bnomei.boost.tinyurl.folder');
-        return [
-            [
-                'pattern' => $folder . '/(:any)',
-                'method' => 'GET',
-                'action' => function ($boostid) {
-                    $page = boost($boostid);
-                    if ($page) {
-                        return die(\Kirby\Cms\Response::redirect($page->url(), 302));
-                    }
-                    return die(\Kirby\Cms\Response::redirect(site()->errorPage()->url(), 404));
-                },
-            ],
-        ];
-    },
     'hooks' => [
         'page.create:after' => function ($page) {
-            if ($page->hasBoost() === true) {
-                $page = $page->forceNewBoostId(false);
-                if (option('bnomei.boost.updateIndexWithHooks')) {
-                    $page->boostIndexAdd();
-                }
+            if (option('bnomei.boost.helper')) {
+                $page->boostIndexAdd();
             }
         },
         'page.update:after' => function ($newPage, $oldPage) {
-            if ($newPage->hasBoost() === true) {
-                if (option('bnomei.boost.updateIndexWithHooks')) {
-                    $newPage->boostIndexAdd();
-                }
+            if (option('bnomei.boost.helper')) {
+                $newPage->boostIndexAdd();
             }
         },
         'page.duplicate:after' => function ($duplicatePage, $originalPage) {
-            if ($duplicatePage->hasBoost() === true) {
-                $duplicatePage = $duplicatePage->forceNewBoostId(true);
-                if (option('bnomei.boost.updateIndexWithHooks')) {
-                    $duplicatePage->boostIndexAdd();
-                }
+            if (option('bnomei.boost.helper')) {
+                $duplicatePage->boostIndexAdd();
             }
         },
         'page.changeNum:after' => function ($newPage, $oldPage) {
-            if ($newPage->hasBoost() === true) {
-                if (option('bnomei.boost.updateIndexWithHooks')) {
-                    $newPage->boostIndexAdd();
-                    $newPage->index(option('bnomei.boost.drafts'))->boostIndexAdd();
-                }
+            if (option('bnomei.boost.helper')) {
+                $newPage->boostIndexAdd();
+                $newPage->index(option('bnomei.boost.drafts'))->boostIndexAdd();
             }
         },
         'page.changeSlug:after' => function ($newPage, $oldPage) {
-            if ($newPage->hasBoost() === true) {
-                if (option('bnomei.boost.updateIndexWithHooks')) {
-                    $newPage->boostIndexAdd();
-                    $newPage->index(option('bnomei.boost.drafts'))->boostIndexAdd();
-                }
+            if (option('bnomei.boost.helper')) {
+                $newPage->boostIndexAdd();
+                $newPage->index(option('bnomei.boost.drafts'))->boostIndexAdd();
             }
         },
         'page.changeStatus:after' => function ($newPage, $oldPage) {
-            if ($newPage->hasBoost() === true) {
-                if (option('bnomei.boost.updateIndexWithHooks')) {
-                    $newPage->boostIndexAdd();
-                    $newPage->index(option('bnomei.boost.drafts'))->boostIndexAdd();
-                }
+            if (option('bnomei.boost.helper')) {
+                $newPage->boostIndexAdd();
+                $newPage->index(option('bnomei.boost.drafts'))->boostIndexAdd();
+            }
+        },
+        'page.changeTemplate:after' => function ($newPage, $oldPage) {
+            if (option('bnomei.boost.helper')) {
+                $newPage->boostIndexAdd();
             }
         },
         'page.delete:after' => function ($page, $force) {
-            if ($page->hasBoost() === true) {
-                if (option('bnomei.boost.updateIndexWithHooks')) {
-                    $page->boostIndexRemove();
-                    $page->index(option('bnomei.boost.drafts'))->boostIndexRemove();
-                }
+            if (option('bnomei.boost.helper')) {
+                $page->boostIndexRemove();
+                $page->index(option('bnomei.boost.drafts'))->boostIndexRemove();
             }
         },
     ],

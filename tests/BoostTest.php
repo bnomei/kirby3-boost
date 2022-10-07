@@ -24,6 +24,16 @@ final class BoostTest extends TestCase
         return $page;
     }
 
+    public function testBoostSiteIndex()
+    {
+        $index = \Bnomei\BoostIndex::singleton();
+        $index->index(true);
+        $index->flush();
+        $count = site()->boost();
+        $this->assertCount(kirby()->site()->index(true)->count(), $index->toArray());
+        $this->assertCount($count, $index->toArray());
+    }
+
     public function testHelperBolt()
     {
         $randomPage = $this->randomPage();
@@ -42,7 +52,7 @@ final class BoostTest extends TestCase
     {
         $randomPage = $this->randomPage();
         $randomPage->boost();
-        $this->assertEquals($randomPage->id(), boost($randomPage->boostid()->value())->id());
+        $this->assertEquals($randomPage->id(), boost($randomPage->uuid()->id())->id());
     }
 
     public function testPageMethodBolt()
@@ -69,20 +79,6 @@ final class BoostTest extends TestCase
         $this->assertFalse($randomPage->isBoosted());
         $this->assertTrue($randomPage->boost());
         $this->assertTrue($randomPage->isBoosted());
-    }
-
-    public function testPageMethodBoostIDField()
-    {
-        $randomPage = $this->randomPage();
-        $this->assertEquals($randomPage->boostid()->value(), $randomPage->boostIDField()->value());
-
-        $this->assertEquals($randomPage->boostid()->value(), $randomPage->BOOSTID());
-    }
-
-    public function testPageMethodTinyUrl()
-    {
-        $randomPage = $this->randomPage();
-        $this->assertStringEndsWith('/x/' . $randomPage->boostid()->value(), $randomPage->tinyUrl());
     }
 
     public function testPagesMethodBoost()
@@ -136,27 +132,17 @@ final class BoostTest extends TestCase
         // works only in 2nd test run when kirby process
         // can read the updated content files from WithPagesTest
         if ($randomPage->related()->isNotEmpty()) {
-            $many = $randomPage->related()->fromBoostIDs();
+            $many = $randomPage->related()->toPagesBoosted();
             $this->assertNotNull($many);
 
             kirby()->impersonate('kirby');
             $randomPage = $randomPage->update([
                 'related' => $randomPage->related()->split()[0],
             ]);
-            $one = $randomPage->related()->fromBoostID();
+            $one = $randomPage->related()->toPageBoosted();
             $this->assertNotNull($one);
         } else {
             $this->markTestSkipped();
         }
-    }
-
-    public function testBoostSiteIndex()
-    {
-        $index = \Bnomei\BoostIndex::singleton();
-        $index->index(true);
-        $index->flush();
-        $count = site()->boost();
-        $this->assertCount(kirby()->collection('boostidpages')->count(), $index->toArray());
-        $this->assertCount($count, $index->toArray());
     }
 }

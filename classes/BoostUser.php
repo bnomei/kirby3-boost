@@ -6,5 +6,5 @@ namespace Bnomei;
 
 class BoostUser extends \Kirby\Cms\User
 {
-    use UserHasBoost;
+    use ModelHasBoost;
 }

@@ -4,27 +4,14 @@ declare(strict_types=1);
 
 namespace Bnomei;
 
-use Kirby\Cms\Page;
-use Kirby\Toolkit\A;
-
-trait PageHasBoost
+trait ModelHasBoost
 {
     /** @var bool */
     private $boostWillBeDeleted;
 
-    public static function create(array $props): Page
+    public function hasBoost(): bool
     {
-        $fieldname = option('bnomei.boost.fieldname');
-        if (!A::get($props['content'], $fieldname)) {
-            $boostid = option('bnomei.boost.index.generator')();
-            // make 100% sure its unique
-            while (BoostIndex::singleton()->findByBoostId($boostid, false)) {
-                $boostid = option('bnomei.boost.index.generator')();
-            }
-            $props['content'][$fieldname] = $boostid;
-        }
-
-        return parent::create($props);
+        return true;
     }
 
     public function checkModifiedTimestampForContentBoost(): bool
@@ -37,37 +24,15 @@ trait PageHasBoost
         $this->boostWillBeDeleted = $value;
     }
 
-    public function hasBoost(): bool
-    {
-        return true;
-    }
-
     public function isContentBoosted(string $languageCode = null): bool
     {
         return $this->readContentCache($languageCode) !== null;
     }
 
-    public function forceNewBoostId(bool $overwrite = false, ?string $id = null)
-    {
-        if ($overwrite || $this->boostIDField()->isEmpty()) {
-            $boostid = $id ?? option('bnomei.boost.index.generator')();
-            // make 100% sure its unique
-            while (BoostIndex::singleton()->findByBoostId($boostid, false)) {
-                $boostid = option('bnomei.boost.index.generator')();
-            }
-            $fieldname = option('bnomei.boost.fieldname');
-            kirby()->impersonate('kirby');
-            return $this->update([
-                $fieldname => $boostid,
-            ]);
-        }
-
-        return $this;
-    }
 
     public function contentBoostedKey(string $languageCode = null): string
     {
-        $key = strval(crc32($this->id()));
+        $key = hash('xxh3', $this->id()); // can not use UUID since content not loaded yet
         if (! $languageCode) {
             $languageCode = kirby()->languages()->count() ? kirby()->language()->code() : null;
         }
@@ -86,7 +51,7 @@ trait PageHasBoost
         }
 
         $modifiedCache = $cache->get(
-            $this->contentBoostedKey($languageCode).'-modified',
+            $this->contentBoostedKey($languageCode) . '-modified',
             null
         );
         if (!$modifiedCache) {
@@ -129,7 +94,7 @@ trait PageHasBoost
         if (! $data) {
             $data = parent::readContent($languageCode);
             if ($data && $this->boostWillBeDeleted !== true) {
-                $this->writeContentCache($data, $languageCode);
+                 $this->writeContentCache($data, $languageCode);
             }
         }
 
@@ -184,14 +149,14 @@ trait PageHasBoost
                 $this->contentBoostedKey($language->code()) . '-content'
             );
             $cache->remove(
-                $this->contentBoostedKey($language->code()).'-modified'
+                $this->contentBoostedKey($language->code()) . '-modified'
             );
         }
         $cache->remove(
             $this->contentBoostedKey() . '-content'
         );
         $cache->remove(
-            $this->contentBoostedKey().'-modified'
+            $this->contentBoostedKey() . '-modified'
         );
 
         return true;

@@ -6,11 +6,13 @@
 
 class PagesThatCanBeReferencedWithoutIndex
 {
-    static $cache = null;
-    static function load(): ?\Kirby\Cms\Pages
+    public static $cache = null;
+    public static function load(): ?\Kirby\Cms\Pages
     {
         // if cached then return that
-        if(static::$cache) return static::$cache;
+        if (static::$cache) {
+            return static::$cache;
+        }
 
         // use lapse to cache the diruri
         // this will avoid index()
@@ -23,7 +25,7 @@ class PagesThatCanBeReferencedWithoutIndex
                     'document',
                     'place'
                 ]);
-                return array_values($collection->map(function($page) {
+                return array_values($collection->map(function ($page) {
                     return $page->diruri();
                 }));
             },
@@ -31,11 +33,11 @@ class PagesThatCanBeReferencedWithoutIndex
         );
 
         // use bolt from autoid/boost to get pages quickly
-        $pages = array_map(function($diruri) {
-            return bolt($diruri);
+        $pages = array_map(function ($diruri) {
+            return \Bnomei\Bolt::page($diruri);
         }, $cachedDirUris);
         // remove those that bolt did not find
-        $pages = array_filter($pages, function($page) {
+        $pages = array_filter($pages, function ($page) {
             return is_null($page) ? false : true;
         });
 

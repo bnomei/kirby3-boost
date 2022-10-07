@@ -1,22 +1,20 @@
 <?php
 
-return function ($site) {
-    $kv = [];
-    foreach (\Bnomei\BoostIndex::singleton()->toArray() as $boostid => $id) {
-        $kv[] = [
-            'value' => $boostid,
-            'text' => A::last(explode(\Bnomei\BoostIndex::SEPERATOR, $id)),
-            'diruri' => A::first(explode(\Bnomei\BoostIndex::SEPERATOR, $id)),
-        ];
-    }
-    usort($kv, function ($a, $b) {
-        if ($a['diruri'] == $b['diruri']) {
-            return 0;
+class StaticBoostIdKVs
+{
+    public static $cache = null;
+    public static function load(): ?array
+    {
+        if (static::$cache) {
+            return static::$cache;
         }
-        return ($a['diruri'] < $b['diruri']) ? -1 : 1;
-    });
-    $kv = array_map(function ($item) {
-        return new \Kirby\Toolkit\Obj($item);
-    }, $kv);
-    return $kv;
+
+        static::$cache = \Bnomei\BoostIndex::singleton()->toKVs();
+
+        return static::$cache;
+    }
+}
+
+return function () {
+    return StaticBoostIdKVs::load();
 };

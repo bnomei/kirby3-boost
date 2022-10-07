@@ -25,41 +25,11 @@ final class PageHasBoostTest extends TestCase
         return $page;
     }
 
-    public function testCreateWillAddBoostId()
-    {
-        $newPage = site()->createChild([
-            'slug' => 'willthishaveboostid',
-            'title' => 'Will this Have BoostId',
-            'content' => [
-                // 'boostid' => null,
-            ],
-        ])->publish();
-        site()->purge();
-        $newPage = page('willthishaveboostid');
-
-        $this->assertTrue($newPage->boostid()->isNotEmpty());
-
-        $newPage->delete(true);
-    }
-
-    public function testWillForceOnDupblicate()
-    {
-        $randomPage = $this->randomPage();
-        $bid1 = $randomPage->boostid()->value();
-
-        $newPage = $randomPage->duplicate('newboostid')->publish();
-        $newPageId = $newPage->id();
-        site()->purge();
-        $newPage = page($newPageId);
-
-        $this->assertTrue($newPage->boostid()->isNotEmpty());
-        $this->assertNotEquals($bid1, $newPage->boostid()->value());
-
-        $newPage->delete(true);
-    }
-
     public function testDeleteCacheOnDelete()
     {
+        kirby()->impersonate('kirby');
+        page('willthisbedeleted')?->delete();
+
         $newPage = site()->createChild([
             'slug' => 'willthisbedeleted',
             'title' => 'Will this be Deleted',
@@ -69,8 +39,6 @@ final class PageHasBoostTest extends TestCase
         ])->publish();
         site()->purge();
         $newPage = page('willthisbedeleted');
-
-        $this->assertTrue($newPage->boostid()->isNotEmpty());
 
         $this->assertNotNull($newPage->readContentCache());
         $key = $newPage->contentBoostedKey();
@@ -89,7 +57,7 @@ final class PageHasBoostTest extends TestCase
         $randomPage = $this->randomPage();
         $key = $randomPage->contentBoostedKey();
         $cache = BoostCache::singleton();
-        
+
         // fake outdated modified value
         $this->assertTrue($cache->set($key . '-modified', $randomPage->modified() - 1));
         $this->assertTrue($randomPage->isContentCacheExpiredByModified());

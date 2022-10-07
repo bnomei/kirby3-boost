@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit1cf7969bd370956647ab831624668d4e
+class ComposerStaticInit0363f9fe4394195bc812f227601ed0cb
 {
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
@@ -59,10 +59,8 @@ class ComposerStaticInit1cf7969bd370956647ab831624668d4e
         'Bnomei\\BoostPage' => __DIR__ . '/../..' . '/classes/BoostPage.php',
         'Bnomei\\BoostUser' => __DIR__ . '/../..' . '/classes/BoostUser.php',
         'Bnomei\\CacheBenchmark' => __DIR__ . '/../..' . '/classes/CacheBenchmark.php',
-        'Bnomei\\FileHasBoost' => __DIR__ . '/../..' . '/classes/FileHasBoost.php',
-        'Bnomei\\PageHasBoost' => __DIR__ . '/../..' . '/classes/PageHasBoost.php',
+        'Bnomei\\ModelHasBoost' => __DIR__ . '/../..' . '/classes/ModelHasBoost.php',
         'Bnomei\\TokenGenerator' => __DIR__ . '/../..' . '/classes/TokenGenerator.php',
-        'Bnomei\\UserHasBoost' => __DIR__ . '/../..' . '/classes/UserHasBoost.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Kirby\\ComposerInstaller\\CmsInstaller' => __DIR__ . '/..' . '/getkirby/composer-installer/src/ComposerInstaller/CmsInstaller.php',
         'Kirby\\ComposerInstaller\\Installer' => __DIR__ . '/..' . '/getkirby/composer-installer/src/ComposerInstaller/Installer.php',
@@ -102,9 +100,9 @@ class ComposerStaticInit1cf7969bd370956647ab831624668d4e
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit1cf7969bd370956647ab831624668d4e::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit1cf7969bd370956647ab831624668d4e::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit1cf7969bd370956647ab831624668d4e::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit0363f9fe4394195bc812f227601ed0cb::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit0363f9fe4394195bc812f227601ed0cb::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit0363f9fe4394195bc812f227601ed0cb::$classMap;
 
         }, null, ClassLoader::class);
     }
