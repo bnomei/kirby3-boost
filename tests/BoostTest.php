@@ -24,16 +24,6 @@ final class BoostTest extends TestCase
         return $page;
     }
 
-    public function testBoostSiteIndex()
-    {
-        $index = \Bnomei\BoostIndex::singleton();
-        $index->index(true);
-        $index->flush();
-        $count = site()->boost();
-        $this->assertCount(kirby()->site()->index(true)->count(), $index->toArray());
-        $this->assertCount($count, $index->toArray());
-    }
-
     public function testHelperBolt()
     {
         $randomPage = $this->randomPage();
@@ -46,13 +36,6 @@ final class BoostTest extends TestCase
         $randomPage = $this->randomPage();
         $randomPage->boost();
         $this->assertEquals($randomPage->modified(), modified($randomPage->id()));
-    }
-
-    public function testHelperBoost()
-    {
-        $randomPage = $this->randomPage();
-        $randomPage->boost();
-        $this->assertEquals($randomPage->id(), boost($randomPage->uuid()->id())->id());
     }
 
     public function testPageMethodBolt()
@@ -132,17 +115,43 @@ final class BoostTest extends TestCase
         // works only in 2nd test run when kirby process
         // can read the updated content files from WithPagesTest
         if ($randomPage->related()->isNotEmpty()) {
-            $many = $randomPage->related()->toPagesBoosted();
+            $many = $randomPage->related()->fromBoostIDs();
             $this->assertNotNull($many);
 
             kirby()->impersonate('kirby');
             $randomPage = $randomPage->update([
                 'related' => $randomPage->related()->split()[0],
             ]);
-            $one = $randomPage->related()->toPageBoosted();
+            $one = $randomPage->related()->fromBoostID();
             $this->assertNotNull($one);
         } else {
             $this->markTestSkipped();
         }
+    }
+
+    public function testBoostSiteIndex()
+    {
+        $index = \Bnomei\BoostIndex::singleton();
+        $index->index(true);
+        $index->flush();
+        $count = site()->boost();
+        $this->assertCount(count(kirby()->collection('boostidkvs')) + 1, $index->toArray());
+        $this->assertCount($count, $index->toArray());
+    }
+
+    public function testNonTranslatable()
+    {
+        $randomPage = $this->randomPage();
+
+        $this->assertEquals('translated EN', $randomPage->text()->value());
+        $this->assertEquals('not translated', $randomPage->nt_text()->value());
+
+        $this->assertEquals('translated EN', $randomPage->content('en')->text()->value());
+        $this->assertEquals('not translated', $randomPage->content('en')->nt_text()->value());
+
+        $this->assertEquals('translated DE', $randomPage->content('de')->text()->value());
+        $this->assertEquals('not translated', $randomPage->content('de')->nt_text()->value());
+
+        $this->markTestIncomplete('using content() does not reflect what routing does. tested manually in browser.');
     }
 }

@@ -1,8 +1,12 @@
 preset: page
 
 fields:
-  boostid:
-    type: boostid
-
   related:
     extends: fields/boostidkvs
+
+  text:
+    type: text
+
+  nt_text:
+    type: text
+    translate: false

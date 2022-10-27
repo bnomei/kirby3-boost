@@ -123,7 +123,7 @@ trait ModelHasBoost
 
         return $cache->set(
             $this->contentBoostedKey($languageCode) . '-content',
-            $data,
+            array_filter($data, fn($content) => $content !== null),
             option('bnomei.boost.expire')
         );
     }

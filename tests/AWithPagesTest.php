@@ -40,7 +40,9 @@ class AWithPagesTest extends TestCase
             'slug' => Str::slug($id),
             'template' => 'default',
             'content' => [
-                'title' => $id
+                'title' => $id,
+                'nt_text' => 'not translated',
+                'text' => 'translated EN',
             ],
         ]);
 
@@ -52,6 +54,10 @@ class AWithPagesTest extends TestCase
                 $this->createPage($page, $i, $depth);
             }
         }
+
+        $page->update([
+            'text' => 'translated DE',
+        ], 'de');
 
         return $page;
     }

@@ -4,6 +4,11 @@
     echo $page->title();
 ?></h1>
 
+<div>
+    <?= var_dump($page->text()->value()); ?>
+    <?= var_dump($page->nt_text()->value()); ?>
+</div>
+
 <h3>debug</h3>
 <?php var_dump(option('debug')); ?>
 

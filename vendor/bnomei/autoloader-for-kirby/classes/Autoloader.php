@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bnomei;
 
+use Closure;
 use Spyc;
 use Symfony\Component\Finder\Finder;
 
@@ -40,14 +41,14 @@ final class Autoloader
                 'name' => static::ANY_PHP_OR_YML,
                 'key' => 'relativepath',
                 'require' => false,
-                'lowercase' => true,
+                'transform' => fn ($key) => strtolower($key),
             ],
             'classes' => [
                 'folder' => 'classes',
                 'name' => static::PHP,
                 'key' => 'classname',
                 'require' => false,
-                'lowercase' => true,
+                'transform' => fn ($key) => strtolower($key),
                 'map' => [],
             ],
             'collections' => [
@@ -55,21 +56,21 @@ final class Autoloader
                 'name' => static::ANY_PHP,
                 'key' => 'relativepath',
                 'require' => true,
-                'lowercase' => false,
+                'transform' => false,
             ],
             'controllers' => [
                 'folder' => 'controllers',
                 'name' => static::ANY_PHP,
                 'key' => 'filename',
                 'require' => true,
-                'lowercase' => true,
+                'transform' => fn ($key) => static::pascalToKebabCase($key),
             ],
             'blockmodels' => [
                 'folder' => 'models',
                 'name' => static::BLOCK_PHP,
                 'key' => 'classname',
                 'require' => false,
-                'lowercase' => true,
+                'transform' => fn ($key) => static::pascalToKebabCase($key),
                 'map' => [],
             ],
             'pagemodels' => [
@@ -77,7 +78,7 @@ final class Autoloader
                 'name' => static::PAGE_PHP,
                 'key' => 'classname',
                 'require' => false,
-                'lowercase' => true,
+                'transform' => fn ($key) => static::pascalToKebabCase($key),
                 'map' => [],
             ],
             'routes' => [
@@ -85,21 +86,21 @@ final class Autoloader
                 'name' => static::ANY_PHP,
                 'key' => 'route',
                 'require' => true,
-                'lowercase' => false,
+                'transform' => false,
             ],
             'apiroutes' => [
                 'folder' => 'api/routes',
                 'name' => static::ANY_PHP,
                 'key' => 'route',
                 'require' => true,
-                'lowercase' => false,
+                'transform' => false,
             ],
             'usermodels' => [
                 'folder' => 'models',
                 'name' => static::USER_PHP,
                 'key' => 'classname',
                 'require' => false,
-                'lowercase' => true,
+                'transform' => fn ($key) => static::pascalToKebabCase($key),
                 'map' => [],
             ],
             'snippets' => [
@@ -107,21 +108,21 @@ final class Autoloader
                 'name' => static::ANY_PHP,
                 'key' => 'relativepath',
                 'require' => false,
-                'lowercase' => false,
+                'transform' => false,
             ],
             'templates' => [
                 'folder' => 'templates',
                 'name' => static::ANY_PHP,
                 'key' => 'filename',
                 'require' => false,
-                'lowercase' => true,
+                'transform' => fn ($key) => strtolower($key),
             ],
             'translations' => [
                 'folder' => 'translations',
                 'name' => static::ANY_PHP_OR_YML_OR_JSON,
                 'key' => 'filename',
                 'require' => true,
-                'lowercase' => true,
+                'transform' => fn ($key) => strtolower($key),
             ],
         ], $options);
 
@@ -164,15 +165,9 @@ final class Autoloader
                 $key = $file->getRelativePathname();
                 $key = str_replace('.' . $extension, '', $key);
                 $key = str_replace('\\', '/', $key); // windows
-                if ($options['lowercase']) {
-                    $key = strtolower($key);
-                }
             } elseif ($options['key'] === 'filename') {
                 $key = basename($file->getRelativePathname());
                 $key = str_replace('.' . $extension, '', $key);
-                if ($options['lowercase']) {
-                    $key = strtolower($key);
-                }
             } elseif ($options['key'] === 'classname') {
                 $key = $file->getRelativePathname();
                 $key = str_replace('.' . $extension, '', $key);
@@ -191,14 +186,15 @@ final class Autoloader
                         $key = substr($key, 0, -strlen($suffix));
                     }
                 }
-                if ($options['lowercase']) {
-                    $key = strtolower($key);
-                }
                 $this->registry[$type][$key] = $class;
             }
             if (empty($key)) {
                 continue;
             } else {
+                if ($options['transform'] instanceof Closure) { // apply transform function
+                    $key = $options['transform']($key);
+                }
+
                 $key = strval($key); // in case key looks like a number but should be a string
             }
 
@@ -341,6 +337,11 @@ final class Autoloader
             'api' => ['routes' => $this->routes('api')],
             'routes' => $this->routes(),
         ], $merge);
+    }
+
+    public function pascalToKebabCase(string $string): string
+    {
+        return ltrim(strtolower(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '-$0', $string)), '-');
     }
 
     public static function singleton(array $options = []): self
