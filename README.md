@@ -250,18 +250,18 @@ var_dump(\Bnomei\CacheBenchmark::run($caches, 1, site()->index()->count())); // 
 ```
 
 - Memory Cache Driver and Null Cache Driver would perform best but it either caches in memory only for current request or not at all and that is not really useful for this plugin. 
-- PHP Cache Driver will be the fastest possible solution but you might run out of php app memory. Use this driver if you need best performance and have good control over the size of your cached data.
+- PHP Cache Driver will be the fastest possible solution, but you might run out of php app memory. Use this driver if you need ultimate performance, have full control over your server php.ini configs and the size of your cached data fits within you application memory. But this driver is not suited well for concurrent writes from multiple requests with overlapping processing time.
 - APCu Cache can be expected to be very fast but one has to make sure all content fits into the memory limitations. You can also use my [apcu cachedriver with garbage collection ](https://github.com/bnomei/kirby3-apcu-cachedriver)
 - SQLite Cache Driver will perform very well since everything will be in one file and I optimized the read/write with [pragmas](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L20) and [wal journal mode](https://github.com/bnomei/kirby3-sqlite-cachedriver/blob/bc3ccf56cefff7fd6b0908573ce2b4f09365c353/index.php#L34). Content will be written using transactions.
 - My Redis Cache Driver has smart preloading using the very fast Redis pipeline and will write changes using transactions.
+- The MySQL Cache Driver is slightly slower than Redis and uses transactions as well.
 - The File Cache Driver will perform worse the more page objects you have. You are probably better of with no cache. This is the only driver with this flaw. Benchmarking this driver will also create a lot of file which in total might cause the script to exceed your php execution time.
-- The MySQL Cache Driver is still in development but I expect it to on par with SQLite.
 
 But do not take my word for it. Download the plugin, set realistic benchmark options and run the benchmark on your production server.
 
 ### Interactive Demo
 
-I created an interactive demo to compare various cache drivers and prove how much your website can be boosted. It kind of ended up as a love-letter to the <a class="underline" href="https://github.com/getkirby/kql">KQL Plugin</a> as well. You can find the benchmark and interactive demos running on server sponsored by **Kirbyzone** here:
+I created an interactive demo to compare various cache drivers and prove how much your website can be boosted. It kind of ended up as a love-letter to the <a class="underline" href="https://github.com/getkirby/kql">KQL Plugin</a> as well. You can find the benchmark and interactive demos here:
 
 - [Benchmark with all Drivers](https://kirby3-boost.bnomei.com)
 - [Demo using PHP Cache Driver](https://kirby3-boost-php.bnomei.com)
