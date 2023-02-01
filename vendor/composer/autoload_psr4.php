@@ -6,7 +6,6 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Symfony\\Polyfill\\Php80\\' => array($vendorDir . '/symfony/polyfill-php80'),
     'Symfony\\Component\\Finder\\' => array($vendorDir . '/symfony/finder'),
     'Kirby\\' => array($vendorDir . '/getkirby/composer-installer/src'),
     'Bnomei\\' => array($baseDir . '/classes', $vendorDir . '/bnomei/autoloader-for-kirby/classes'),

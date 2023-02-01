@@ -58,6 +58,13 @@ final class Autoloader
                 'require' => true,
                 'transform' => false,
             ],
+            'commands' => [
+                'folder' => 'commands',
+                'name' => static::ANY_PHP,
+                'key' => 'relativepath',
+                'require' => true,
+                'transform' => fn ($key) => str_replace('/', ':', $key),
+            ],
             'controllers' => [
                 'folder' => 'controllers',
                 'name' => static::ANY_PHP,
@@ -274,6 +281,11 @@ final class Autoloader
         return $this->registry('collections');
     }
 
+    public function commands(): array
+    {
+        return $this->registry('commands');
+    }
+
     public function controllers(): array
     {
         return $this->registry('controllers');
@@ -326,6 +338,7 @@ final class Autoloader
         return array_merge_recursive([
             'blueprints' => $this->blueprints(),
             'collections' => $this->collections(),
+            'commands' => $this->commands(),
             'controllers' => $this->controllers(),
             'blockModels' => $this->blockModels(),
             'pageModels' => $this->pageModels(),

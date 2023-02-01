@@ -59,6 +59,7 @@ if (! function_exists('boost')) {
 
 Kirby::plugin('bnomei/boost', [
     'options' => [
+        'hashalgo' => 'xxh3,crc32', // best starting php 8.1 (use crc32 on php 8.0)
         'cache' => true,
         'expire' => 0,
         'fileModifiedCheck' => false, // expects content file to not be altered outside of kirby

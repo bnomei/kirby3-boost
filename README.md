@@ -416,15 +416,16 @@ $boostedCount = site()->boost();
 
 ## Settings
 
-| bnomei.boost.            | Default  | Description                                                                                                              |            
-|---------------------------|----------|--------------------------------------------------------------------------------------------------------------------------|
-| expire | `0`      | expire in minutes for all caches created                                                                                 |
-| read | `true`   | read from cache                                                                                                          |
-| write | `true`   | write to cache                                                                                                           |
-| drafts | `true`   | index drafts                                                                                                             |
-| patch.files | `true`   | monkey patch Files Class to do content caching                                                                           |
-| fileModifiedCheck | `false`  | expects file to not be altered outside of kirby                                                                          |                                                                                                     |
-| helper | `true`   | allow usage of boost() helper                                                                                            |
+| bnomei.boost.     | Default      | Description                                     |            
+|-------------------|--------------|-------------------------------------------------|
+| hashalgo          | `xxh3,crc32` | used hash algorithm php8.1+/php8.0              |
+| expire            | `0`          | expire in minutes for all caches created        |
+| read              | `true`       | read from cache                                 |
+| write             | `true`       | write to cache                                  |
+| drafts            | `true`       | index drafts                                    |
+| patch.files       | `true`       | monkey patch Files Class to do content caching  |
+| fileModifiedCheck | `false`      | expects file to not be altered outside of kirby |                                                                                                     |
+| helper            | `true`       | allow usage of boost() helper                   |
 
 ## External changes to content files
 

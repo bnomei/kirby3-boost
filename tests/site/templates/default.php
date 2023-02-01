@@ -27,7 +27,7 @@ var_dump($m->get('a'));
 
 <h3>bolt</h3>
 <?php
-var_dump($m->get(hash('xxh3', $page->id()) . '-bolt'));
+var_dump($m->get(hash(\Bnomei\BoostCache::hashalgo(), $page->id()) . '-bolt'));
 var_dump(count(Bnomei\Bolt::toArray()));
 bolt($page->id());
 var_dump(count(Bnomei\Bolt::toArray()));

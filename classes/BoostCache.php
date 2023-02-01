@@ -45,6 +45,14 @@ final class BoostCache
         }
     }
 
+    public static function hashalgo() {
+        $algos = explode(',', option('bnomei.boost.hashalgo'));
+        if (version_compare(PHP_VERSION, '8.1.0') >= 0) {
+            return $algos[0];
+        }
+        return $algos[1];
+    }
+
     public static function modified($model): ?int
     {
         if ($model instanceof \Kirby\Cms\Page ||
@@ -59,7 +67,7 @@ final class BoostCache
         } elseif ($model instanceof \Kirby\Cms\Site) {
             return filemtime($model->contentFile());
         } elseif (is_string($model)) {
-            $key = hash('xxh3', $model);
+            $key = hash(BoostCache::hashalgo(), $model);
             $languageCode = kirby()->languages()->count() ? kirby()->language()->code() : null;
             if ($languageCode) {
                 $key = $key . '-' .  $languageCode;

@@ -135,7 +135,7 @@ final class BoostTest extends TestCase
         $index->index(true);
         $index->flush();
         $count = site()->boost();
-        $this->assertCount(count(kirby()->collection('boostidkvs')) + 1, $index->toArray());
+        $this->assertCount(count(kirby()->collection('boostidkvs')), $index->toArray());
         $this->assertCount($count, $index->toArray());
     }
 
@@ -152,6 +152,6 @@ final class BoostTest extends TestCase
         $this->assertEquals('translated DE', $randomPage->content('de')->text()->value());
         $this->assertEquals('not translated', $randomPage->content('de')->nt_text()->value());
 
-        $this->markTestIncomplete('using content() does not reflect what routing does. tested manually in browser.');
+        $this->markTestSkipped('using content() does not reflect what routing does. tested manually in browser.');
     }
 }

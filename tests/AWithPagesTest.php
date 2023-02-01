@@ -32,7 +32,7 @@ class AWithPagesTest extends TestCase
 
     public function createPage($parent, int $idx, int $depth = 3): Page
     {
-        $id = 'Test ' . hash('xxh3', microtime() . $idx . $depth);
+        $id = 'Test ' . hash(\Bnomei\BoostCache::hashalgo(), microtime() . $idx . $depth);
         /* @var $page Page */
         kirby()->impersonate('kirby');
 

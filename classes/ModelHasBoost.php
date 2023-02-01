@@ -32,7 +32,7 @@ trait ModelHasBoost
 
     public function contentBoostedKey(string $languageCode = null): string
     {
-        $key = hash('xxh3', $this->id()); // can not use UUID since content not loaded yet
+        $key = hash(BoostCache::hashalgo(), $this->id()); // can not use UUID since content not loaded yet
         if (! $languageCode) {
             $languageCode = kirby()->languages()->count() ? kirby()->language()->code() : null;
         }

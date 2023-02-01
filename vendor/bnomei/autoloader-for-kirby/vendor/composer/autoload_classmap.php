@@ -6,11 +6,8 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
     'Bnomei\\Autoloader' => $baseDir . '/classes/Autoloader.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
-    'PhpToken' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
-    'Stringable' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
     'Symfony\\Component\\Finder\\Comparator\\Comparator' => $vendorDir . '/symfony/finder/Comparator/Comparator.php',
     'Symfony\\Component\\Finder\\Comparator\\DateComparator' => $vendorDir . '/symfony/finder/Comparator/DateComparator.php',
     'Symfony\\Component\\Finder\\Comparator\\NumberComparator' => $vendorDir . '/symfony/finder/Comparator/NumberComparator.php',
@@ -34,8 +31,4 @@ return array(
     'Symfony\\Component\\Finder\\Iterator\\SortableIterator' => $vendorDir . '/symfony/finder/Iterator/SortableIterator.php',
     'Symfony\\Component\\Finder\\Iterator\\VcsIgnoredFilterIterator' => $vendorDir . '/symfony/finder/Iterator/VcsIgnoredFilterIterator.php',
     'Symfony\\Component\\Finder\\SplFileInfo' => $vendorDir . '/symfony/finder/SplFileInfo.php',
-    'Symfony\\Polyfill\\Php80\\Php80' => $vendorDir . '/symfony/polyfill-php80/Php80.php',
-    'Symfony\\Polyfill\\Php80\\PhpToken' => $vendorDir . '/symfony/polyfill-php80/PhpToken.php',
-    'UnhandledMatchError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
-    'ValueError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
 );
