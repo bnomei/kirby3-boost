@@ -4,8 +4,7 @@
 // performance is mediocre at best since each object will be resolved.
 
 return fn () => lapseStatic(__FILE__, function () {
-    return array_filter(
-        collection('boostidkvs'),
+    return collection('boostidkvs')->filterBy(
         function ($kvObject) {
             if ($kvObject->template === 'post') {
                 return boost($kvObject->value);

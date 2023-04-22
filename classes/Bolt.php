@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bnomei;
 
-use Kirby\Cms\Dir;
+use Kirby\Filesystem\Dir;
 use Kirby\Cms\Page;
 use Kirby\Toolkit\A;
 
@@ -228,7 +228,7 @@ final class Bolt
     public static function index($callback)
     {
         $count = 0;
-        foreach (kirby()->collection('siteindexfolders') as $page) {
+        foreach (site()->siteindexfolders() as $page) {
             // save memory when indexing
             $page = \Bnomei\Bolt::page($page, null, false, false);
             if ($page && !is_string($callback) && is_callable($callback)) {

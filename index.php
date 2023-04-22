@@ -1,10 +1,17 @@
 <?php
 
-use Bnomei\BoostIndex;
-
 @include_once __DIR__ . '/vendor/autoload.php';
 
-autoloader(__DIR__)->classes();
+load([
+    'bnomei\\bolt' => 'classes/Bolt.php',
+    'bnomei\\boostcache' => 'classes/BoostCache.php',
+    'bnomei\\boostfile' => 'classes/BoostFile.php',
+    'bnomei\\boostindex' => 'classes/BoostIndex.php',
+    'bnomei\\boostpage' => 'classes/BoostPage.php',
+    'bnomei\\boostuser' => 'classes/BoostUser.php',
+    'bnomei\\cachebenchmark' => 'classes/CacheBenchmark.php',
+    'bnomei\\modelhasboost' => 'classes/ModelHasBoost.php',
+], __DIR__);
 
 if (! function_exists('bolt')) {
     function bolt(string $id, ?\Kirby\Cms\Page $parent = null, bool $cache = true, bool $extend = true)
@@ -71,8 +78,13 @@ Kirby::plugin('bnomei/boost', [
         ],
         'helper' => true, // use boost helper
     ],
-    'blueprints' => autoloader(__DIR__)->blueprints(),
-    'collections' => autoloader(__DIR__)->collections(),
+    'blueprints' => [
+        'fields/boostidkv' => __DIR__ . '/blueprints/fields/boostidkv.yml',
+        'fields/boostidkvs' => __DIR__ . '/blueprints/fields/boostidkvs.yml',
+    ],
+    'collections' => [
+        'boostidkvs' => require __DIR__ . '/collections/boostidkvs.php',
+    ],
     'pageMethods' => [ // PAGE
         'bolt' => function (string $id) {
             return \Bnomei\Bolt::page($id, $this);
@@ -101,7 +113,6 @@ Kirby::plugin('bnomei/boost', [
             // has boost?
             if ($this->hasBoost() === true) {
                 $this->deleteContentCache();
-                ;
             }
 
             $this->boostIndexRemove();
@@ -115,7 +126,7 @@ Kirby::plugin('bnomei/boost', [
             return $this->isContentBoosted(kirby()->languageCode());
         },
         'boostIndexAdd' => function () {
-            return Bnomei\BoostIndex::singleton()->add($this);
+            return \Bnomei\BoostIndex::singleton()->add($this);
         },
         'boostIndexRemove' => function () {
             return \Bnomei\BoostIndex::singleton()->remove($this);
@@ -214,6 +225,33 @@ Kirby::plugin('bnomei/boost', [
                 }
             }
             return new \Kirby\Cms\Pages($pages);
+        },
+        'siteIndexfolders' => function () {
+            $paths = kirby()->cache('bnomei.boost')->get('siteindexfolders');
+
+            if (!$paths) {
+                $drafts = option('bnomei.boost.drafts');
+                $root = kirby()->roots()->content();
+
+                $iter = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS),
+                    RecursiveIteratorIterator::SELF_FIRST,
+                    RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
+                );
+
+                $paths = [];
+                foreach ($iter as $path => $dir) {
+                    if ($dir->isDir()) {
+                        if (!$drafts && strstr($path, '_drafts') === false) {
+                            continue;
+                        }
+                        $paths[] = str_replace($root . DIRECTORY_SEPARATOR, '', $path);
+                    }
+                }
+                kirby()->cache('bnomei.boost')->set('siteindexfolders', $paths, 1);
+            }
+
+            return $paths;
         },
     ],
     'fieldMethods' => [

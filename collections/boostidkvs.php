@@ -16,5 +16,5 @@ class StaticBoostIdKVs
 }
 
 return function () {
-    return StaticBoostIdKVs::load();
+    return new \Kirby\Cms\Collection(StaticBoostIdKVs::load());
 };

@@ -78,7 +78,7 @@ final class BoostIndex
 
         $this->index = [];
         $count = 0;
-        foreach (kirby()->collection('siteindexfolders') as $page) {
+        foreach (site()->siteindexfolders() as $page) {
             // save memory when indexing
             $page = \Bnomei\Bolt::page($page, null, false, false);
             if (!$page || $page->hasBoost() !== true) {
@@ -222,6 +222,7 @@ final class BoostIndex
         foreach ($this->toArray() as $uuid => $data) {
             list($diruri, $title, $template) = explode(\Bnomei\BoostIndex::SEPERATOR, $data);
             $kv[] = [
+                'id' => $uuid, // needed for kirby\cms\collections class to work
                 'diruri' => $diruri,
                 'template' => $template,
                 'text' => $title,
