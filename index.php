@@ -226,10 +226,10 @@ Kirby::plugin('bnomei/boost', [
             }
             return new \Kirby\Cms\Pages($pages);
         },
-        'siteIndexfolders' => function () {
-            $paths = kirby()->cache('bnomei.boost')->get('siteindexfolders');
+        'siteindexfolders' => function () {
+            $paths = kirby()->cache('bnomei.boost')->get('siteindexfolders', []);
 
-            if (!$paths) {
+            if (count($paths) === 0) {
                 $drafts = option('bnomei.boost.drafts');
                 $root = kirby()->roots()->content();
 
