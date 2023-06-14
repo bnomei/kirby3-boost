@@ -77,6 +77,13 @@ final class Bolt
     public function lookup(string $id, bool $cache = true): ?Page
     {
         $lookup = A::get(static::$idToPage, $id);
+
+        // in case the page was deleted/moved
+        if ($lookup && Dir::exists($lookup->root() === false)) {
+            unset(static::$idToPage[$id]);
+            $lookup = null;
+        }
+
         if (!$lookup && $cache && static::cache()) {
             if ($diruri = static::cache()->get('bolt/' . hash(BoostCache::hashalgo(), $id))) {
                 // bolt will ignore caches with invalid paths and update them automatically
@@ -136,7 +143,7 @@ final class Bolt
             $num = count($numSplit) > 1 ? intval($numSplit[1]) : null;
             $treeid = $treeid ? $treeid . '/' . $partWithoutNum : $partWithoutNum;
             $page = $this->lookup($treeid, $cache);
-            if ($page) {
+            if ($page && Dir::exists($page->root())) {
                 $parent = $page;
                 $this->root = $page->root(); // loop
                 continue;
