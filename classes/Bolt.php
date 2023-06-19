@@ -79,7 +79,7 @@ final class Bolt
         $lookup = A::get(static::$idToPage, $id);
 
         // in case the page was deleted/moved
-        if ($lookup && Dir::exists($lookup->root() === false)) {
+        if ($lookup && Dir::exists($lookup->root()) === false) {
             unset(static::$idToPage[$id]);
             $lookup = null;
         }
