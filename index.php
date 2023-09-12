@@ -140,9 +140,10 @@ Kirby::plugin('bnomei/boost', [
         },
         'searchForTemplate' => function (string $template): \Kirby\Cms\Pages {
             $pages = [];
-            foreach (\Bnomei\BoostIndex::singleton()->toKVs() as $data) {
-                $diruri = $data['diruri'];
-                if ($data['template'] === $template && Str::contains($diruri, $this->diruri())) {
+            foreach (\Bnomei\BoostIndex::singleton()->toKVs() as $obj) {
+                /* @var \Kirby\Toolkit\Obj $obj */
+                $diruri = $obj->diruri;
+                if ($obj->template === $template && Str::contains($diruri, $this->diruri())) {
                     $pages[] = bolt($diruri);
                 }
             }
@@ -219,9 +220,10 @@ Kirby::plugin('bnomei/boost', [
         },
         'searchForTemplate' => function (string $template): \Kirby\Cms\Pages {
             $pages = [];
-            foreach (\Bnomei\BoostIndex::singleton()->toKVs() as $data) {
-                if ($data['template'] === $template) {
-                    $pages[] = bolt($data['diruri']);
+            foreach (\Bnomei\BoostIndex::singleton()->toKVs() as $obj) {
+                /* @var \Kirby\Toolkit\Obj $obj */
+                if ($obj->template === $template) {
+                    $pages[] = bolt($obj->diruri);
                 }
             }
             return new \Kirby\Cms\Pages($pages);
