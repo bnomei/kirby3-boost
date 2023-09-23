@@ -112,6 +112,7 @@ trait ModelHasBoost
 
         // in rare case file does not exists or is not readable
         if ($modified === false) {
+			$this->deleteContentCache(); // whatever was in the cache is no longer valid
             return false; // try again another time
         }
 
