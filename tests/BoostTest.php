@@ -154,4 +154,20 @@ final class BoostTest extends TestCase
 
         $this->markTestSkipped('using content() does not reflect what routing does. tested manually in browser.');
     }
+
+    public function testBoostCanLoadFile() {
+        $fileUuid = 'file://hp4IB3c6UxKODRyK';
+        $time = microtime(true);
+        $file = boost($fileUuid);
+        echo 'boost(): ' . (microtime(true) - $time) . PHP_EOL;
+        $this->assertEquals($file->uuid()->toString(), $fileUuid);
+    }
+
+    public function testKirbyCanLoadFile() {
+        $fileUuid = 'file://hp4IB3c6UxKODRyK';
+        $time = microtime(true);
+        $file = site()->file($fileUuid);
+        echo 'site()->file(): ' . (microtime(true) - $time) . PHP_EOL;
+        $this->assertEquals($file->uuid()->toString(), $fileUuid);
+    }
 }
