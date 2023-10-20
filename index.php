@@ -75,7 +75,8 @@ if (! function_exists('boost')) {
             // since that is faster than letting kirby core do it
             // FileUuuid::findByCache() would resolve so we do it manually
             if ($uuid = FileUuid::for($schema . '://' . $id) ) {
-                $value = $uuid->value();
+                // $value = $uuid->value(); // would resolve parent
+                $value = Uuids::cache()->get($uuid->key());
                 if (!$value) {
                     return null;
                 }

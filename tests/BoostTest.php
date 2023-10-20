@@ -158,7 +158,11 @@ final class BoostTest extends TestCase
     public function testBoostCanLoadFile() {
         $fileUuid = 'file://hp4IB3c6UxKODRyK';
         $time = microtime(true);
-        $file = boost($fileUuid);
+        $c = 10000;
+        while ($c > 0) {
+            $file = boost($fileUuid);
+            $c--;
+        }
         echo 'boost(): ' . (microtime(true) - $time) . PHP_EOL;
         $this->assertEquals($file->uuid()->toString(), $fileUuid);
     }
@@ -166,7 +170,11 @@ final class BoostTest extends TestCase
     public function testKirbyCanLoadFile() {
         $fileUuid = 'file://hp4IB3c6UxKODRyK';
         $time = microtime(true);
-        $file = site()->file($fileUuid);
+        $c = 10000;
+        while ($c > 0) {
+            $file = site()->file($fileUuid);
+            $c--;
+        }
         echo 'site()->file(): ' . (microtime(true) - $time) . PHP_EOL;
         $this->assertEquals($file->uuid()->toString(), $fileUuid);
     }
