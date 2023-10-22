@@ -63,16 +63,18 @@ final class BoostIndex
     {
         if ($this->cache() && $this->isDirty) {
             $this->isDirty = false;
+
             return $this->cache()->set('index', $this->index, $this->expire);
         }
+
         return false;
     }
 
-    public function index(bool $force = false, ?Page $target = null): int
+    public function index(bool $force = false, Page $target = null): int
     {
 
         $count = $this->index ? count($this->index) : 0;
-        if ($count > 0 && !$force) {
+        if ($count > 0 && ! $force) {
             return $count;
         }
 
@@ -81,8 +83,9 @@ final class BoostIndex
         foreach (site()->siteindexfolders() as $page) {
             // save memory when indexing
             $page = \Bnomei\Bolt::page($page, null, false, false);
-            if (!$page || $page->hasBoost() !== true) {
+            if (! $page || $page->hasBoost() !== true) {
                 $page = null; // free memory, do not use unset()
+
                 continue;
             }
 
@@ -101,6 +104,7 @@ final class BoostIndex
             }
             $page = null; // free memory, do not use unset()
         }
+
         return $count;
     }
 
@@ -108,6 +112,7 @@ final class BoostIndex
     {
         $this->index = [];
         $this->isDirty = true;
+
         /* on destruct
         if ($this->cache()) {
             return $this->cache()->set('index', [], $this->expire);
@@ -118,7 +123,7 @@ final class BoostIndex
 
     public function find(string $uuid, bool $throwException = true): ?Page
     {
-        $uuid = str_replace('page://','', trim($uuid));
+        $uuid = str_replace('page://', '', trim($uuid));
         $diruri = $this->diruri($uuid);
 
         if ($diruri && $page = \Bnomei\Bolt::page($diruri)) {
@@ -132,7 +137,7 @@ final class BoostIndex
                 $crawl = $page;
             }
 
-            if (!$crawl) {
+            if (! $crawl) {
                 // then try crawling index
                 foreach (site()->index(option('bnomei.boost.drafts')) as $page) {
                     if ($this->add($page) && $page->uuid()->id() === $uuid) {
@@ -146,17 +151,18 @@ final class BoostIndex
             if ($crawl) {
                 return $crawl;
             } elseif ($throwException) {
-                throw new \Exception("No page found for uuid: " . $uuid);
+                throw new \Exception('No page found for uuid: '.$uuid);
             }
         }
+
         return null;
     }
 
     public function data(string $uuid): ?array
     {
         if ($data = A::get($this->index, $uuid)) {
-            if (Str::contains($data, static::SEPERATOR)) {
-                list($diruri, $title, $template) = explode(static::SEPERATOR, $data);
+            if (Str::contains($data, self::SEPERATOR)) {
+                [$diruri, $title, $template] = explode(self::SEPERATOR, $data);
                 $data = [
                     'diruri' => $diruri,
                     'template' => $template,
@@ -172,6 +178,7 @@ final class BoostIndex
     public function diruri(string $uuid)
     {
         $data = $this->data($uuid);
+
         return A::get($data, 'diruri');
     }
 
@@ -183,17 +190,18 @@ final class BoostIndex
             return false;
         }
 
-        $id = $page->diruri() . static::SEPERATOR . $page->title()->value() . static::SEPERATOR . $page->template()->name();
+        $id = $page->diruri().self::SEPERATOR.$page->title()->value().self::SEPERATOR.$page->template()->name();
         if (kirby()->multilang()) {
-            $id = $page->diruri() . static::SEPERATOR . $page->content(kirby()->defaultLanguage()->code())->title()->value() . static::SEPERATOR . $page->template()->name();
+            $id = $page->diruri().self::SEPERATOR.$page->content(kirby()->defaultLanguage()->code())->title()->value().self::SEPERATOR.$page->template()->name();
         }
 
-        if (!array_key_exists($uuid, $this->index) ||
+        if (! array_key_exists($uuid, $this->index) ||
             $this->index[$uuid] !== $id
         ) {
             $this->isDirty = true;
             $this->index[$uuid] = $id;
         }
+
         return true;
     }
 
@@ -208,6 +216,7 @@ final class BoostIndex
             unset($this->index[$uuid]);
             $this->isDirty = true;
         }
+
         return true;
     }
 
@@ -220,7 +229,7 @@ final class BoostIndex
     {
         $kv = [];
         foreach ($this->toArray() as $uuid => $data) {
-            list($diruri, $title, $template) = explode(\Bnomei\BoostIndex::SEPERATOR, $data);
+            [$diruri, $title, $template] = explode(\Bnomei\BoostIndex::SEPERATOR, $data);
             $kv[] = [
                 'id' => $uuid, // needed for kirby\cms\collections class to work
                 'diruri' => $diruri,
@@ -233,11 +242,13 @@ final class BoostIndex
             if ($a['diruri'] == $b['diruri']) {
                 return 0;
             }
+
             return ($a['diruri'] < $b['diruri']) ? -1 : 1;
         });
         $kv = array_map(function ($item) {
             return new \Kirby\Toolkit\Obj($item);
         }, $kv);
+
         return $kv;
     }
 
@@ -247,17 +258,18 @@ final class BoostIndex
     }
 
     private static $singleton;
+
     public static function singleton(): self
     {
-        if (!static::$singleton) {
-            static::$singleton = new self();
+        if (! self::$singleton) {
+            self::$singleton = new self();
         }
 
-        return static::$singleton;
+        return self::$singleton;
     }
 
     public static function page(string $id): ?Page
     {
-        return static::singleton()->find($id, false);
+        return self::singleton()->find($id, false);
     }
 }

@@ -1,181 +1,149 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 use Kirby\Cms\Page;
-use PHPUnit\Framework\TestCase;
 
-final class BoostTest extends TestCase
+function randomPageWithChildren(): ?Page
 {
-    public function randomPage(): ?Page
-    {
-        return site()->index()->notTemplate('home')->shuffle()->first();
-    }
-
-    public function randomPageWithChildren(): ?Page
-    {
-        $page = null;
-        while (!$page) {
-            $rp = $this->randomPage();
-            if ($rp->hasChildren()) {
-                $page = $rp;
-            }
-        }
-        return $page;
-    }
-
-    public function testHelperBolt()
-    {
-        $randomPage = $this->randomPage();
-        $randomPage->boost();
-        $this->assertEquals($randomPage->id(), bolt($randomPage->diruri())->id());
-    }
-
-    public function testHelperModified()
-    {
-        $randomPage = $this->randomPage();
-        $randomPage->boost();
-        $this->assertEquals($randomPage->modified(), modified($randomPage->id()));
-    }
-
-    public function testPageMethodBolt()
-    {
-        $randomPage = $this->randomPageWithChildren();
-        $lastChild = $randomPage->children()->last();
-        $this->assertEquals(
-            $lastChild->id(),
-            $randomPage->bolt($lastChild->slug())->id()
-        );
-    }
-
-    public function testPageMethodBoost()
-    {
-        $randomPage = $this->randomPage();
-        $this->assertTrue($randomPage->boost());
-    }
-
-    public function testPageMethodIsBoosted()
-    {
-        $randomPage = $this->randomPage();
-        $randomPage->deleteContentCache();
-
-        $this->assertFalse($randomPage->isBoosted());
-        $this->assertTrue($randomPage->boost());
-        $this->assertTrue($randomPage->isBoosted());
-    }
-
-    public function testPagesMethodBoost()
-    {
-        $randomPage = $this->randomPageWithChildren();
-
-        \Bnomei\BoostIndex::singleton()->index(true);
-        $before = \Bnomei\BoostIndex::singleton()->count();
-        $this->assertIsFloat($randomPage->children()->boostIndexRemove());
-        $after = \Bnomei\BoostIndex::singleton()->count();
-        $this->assertEquals($after, $before - $randomPage->children()->count());
-
-        $before = \Bnomei\BoostIndex::singleton()->count();
-        $this->assertIsFloat($randomPage->children()->boostIndexAdd());
-        $after = \Bnomei\BoostIndex::singleton()->count();
-        $this->assertEquals($after, $before + $randomPage->children()->count());
-
-        $this->assertIsFloat($randomPage->children()->boost());
-        $this->assertIsInt(site()->boost());
-    }
-
-    public function testPagesMethodBoostmark()
-    {
-        $randomPage = $this->randomPageWithChildren();
-
-        \Bnomei\BoostIndex::singleton()->index(true);
-        \Bnomei\BoostIndex::singleton()->flush();
-        $this->assertIsFloat($randomPage->children()->unboost());
-        $before = \Bnomei\BoostIndex::singleton()->count();
-        $boostmark = $randomPage->children()->boostmark();
-        $this->assertIsArray($boostmark);
-        $this->assertEquals($randomPage->children()->count(), $boostmark['count']);
-        $after = \Bnomei\BoostIndex::singleton()->count();
-        $this->assertEquals($after, $before + $randomPage->children()->count());
-        $boostmark2 = $randomPage->children()->boostmark();
-        $this->assertEquals($boostmark2['checksum'], $boostmark['checksum']);
-
-        // trigger file write
-        kirby()->impersonate('kirby');
-        $randomPage->update([
-            'title' => $randomPage->title()->value(),
-        ]);
-        $boostmark3 = site()->boostmark();
-        $this->assertIsArray($boostmark3);
-        $this->assertNotEquals($boostmark3['checksum'], $boostmark['checksum']);
-    }
-
-    public function testFieldMethodsBoost()
-    {
-        $randomPage = $this->randomPage();
-        // works only in 2nd test run when kirby process
-        // can read the updated content files from WithPagesTest
-        if ($randomPage->related()->isNotEmpty()) {
-            $many = $randomPage->related()->fromBoostIDs();
-            $this->assertNotNull($many);
-
-            kirby()->impersonate('kirby');
-            $randomPage = $randomPage->update([
-                'related' => $randomPage->related()->split()[0],
-            ]);
-            $one = $randomPage->related()->fromBoostID();
-            $this->assertNotNull($one);
-        } else {
-            $this->markTestSkipped();
+    $page = null;
+    while (! $page) {
+        $rp = randomPage();
+        if ($rp->hasChildren()) {
+            $page = $rp;
         }
     }
 
-    public function testBoostSiteIndex()
-    {
-        $index = \Bnomei\BoostIndex::singleton();
-        $index->index(true);
-        $index->flush();
-        $count = site()->boost();
-        $this->assertCount(count(kirby()->collection('boostidkvs')), $index->toArray());
-        $this->assertCount($count, $index->toArray());
-    }
-
-    public function testNonTranslatable()
-    {
-        $randomPage = $this->randomPage();
-
-        $this->assertEquals('translated EN', $randomPage->text()->value());
-        $this->assertEquals('not translated', $randomPage->nt_text()->value());
-
-        $this->assertEquals('translated EN', $randomPage->content('en')->text()->value());
-        $this->assertEquals('not translated', $randomPage->content('en')->nt_text()->value());
-
-        $this->assertEquals('translated DE', $randomPage->content('de')->text()->value());
-        $this->assertEquals('not translated', $randomPage->content('de')->nt_text()->value());
-
-        $this->markTestSkipped('using content() does not reflect what routing does. tested manually in browser.');
-    }
-
-    public function testBoostCanLoadFile() {
-        $fileUuid = 'file://hp4IB3c6UxKODRyK';
-        $time = microtime(true);
-        $c = 10000;
-        while ($c > 0) {
-            $file = boost($fileUuid);
-            $c--;
-        }
-        echo 'boost(): ' . (microtime(true) - $time) . PHP_EOL;
-        $this->assertEquals($file->uuid()->toString(), $fileUuid);
-    }
-
-    public function testKirbyCanLoadFile() {
-        $fileUuid = 'file://hp4IB3c6UxKODRyK';
-        $time = microtime(true);
-        $c = 10000;
-        while ($c > 0) {
-            $file = site()->file($fileUuid);
-            $c--;
-        }
-        echo 'site()->file(): ' . (microtime(true) - $time) . PHP_EOL;
-        $this->assertEquals($file->uuid()->toString(), $fileUuid);
-    }
+    return $page;
 }
+test('helper bolt', function () {
+    $randomPage = randomPage();
+    $randomPage->boost();
+    expect(bolt($randomPage->diruri())->id())->toEqual($randomPage->id());
+});
+test('helper modified', function () {
+    $randomPage = randomPage();
+    $randomPage->boost();
+    expect(modified($randomPage->id()))->toEqual($randomPage->modified());
+});
+test('page method bolt', function () {
+    $randomPage = randomPageWithChildren();
+    $lastChild = $randomPage->children()->last();
+    expect($randomPage->bolt($lastChild->slug())->id())->toEqual($lastChild->id());
+});
+test('page method boost', function () {
+    $randomPage = randomPage();
+    expect($randomPage->boost())->toBeTrue();
+});
+test('page method is boosted', function () {
+    $randomPage = randomPage();
+    $randomPage->deleteContentCache();
+
+    expect($randomPage->isBoosted())->toBeFalse();
+    expect($randomPage->boost())->toBeTrue();
+    expect($randomPage->isBoosted())->toBeTrue();
+});
+test('pages method boost', function () {
+    $randomPage = randomPageWithChildren();
+
+    \Bnomei\BoostIndex::singleton()->index(true);
+    $before = \Bnomei\BoostIndex::singleton()->count();
+    expect($randomPage->children()->boostIndexRemove())->toBeFloat();
+    $after = \Bnomei\BoostIndex::singleton()->count();
+    expect($before - $randomPage->children()->count())->toEqual($after);
+
+    $before = \Bnomei\BoostIndex::singleton()->count();
+    expect($randomPage->children()->boostIndexAdd())->toBeFloat();
+    $after = \Bnomei\BoostIndex::singleton()->count();
+    expect($before + $randomPage->children()->count())->toEqual($after);
+
+    expect($randomPage->children()->boost())->toBeFloat();
+    expect(site()->boost())->toBeInt();
+});
+test('pages method boostmark', function () {
+    $randomPage = randomPageWithChildren();
+
+    \Bnomei\BoostIndex::singleton()->index(true);
+    \Bnomei\BoostIndex::singleton()->flush();
+    expect($randomPage->children()->unboost())->toBeFloat();
+    $before = \Bnomei\BoostIndex::singleton()->count();
+    $boostmark = $randomPage->children()->boostmark();
+    expect($boostmark)->toBeArray();
+    expect($boostmark['count'])->toEqual($randomPage->children()->count());
+    $after = \Bnomei\BoostIndex::singleton()->count();
+    expect($before + $randomPage->children()->count())->toEqual($after);
+    $boostmark2 = $randomPage->children()->boostmark();
+    expect($boostmark['checksum'])->toEqual($boostmark2['checksum']);
+
+    // trigger file write
+    kirby()->impersonate('kirby');
+    $randomPage->update([
+        'title' => $randomPage->title()->value(),
+    ]);
+    $boostmark3 = site()->boostmark();
+    expect($boostmark3)->toBeArray();
+    $this->assertNotEquals($boostmark3['checksum'], $boostmark['checksum']);
+});
+test('field methods boost', function () {
+    $randomPage = randomPage();
+
+    // works only in 2nd test run when kirby process
+    // can read the updated content files from WithPagesTest
+    if ($randomPage->related()->isNotEmpty()) {
+        $many = $randomPage->related()->fromBoostIDs();
+        expect($many)->not->toBeNull();
+
+        kirby()->impersonate('kirby');
+        $randomPage = $randomPage->update([
+            'related' => $randomPage->related()->split()[0],
+        ]);
+        $one = $randomPage->related()->fromBoostID();
+        expect($one)->not->toBeNull();
+    } else {
+        $this->markTestSkipped();
+    }
+});
+test('boost site index', function () {
+    $index = \Bnomei\BoostIndex::singleton();
+    $index->index(true);
+    $index->flush();
+    $count = site()->boost();
+    expect($index->toArray())->toHaveCount(count(kirby()->collection('boostidkvs')));
+    expect($index->toArray())->toHaveCount($count);
+});
+test('non translatable', function () {
+    $randomPage = randomPage();
+
+    expect($randomPage->text()->value())->toEqual('translated EN');
+    expect($randomPage->nt_text()->value())->toEqual('not translated');
+
+    expect($randomPage->content('en')->text()->value())->toEqual('translated EN');
+    expect($randomPage->content('en')->nt_text()->value())->toEqual('not translated');
+
+    expect($randomPage->content('de')->text()->value())->toEqual('translated DE');
+    expect($randomPage->content('de')->nt_text()->value())->toEqual('not translated');
+
+    $this->markTestSkipped('using content() does not reflect what routing does. tested manually in browser.');
+});
+test('boost can load file', function () {
+    $fileUuid = 'file://hp4IB3c6UxKODRyK';
+    $time = microtime(true);
+    $c = 10000;
+    while ($c > 0) {
+        $file = boost($fileUuid);
+        $c--;
+    }
+    echo 'boost(): '.(microtime(true) - $time).PHP_EOL;
+    expect($fileUuid)->toEqual($file->uuid()->toString());
+});
+test('kirby can load file', function () {
+    $fileUuid = 'file://hp4IB3c6UxKODRyK';
+    $time = microtime(true);
+    $c = 10000;
+    while ($c > 0) {
+        $file = site()->file($fileUuid);
+        $c--;
+    }
+    echo 'site()->file(): '.(microtime(true) - $time).PHP_EOL;
+    expect($fileUuid)->toEqual($file->uuid()->toString());
+});

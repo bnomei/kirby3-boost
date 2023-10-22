@@ -29,7 +29,6 @@ trait ModelHasBoost
         return $this->readContentCache($languageCode) !== null;
     }
 
-
     public function contentBoostedKey(string $languageCode = null): string
     {
         $key = hash(BoostCache::hashalgo(), $this->id()); // can not use UUID since content not loaded yet
@@ -37,7 +36,7 @@ trait ModelHasBoost
             $languageCode = kirby()->languages()->count() ? kirby()->language()->code() : null;
         }
         if ($languageCode) {
-            $key = $key . '-' .  $languageCode;
+            $key = $key.'-'.$languageCode;
         }
 
         return $key;
@@ -51,10 +50,10 @@ trait ModelHasBoost
         }
 
         $modifiedCache = $cache->get(
-            $this->contentBoostedKey($languageCode) . '-modified',
+            $this->contentBoostedKey($languageCode).'-modified',
             null
         );
-        if (!$modifiedCache) {
+        if (! $modifiedCache) {
             return true;
         }
 
@@ -80,7 +79,7 @@ trait ModelHasBoost
         }
 
         return BoostCache::singleton()->get(
-            $this->contentBoostedKey($languageCode) . '-content',
+            $this->contentBoostedKey($languageCode).'-content',
             null
         );
     }
@@ -94,14 +93,14 @@ trait ModelHasBoost
         if (! $data) {
             $data = parent::readContent($languageCode);
             if ($data && $this->boostWillBeDeleted !== true) {
-                 $this->writeContentCache($data, $languageCode);
+                $this->writeContentCache($data, $languageCode);
             }
         }
 
         return $data;
     }
 
-    public function writeContentCache(?array $data = null, string $languageCode = null): bool
+    public function writeContentCache(array $data = null, string $languageCode = null): bool
     {
         $cache = BoostCache::singleton();
         if (! $cache || option('bnomei.boost.write') === false) {
@@ -113,18 +112,19 @@ trait ModelHasBoost
         // in rare case file does not exists or is not readable
         if ($modified === false) {
             $this->deleteContentCache(); // whatever was in the cache is no longer valid
+
             return false; // try again another time
         }
 
         $cache->set(
-            $this->contentBoostedKey($languageCode) . '-modified',
+            $this->contentBoostedKey($languageCode).'-modified',
             $modified,
             option('bnomei.boost.expire')
         );
 
         return $cache->set(
-            $this->contentBoostedKey($languageCode) . '-content',
-            array_filter($data, fn($content) => $content !== null),
+            $this->contentBoostedKey($languageCode).'-content',
+            array_filter($data, fn ($content) => $content !== null),
             option('bnomei.boost.expire')
         );
     }
@@ -147,17 +147,17 @@ trait ModelHasBoost
 
         foreach (kirby()->languages() as $language) {
             $cache->remove(
-                $this->contentBoostedKey($language->code()) . '-content'
+                $this->contentBoostedKey($language->code()).'-content'
             );
             $cache->remove(
-                $this->contentBoostedKey($language->code()) . '-modified'
+                $this->contentBoostedKey($language->code()).'-modified'
             );
         }
         $cache->remove(
-            $this->contentBoostedKey() . '-content'
+            $this->contentBoostedKey().'-content'
         );
         $cache->remove(
-            $this->contentBoostedKey() . '-modified'
+            $this->contentBoostedKey().'-modified'
         );
 
         return true;

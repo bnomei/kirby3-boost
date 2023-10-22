@@ -11,7 +11,7 @@ use Kirby\Uuid\FileUuid;
 use Kirby\Uuid\Uuid;
 use Kirby\Uuid\Uuids;
 
-@include_once __DIR__ . '/vendor/autoload.php';
+@include_once __DIR__.'/vendor/autoload.php';
 
 load([
     'bnomei\\bolt' => 'classes/Bolt.php',
@@ -25,10 +25,10 @@ load([
 ], __DIR__);
 
 if (! function_exists('bolt')) {
-    function bolt(string $id, ?Page $parent = null, bool $cache = true, bool $extend = true)
+    function bolt(string $id, Page $parent = null, bool $cache = true, bool $extend = true)
     {
         $id = str_replace('page://', '', $id);
-        $cacheKey = 'page/' . Str::substr($id, 0, 2) . '/' . Str::substr($id, 2);
+        $cacheKey = 'page/'.Str::substr($id, 0, 2).'/'.Str::substr($id, 2);
         if ($pageIdFromUuidCache = Uuids::cache()->get($cacheKey)) {
             $id = $pageIdFromUuidCache;
         }
@@ -47,7 +47,7 @@ if (! function_exists('modified')) {
 if (! function_exists('boost')) {
     function boost($id)
     {
-        if (!$id || !option('bnomei.boost.helper')) {
+        if (! $id || ! option('bnomei.boost.helper')) {
             return null;
         }
 
@@ -56,6 +56,7 @@ if (! function_exists('boost')) {
             foreach ($id as $uuid) {
                 $pages[] = boost($uuid);
             }
+
             return new Pages($pages);
         }
 
@@ -67,29 +68,31 @@ if (! function_exists('boost')) {
         }
 
         if (is_string($id) && Str::contains($id, '://')) {
-            list($schema, $id) = explode('://', $id);
+            [$schema, $id] = explode('://', $id);
         }
 
         if ($schema === 'file' && is_string($id)) {
             // get id for file, guess parent page, get that then file
             // since that is faster than letting kirby core do it
             // FileUuuid::findByCache() would resolve so we do it manually
-            if ($uuid = FileUuid::for($schema . '://' . $id) ) {
+            if ($uuid = FileUuid::for($schema.'://'.$id)) {
                 // $value = $uuid->value(); // would resolve parent
                 $value = Uuids::cache()->get($uuid->key());
-                if (!$value) {
+                if (! $value) {
                     return null;
                 }
                 $parent = boost($value['parent']);
+
                 return $parent?->file($value['filename']);
             }
         }
 
         if ($schema === 'page' && is_string($id)) {
             $page = BoostIndex::page($id);
-            if (!$page) {
+            if (! $page) {
                 $page = Bolt::page($id);
             }
+
             return $page;
         }
 
@@ -112,11 +115,11 @@ Kirby::plugin('bnomei/boost', [
         'helper' => true, // use boost helper
     ],
     'blueprints' => [
-        'fields/boostidkv' => __DIR__ . '/blueprints/fields/boostidkv.yml',
-        'fields/boostidkvs' => __DIR__ . '/blueprints/fields/boostidkvs.yml',
+        'fields/boostidkv' => __DIR__.'/blueprints/fields/boostidkv.yml',
+        'fields/boostidkvs' => __DIR__.'/blueprints/fields/boostidkvs.yml',
     ],
     'collections' => [
-        'boostidkvs' => require __DIR__ . '/collections/boostidkvs.php',
+        'boostidkvs' => require __DIR__.'/collections/boostidkvs.php',
     ],
     'pageMethods' => [ // PAGE
         'bolt' => function (string $id) {
@@ -131,7 +134,7 @@ Kirby::plugin('bnomei/boost', [
                 $lang = kirby()->languageCode();
 
                 // if needs write
-                if (!($page->readContentCache($lang))) {
+                if (! ($page->readContentCache($lang))) {
                     // then write
                     $page->writeContentCache($page->content()->toArray(), $lang);
                 }
@@ -155,6 +158,7 @@ Kirby::plugin('bnomei/boost', [
             if ($this->hasBoost() !== true) {
                 return false;
             }
+
             // $this->boostIndexAdd(); // this would trigger content add
             return $this->isContentBoosted(kirby()->languageCode());
         },
@@ -166,7 +170,7 @@ Kirby::plugin('bnomei/boost', [
         },
         'boostCacheDirUri' => function () {
             BoostCache::singleton()->set(
-                $this->uuid()->id() . '/diruri',
+                $this->uuid()->id().'/diruri',
                 $this->diruri(),
                 option('bnomei.boost.expire')
             );
@@ -180,6 +184,7 @@ Kirby::plugin('bnomei/boost', [
                     $pages[] = bolt($diruri);
                 }
             }
+
             return new Pages($pages);
         },
     ],
@@ -192,6 +197,7 @@ Kirby::plugin('bnomei/boost', [
                 $count += $page->boost() ? 1 : 0;
             }
             BoostCache::endTransaction();
+
             return round(($time + microtime(true)) * 1000);
         },
         'unboost' => function () {
@@ -202,6 +208,7 @@ Kirby::plugin('bnomei/boost', [
                 $count += $page->unboost() ? 1 : 0;
             }
             BoostCache::endTransaction();
+
             return round(($time + microtime(true)) * 1000);
         },
         'boostIndexAdd' => function () {
@@ -209,6 +216,7 @@ Kirby::plugin('bnomei/boost', [
             foreach ($this as $page) {
                 BoostIndex::singleton()->add($page);
             }
+
             return round(($time + microtime(true)) * 1000);
         },
         'boostIndexRemove' => function () {
@@ -216,6 +224,7 @@ Kirby::plugin('bnomei/boost', [
             foreach ($this as $page) {
                 BoostIndex::singleton()->remove($page);
             }
+
             return round(($time + microtime(true)) * 1000);
         },
         'boostmark' => function (): array {
@@ -226,12 +235,13 @@ Kirby::plugin('bnomei/boost', [
             foreach ($this as $page) {
                 if ($page->hasBoost() === true) {
                     // uuid and a field to force reading from cache calling the uuid & title from content file
-                    $str .= $page->diruri() . $page->modified() . $page->uuid()->id()  . $page->title()->value();
+                    $str .= $page->diruri().$page->modified().$page->uuid()->id().$page->title()->value();
                     $page->boostIndexAdd();
                     $count++;
                 }
             }
             BoostCache::endTransaction();
+
             return [
                 'duration' => round(($time + microtime(true)) * 1000),
                 'count' => $count,
@@ -245,10 +255,12 @@ Kirby::plugin('bnomei/boost', [
             Bolt::index(function ($page) use (&$count) {
                 $count += $page->boost() ? 1 : 0;
             });
+
             return $count;
         },
         'boostmark' => function () {
             $drafts = option('bnomei.boost.drafts');
+
             return site()->index($drafts)->boostmark();
         },
         'searchForTemplate' => function (string $template): Pages {
@@ -259,6 +271,7 @@ Kirby::plugin('bnomei/boost', [
                     $pages[] = bolt($obj->diruri);
                 }
             }
+
             return new Pages($pages);
         },
         'siteindexfolders' => function () {
@@ -277,10 +290,10 @@ Kirby::plugin('bnomei/boost', [
                 $paths = [];
                 foreach ($iter as $path => $dir) {
                     if ($dir->isDir()) {
-                        if (!$drafts && strstr($path, '_drafts') === false) {
+                        if (! $drafts && strstr($path, '_drafts') === false) {
                             continue;
                         }
-                        $paths[] = str_replace($root . DIRECTORY_SEPARATOR, '', $path);
+                        $paths[] = str_replace($root.DIRECTORY_SEPARATOR, '', $path);
                     }
                 }
                 kirby()->cache('bnomei.boost')->set('siteindexfolders', $paths, 1);
@@ -300,6 +313,7 @@ Kirby::plugin('bnomei/boost', [
                     $pages[] = $page;
                 }
             }
+
             return new Pages($pages);
         },
     ],

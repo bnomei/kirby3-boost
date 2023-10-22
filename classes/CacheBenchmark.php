@@ -15,7 +15,7 @@ final class CacheBenchmark
         }
 
         for ($i = 0; $i < $count; $i++) {
-            $cache->set('CacheBenchmark-' . $i, Str::random($contentLength), 0);
+            $cache->set('CacheBenchmark-'.$i, Str::random($contentLength), 0);
         }
 
         $time = microtime(true);
@@ -24,12 +24,12 @@ final class CacheBenchmark
         $index = 0;
         $write = intval(ceil($count / ($count * $writeRatio)));
         while ($time + $seconds > microtime(true)) {
-            if ($v = $cache->get('CacheBenchmark-' . $index)) {
+            if ($v = $cache->get('CacheBenchmark-'.$index)) {
                 // $v
             }
             $gets++; // count null caches and fails
             if ($index % $write === 0) {
-                $cache->set('CacheBenchmark-' . $index, Str::random($contentLength), 0);
+                $cache->set('CacheBenchmark-'.$index, Str::random($contentLength), 0);
                 $sets++;
             }
             $index++;
@@ -39,7 +39,7 @@ final class CacheBenchmark
         }
 
         for ($i = 0; $i < $count; $i++) {
-            $cache->remove('CacheBenchmark-' . $i);
+            $cache->remove('CacheBenchmark-'.$i);
         }
 
         if (is_callable([$cache, 'endTransaction'])) {
@@ -55,23 +55,24 @@ final class CacheBenchmark
 
     public static function run(array $caches = [], int $seconds = 1, $count = 1000, $contentLength = 128, $writeRatio = 0.1): array
     {
-        $caches = $caches ?? [ BoostCache::file() ];
+        $caches = $caches ?? [BoostCache::file()];
 
         $benchmarks = [];
         $highscore = 0;
         foreach ($caches as $cache) {
-            if (!$cache) {
+            if (! $cache) {
                 continue;
             }
             $class = get_class($cache);
-            $benchmarks[$class] = static::benchmark($cache, $seconds, $count, $contentLength, $writeRatio);
+            $benchmarks[$class] = self::benchmark($cache, $seconds, $count, $contentLength, $writeRatio);
             if ($benchmarks[$class]['gets'] > $highscore) {
                 $highscore = $benchmarks[$class]['gets'];
             }
         }
 
         $benchmarks = array_map(function ($item) use ($highscore) {
-            $item['score'] = intval(ceil($item['gets'] / $highscore * 100)). '/100';
+            $item['score'] = intval(ceil($item['gets'] / $highscore * 100)).'/100';
+
             return $item;
         }, $benchmarks);
 
@@ -82,16 +83,17 @@ final class CacheBenchmark
             if ($a['gets'] > $b['gets']) {
                 return 1;
             }
+
             return 0;
         });
         $benchmarks = array_reverse($benchmarks, true); // DESC
 
         return [
             'options' => [
-               'seconds' => $seconds,
-               'count' => $count,
-               'contentLength' => $contentLength,
-               'writeRatio' => $writeRatio,
+                'seconds' => $seconds,
+                'count' => $count,
+                'contentLength' => $contentLength,
+                'writeRatio' => $writeRatio,
             ],
             'results' => $benchmarks,
         ];

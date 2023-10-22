@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Bnomei;
 
+use Kirby\Cache\ApcuCache;
 use Kirby\Cache\Cache;
 use Kirby\Cache\FileCache;
-use Kirby\Cache\ApcuCache;
-use Kirby\Cache\MemoryCache;
 use Kirby\Cache\MemCached;
+use Kirby\Cache\MemoryCache;
 use Kirby\Cache\NullCache;
 use Kirby\Filesystem\F;
 use Kirby\Toolkit\Str;
@@ -16,6 +16,7 @@ use Kirby\Toolkit\Str;
 final class BoostCache
 {
     private static $singleton;
+
     public static function singleton(): Cache
     {
         if (! self::$singleton) {
@@ -45,11 +46,13 @@ final class BoostCache
         }
     }
 
-    public static function hashalgo() {
+    public static function hashalgo()
+    {
         $algos = explode(',', option('bnomei.boost.hashalgo'));
         if (version_compare(PHP_VERSION, '8.1.0') >= 0) {
             return $algos[0];
         }
+
         return $algos[1];
     }
 
@@ -58,7 +61,7 @@ final class BoostCache
         if ($model instanceof \Kirby\Cms\Page ||
             $model instanceof \Kirby\Cms\File ||
             $model instanceof \Kirby\Cms\User) {
-            $modified = static::singleton()->get($model->contentBoostedKey() . '-modified');
+            $modified = self::singleton()->get($model->contentBoostedKey().'-modified');
             if ($modified) { // could be false
                 return $modified;
             } else {
@@ -70,15 +73,16 @@ final class BoostCache
             $key = hash(BoostCache::hashalgo(), $model);
             $languageCode = kirby()->languages()->count() ? kirby()->language()->code() : null;
             if ($languageCode) {
-                $key = $key . '-' .  $languageCode;
+                $key = $key.'-'.$languageCode;
             }
-            $modified = static::singleton()->get($key . '-modified');
+            $modified = self::singleton()->get($key.'-modified');
             if ($modified) { // could be false
                 return $modified;
             }
             if ($page = bolt($model)) {
                 return $page->modified();
             }
+
             return null;
         }
 
@@ -88,7 +92,7 @@ final class BoostCache
     public static function patchFilesClass()
     {
         if (option('bnomei.boost.patch.files')) {
-            $filesClass = kirby()->roots()->kirby() . '/src/Cms/Files.php';
+            $filesClass = kirby()->roots()->kirby().'/src/Cms/Files.php';
             if (F::exists($filesClass) && F::isWritable($filesClass)) {
                 $code = F::read($filesClass);
                 if (Str::contains($code, '\Bnomei\BoostFile::factory') === false) {
@@ -126,6 +130,7 @@ final class BoostCache
                 'port' => 11211,
             ]));
         }
+
         return null;
     }
 
@@ -140,8 +145,10 @@ final class BoostCache
         if (class_exists('Bnomei\\SQLiteCache')) {
             $feather = \Bnomei\SQLiteCache::singleton(array_merge([
             ], $options));
+
             return $feather;
         }
+
         return null;
     }
 
@@ -151,6 +158,7 @@ final class BoostCache
             return \Bnomei\MySQLCache::singleton(array_merge([
             ], $options));
         }
+
         return null;
     }
 
@@ -159,8 +167,10 @@ final class BoostCache
         if (class_exists('Bnomei\\PHPCache')) {
             $elephant = \Bnomei\PHPCache::singleton(array_merge([
             ], $options));
+
             return $elephant;
         }
+
         return null;
     }
 
@@ -169,8 +179,10 @@ final class BoostCache
         if (class_exists('Bnomei\\MongoDBCache')) {
             $ape = \Bnomei\MongoDBCache::singleton(array_merge([
             ], $options));
+
             return $ape;
         }
+
         return null;
     }
 
@@ -178,10 +190,11 @@ final class BoostCache
     {
         if (class_exists('Bnomei\\Redis')) {
             return new \Bnomei\Redis(array_merge([
-                'host'   => '127.0.0.1',
-                'port'   => 6379,
+                'host' => '127.0.0.1',
+                'port' => 6379,
             ], $options));
         }
+
         return null;
     }
 }

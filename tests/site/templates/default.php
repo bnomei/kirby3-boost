@@ -19,7 +19,7 @@
 <?php
 $pmk = $page->contentBoostedKey();
 $m = \Bnomei\BoostCache::singleton();
-if (!$m->get('a')) {
+if (! $m->get('a')) {
     var_dump($m->set('a', 1234567890));
 }
 var_dump($m->get('a'));
@@ -27,7 +27,7 @@ var_dump($m->get('a'));
 
 <h3>bolt</h3>
 <?php
-var_dump($m->get(hash(\Bnomei\BoostCache::hashalgo(), $page->id()) . '-bolt'));
+var_dump($m->get(hash(\Bnomei\BoostCache::hashalgo(), $page->id()).'-bolt'));
 var_dump(count(Bnomei\Bolt::toArray()));
 bolt($page->id());
 var_dump(count(Bnomei\Bolt::toArray()));
@@ -40,9 +40,9 @@ var_dump(count(Bnomei\Bolt::toArray()));
 
 <h3>isBoosted</h3>
 <?php
-    var_dump($m->get($pmk . '-modified'));
-    var_dump($m->get($pmk . '-content'));
-    var_dump($page->isBoosted());
+    var_dump($m->get($pmk.'-modified'));
+var_dump($m->get($pmk.'-content'));
+var_dump($page->isBoosted());
 ?>
 
 <h3>boostid</h3>

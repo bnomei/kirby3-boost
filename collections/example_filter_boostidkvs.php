@@ -8,7 +8,8 @@ return fn () => lapseStatic(__FILE__, function () {
         function ($kvObject) {
             if ($kvObject->template === 'post') {
                 return boost($kvObject->value);
-            };
+            }
+
             return null;
         }
     );

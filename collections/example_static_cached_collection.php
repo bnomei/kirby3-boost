@@ -7,7 +7,8 @@
 class PagesThatCanBeReferencedWithoutIndex
 {
     public static $cache = null;
-    public static function load(): ?\Kirby\Cms\Pages
+
+    public static function load(): ?Kirby\Cms\Pages
     {
         // if cached then return that
         if (static::$cache) {
@@ -23,8 +24,9 @@ class PagesThatCanBeReferencedWithoutIndex
                     'person',
                     'organisation',
                     'document',
-                    'place'
+                    'place',
                 ]);
+
                 return array_values($collection->map(function ($page) {
                     return $page->diruri();
                 }));
@@ -44,6 +46,7 @@ class PagesThatCanBeReferencedWithoutIndex
         $collectionFromDirUris = new \Kirby\Cms\Pages($pages);
 
         static::$cache = $collectionFromDirUris;
+
         return static::$cache;
     }
 }

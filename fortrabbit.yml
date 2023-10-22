@@ -1,5 +1,0 @@
-version: 2
-composer:
-  no-dev: true
-sustained:
-  - vendor

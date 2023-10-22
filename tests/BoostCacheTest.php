@@ -1,56 +1,42 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 use Bnomei\BoostCache;
-use PHPUnit\Framework\TestCase;
 
-final class BoostCacheTest extends TestCase
-{
-    public function testCache()
-    {
-        $cache = BoostCache::singleton();
-        // cli will have file cache
-        $this->assertInstanceOf(\Kirby\Cache\FileCache::class, $cache);
+test('cache', function () {
+    $cache = BoostCache::singleton();
 
-        $this->assertFalse(option('debug'));
-    }
+    // cli will have file cache
+    expect($cache)->toBeInstanceOf(\Kirby\Cache\FileCache::class);
 
-    public function testWriteAndRead()
-    {
-        $cache = BoostCache::singleton();
-        $this->assertTrue($cache->set('a', 1));
-        $this->assertEquals(1, $cache->get('a'));
-    }
-
-    public function testReadFromCache()
-    {
-        $cache = BoostCache::singleton();
-        $this->assertEquals(1, $cache->get('a'));
-        $this->assertEquals(null, $cache->get('b'));
-    }
-
-    public function testTearDown(): void
-    {
-        $cache = BoostCache::singleton();
-        $this->assertTrue($cache->remove('a'));
-    }
-
-    public function testCoreDrivers(): void
-    {
-        $cache = BoostCache::singleton();
-        $this->assertNotNull(BoostCache::nulld());
-        $this->assertNotNull(BoostCache::file());
-        $this->assertNotNull(BoostCache::apcu());
-        $this->assertNotNull(BoostCache::memory());
-        // $this->assertNotNull(BoostCache::memcached());
-    }
-
-    public function testNonCoreDrivers(): void
-    {
-        $cache = BoostCache::singleton();
-        $this->assertNull(BoostCache::sqlite());
-        $this->assertNull(BoostCache::mysql());
-        $this->assertNull(BoostCache::redis());
-    }
-}
+    expect(option('debug'))->toBeFalse();
+});
+test('write and read', function () {
+    $cache = BoostCache::singleton();
+    expect($cache->set('a', 1))->toBeTrue();
+    expect($cache->get('a'))->toEqual(1);
+});
+test('read from cache', function () {
+    $cache = BoostCache::singleton();
+    expect($cache->get('a'))->toEqual(1);
+    expect($cache->get('b'))->toEqual(null);
+});
+test('tear down', function () {
+    $cache = BoostCache::singleton();
+    expect($cache->remove('a'))->toBeTrue();
+});
+test('core drivers', function () {
+    $cache = BoostCache::singleton();
+    expect(BoostCache::nulld())->not->toBeNull();
+    expect(BoostCache::file())->not->toBeNull();
+    expect(BoostCache::apcu())->not->toBeNull();
+    expect(BoostCache::memory())->not->toBeNull();
+    // $this->assertNotNull(BoostCache::memcached());
+});
+test('non core drivers', function () {
+    $cache = BoostCache::singleton();
+    expect(BoostCache::sqlite())->toBeNull();
+    expect(BoostCache::mysql())->toBeNull();
+    expect(BoostCache::redis())->toBeNull();
+});

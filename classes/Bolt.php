@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bnomei;
 
-use Kirby\Filesystem\Dir;
 use Kirby\Cms\Page;
+use Kirby\Filesystem\Dir;
 use Kirby\Toolkit\A;
 
 final class Bolt
@@ -24,6 +24,7 @@ final class Bolt
      * @var array<string>
      */
     private $modelFiles;
+
     /**
      * @var Page|null
      */
@@ -34,7 +35,7 @@ final class Bolt
      */
     private static $idToPage;
 
-    public function __construct(?Page $parent = null)
+    public function __construct(Page $parent = null)
     {
         $kirby = kirby();
         $this->root = $kirby->root('content');
@@ -45,12 +46,12 @@ final class Bolt
 
         $this->extension = $kirby->contentExtension();
         if ($kirby->multilang()) {
-            $this->extension = $kirby->defaultLanguage()->code() . '.' . $this->extension;
+            $this->extension = $kirby->defaultLanguage()->code().'.'.$this->extension;
         }
 
         $extension = $this->extension;
         $this->modelFiles = array_map(static function ($value) use ($extension) {
-            return $value . '.' . $extension;
+            return $value.'.'.$extension;
         }, array_keys(Page::$models));
 
         if (option('debug')) {
@@ -65,7 +66,7 @@ final class Bolt
 
     public function flush()
     {
-        static::$idToPage = [];
+        self::$idToPage = [];
 
         // this would flush content cache as well or depending on cache driver everything
         // do NOT do this ever!
@@ -76,46 +77,48 @@ final class Bolt
 
     public function lookup(string $id, bool $cache = true): ?Page
     {
-        $lookup = A::get(static::$idToPage, $id);
+        $lookup = A::get(self::$idToPage, $id);
 
         // in case the page was deleted/moved
         if ($lookup && Dir::exists($lookup->root()) === false) {
-            unset(static::$idToPage[$id]);
+            unset(self::$idToPage[$id]);
             $lookup = null;
         }
 
-        if (!$lookup && $cache && static::cache()) {
-            if ($diruri = static::cache()->get('bolt/' . hash(BoostCache::hashalgo(), $id))) {
+        if (! $lookup && $cache && self::cache()) {
+            if ($diruri = self::cache()->get('bolt/'.hash(BoostCache::hashalgo(), $id))) {
                 // bolt will ignore caches with invalid paths and update them automatically
                 // it does not need to be flushed ever
                 if ($page = $this->findByID($diruri, false)) {
                     $this->pushLookup($id, $page);
                     $lookup = $page;
                 } else {
-                    static::cache()->remove('bolt/' . hash(BoostCache::hashalgo(), $id));
+                    self::cache()->remove('bolt/'.hash(BoostCache::hashalgo(), $id));
                 }
             }
         }
+
         return $lookup;
     }
 
     public function pushLookup(string $id, Page $page): void
     {
-        static::$idToPage[$id] = $page;
+        self::$idToPage[$id] = $page;
 
         // only update if necessary
         $diruri = $page->diruri();
-        if ($diruri !== static::cache()->get('bolt/' . hash(BoostCache::hashalgo(), $id))) {
-            static::cache()->set(hash(BoostCache::hashalgo(), $id) . '-bolt', $diruri, option('bnomei.boost.expire'));
+        if ($diruri !== self::cache()->get('bolt/'.hash(BoostCache::hashalgo(), $id))) {
+            self::cache()->set(hash(BoostCache::hashalgo(), $id).'-bolt', $diruri, option('bnomei.boost.expire'));
         }
     }
 
     public static function toArray(): array
     {
-        if (!static::$idToPage) {
-            static::$idToPage = [];
+        if (! self::$idToPage) {
+            self::$idToPage = [];
         }
-        return static::$idToPage;
+
+        return self::$idToPage;
     }
 
     public function findByID(string $id, bool $cache = true, bool $extend = true): ?Page
@@ -126,7 +129,6 @@ final class Bolt
             return $page;
         }
 
-
         $draft = false;
         $treeid = null;
         $parent = $this->parent;
@@ -135,17 +137,19 @@ final class Bolt
         foreach ($parts as $part) {
             if ($part === '_drafts') {
                 $draft = true;
-                $this->root .= '/' . '_drafts';
+                $this->root .= '/'.'_drafts';
+
                 continue;
             }
             $numSplit = array_reverse(explode(Dir::$numSeparator, $part));
             $partWithoutNum = $numSplit[0];
             $num = count($numSplit) > 1 ? intval($numSplit[1]) : null;
-            $treeid = $treeid ? $treeid . '/' . $partWithoutNum : $partWithoutNum;
+            $treeid = $treeid ? $treeid.'/'.$partWithoutNum : $partWithoutNum;
             $page = $this->lookup($treeid, $cache);
             if ($page && Dir::exists($page->root())) {
                 $parent = $page;
                 $this->root = $page->root(); // loop
+
                 continue;
             }
 
@@ -159,12 +163,12 @@ final class Bolt
             ];
 
             // if dir exists
-            if (is_dir($this->root . '/' . $part)) {
-                $params['root'] = $this->root . '/' . $part;
+            if (is_dir($this->root.'/'.$part)) {
+                $params['root'] = $this->root.'/'.$part;
                 $params['dirname'] = $part;
                 foreach ($this->modelFiles as $modelFile) {
-                    if (file_exists($params['root'] . '/' . $modelFile)) {
-                        $template = str_replace('.' . $this->extension, '', $modelFile);
+                    if (file_exists($params['root'].'/'.$modelFile)) {
+                        $template = str_replace('.'.$this->extension, '', $modelFile);
                         $params['template'] = $template;
                         $params['model'] = $template;
                         break;
@@ -177,19 +181,19 @@ final class Bolt
                         if (strpos($file, '.') !== false) {
                             continue;
                         }
-                        $_part = Dir::$numSeparator . $part;
+                        $_part = Dir::$numSeparator.$part;
                         if (substr($file, -strlen($_part)) === $_part) {
-                            $params['root'] = $this->root . '/' . $file;
+                            $params['root'] = $this->root.'/'.$file;
                             $params['diruri'] = $file;
-                            if (preg_match('/^([0-9]+)' . Dir::$numSeparator . '(.*)$/', $file, $match)) {
+                            if (preg_match('/^([0-9]+)'.Dir::$numSeparator.'(.*)$/', $file, $match)) {
                                 $params['num'] = intval($match[1]);
                                 $params['slug'] = $match[2];
                             }
                         }
                         if ($params['root']) {
                             foreach ($this->modelFiles as $modelFile) {
-                                if (file_exists($params['root'] . '/' . $modelFile)) {
-                                    $template = str_replace('.' . $this->extension, '', $modelFile);
+                                if (file_exists($params['root'].'/'.$modelFile)) {
+                                    $template = str_replace('.'.$this->extension, '', $modelFile);
                                     $params['template'] = $template;
                                     $params['model'] = $template;
                                     break;
@@ -217,17 +221,18 @@ final class Bolt
 
                 if ($extend) {
                     kirby()->extend([
-                        'pages' => [$this->root => $page,]
+                        'pages' => [$this->root => $page],
                     ]);
                 }
             }
             $parent = $page;
             $this->root = $params['root']; // loop
         }
+
         return $page;
     }
 
-    public static function page(string $id, ?Page $parent = null, bool $cache = true, bool $extend = true): ?Page
+    public static function page(string $id, Page $parent = null, bool $cache = true, bool $extend = true): ?Page
     {
         return (new self($parent))->findByID($id, $cache, $extend);
     }
@@ -238,12 +243,13 @@ final class Bolt
         foreach (site()->siteindexfolders() as $page) {
             // save memory when indexing
             $page = \Bnomei\Bolt::page($page, null, false, false);
-            if ($page && !is_string($callback) && is_callable($callback)) {
+            if ($page && ! is_string($callback) && is_callable($callback)) {
                 $callback($page);
             }
             $count++;
             $page = null; // free memory, do not use unset()
         }
+
         return $count;
     }
 }

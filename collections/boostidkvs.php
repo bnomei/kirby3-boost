@@ -3,6 +3,7 @@
 class StaticBoostIdKVs
 {
     public static $cache = null;
+
     public static function load(): ?array
     {
         if (static::$cache) {

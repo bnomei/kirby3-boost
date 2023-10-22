@@ -3,3 +3,4 @@
 /docker-compose     export-ignore
 /fortrabbit         export-ignore
 /phpunit.xml        export-ignore
+/collections/example_*.php    export-ignore

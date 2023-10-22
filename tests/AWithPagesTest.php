@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 use Kirby\Cms\Page;
 use Kirby\Toolkit\Str;
@@ -32,7 +32,7 @@ class AWithPagesTest extends TestCase
 
     public function createPage($parent, int $idx, int $depth = 3): Page
     {
-        $id = 'Test ' . hash(\Bnomei\BoostCache::hashalgo(), microtime() . $idx . $depth);
+        $id = 'Test '.hash(\Bnomei\BoostCache::hashalgo(), microtime().$idx.$depth);
         /* @var $page Page */
         kirby()->impersonate('kirby');
 
@@ -77,8 +77,8 @@ class AWithPagesTest extends TestCase
 
         foreach (site()->index()->filterBy('template', 'default') as $page) {
             $boostids[$page->uuid()->id()] = $page->diruri();
-//            $boostids[$page->uuid()->toString()] = $page->diruri(); // TODO: make it work with page:// as well
-        };
+            //            $boostids[$page->uuid()->toString()] = $page->diruri(); // TODO: make it work with page:// as well
+        }
 
         $this->assertTrue(count($boostids) > 0);
         $this->assertTrue(site()->index()->count() > 1); // not just home
@@ -90,7 +90,7 @@ class AWithPagesTest extends TestCase
             }
 
             $page->update([
-                'related' => count($boostids) >= 2 ? implode(',', array_rand($boostids, rand(2, min(count($boostids), 10)))) : ''
+                'related' => count($boostids) >= 2 ? implode(',', array_rand($boostids, rand(2, min(count($boostids), 10)))) : '',
             ]);
         }
     }

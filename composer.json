@@ -1,89 +1,88 @@
 {
-  "name": "bnomei/kirby3-boost",
-  "type": "kirby-plugin",
-  "version": "2.4.1",
-  "description": "Boost the speed of Kirby by having content files of files/pages/users cached, with fast lookup based on uuid.",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Bruno Meilick",
-      "email": "b@bnomei.com"
-    }
-  ],
-  "keywords": [
-    "kirby3",
-    "kirby3-cms",
-    "kirby3-plugin",
-    "autoid",
-    "boost",
-    "pages",
-    "random",
-    "uuid",
-    "token",
-    "lookup",
-    "cache",
-    "performance",
-    "memcache",
-    "memcached",
-    "memory",
-    "sqlite",
-    "mysql",
-    "redis",
-    "apcu",
-    "file"
-  ],
-  "autoload": {
-    "psr-4": {
-      "Bnomei\\": "classes/"
-    }
-  },
-  "config": {
-    "optimize-autoloader": true,
-    "sort-packages": true,
-    "allow-plugins": {
-      "getkirby/composer-installer": true
-    }
-  },
-  "require": {
-    "php": ">=8.0.0",
-    "getkirby/composer-installer": "^1.2"
-  },
-  "require-dev": {
-    "getkirby/cms": ">=3.8.0",
-    "php-coveralls/php-coveralls": "^2.4",
-    "phpunit/phpunit": "^9.5"
-  },
-  "scripts": {
-    "analyze": "phpstan analyse",
-    "fix": "php-cs-fixer fix",
-    "test": [
-      "mkdir -p tests/logs",
-      "@putenv XDEBUG_MODE=coverage",
-      "phpunit --configuration ./phpunit.xml --group SetupPagesInSeperatePHPUnitRun",
-      "phpunit --configuration ./phpunit.xml"
+    "name": "bnomei/kirby3-boost",
+    "type": "kirby-plugin",
+    "version": "4.0.0",
+    "description": "Boost the speed of Kirby by having content files of files/pages/users cached, with fast lookup based on uuid.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bruno Meilick",
+            "email": "b@bnomei.com"
+        }
     ],
-    "dist": [
-      "composer install --no-dev --optimize-autoloader",
-      "git rm -rf --cached .; git add .;"
+    "keywords": [
+        "kirby",
+        "kirby-cms",
+        "kirby-plugin",
+        "autoid",
+        "boost",
+        "pages",
+        "random",
+        "uuid",
+        "token",
+        "lookup",
+        "cache",
+        "performance",
+        "memcache",
+        "memcached",
+        "memory",
+        "sqlite",
+        "mysql",
+        "redis",
+        "apcu",
+        "file"
     ],
-    "kirby": [
-      "composer install",
-      "composer update",
-      "composer install --working-dir=tests/kirby --no-dev --optimize-autoloader",
-      "composer update --working-dir=tests/kirby"
-    ]
-  },
-  "extra": {
-    "kirby-cms-path": "tests/kirby"
-  },
-  "suggest": {
-    "bnomei/kirby3-boost-demo": "Try boost with a big set of data",
-    "bnomei/kirby3-lapse": "Cache any data until set expiration time (with automatic keys)",
-    "bnomei/kirby3-apcu-cachedriver": "APCu based Cache-Driver (with garbage collection)",
-    "bnomei/kirby3-mysql-cachedriver": "MySQL based Cache-Driver",
-    "bnomei/kirby3-php-cachedriver": "PHP based Cache-Driver",
-    "bnomei/kirby3-redis-cachedriver": "Redis based Cache-Driver",
-    "bnomei/kirby3-sqlite-cachedriver": "SQLite based Cache-Driver",
-    "getkirby/kql": "Kirby's Query Language API combines the flexibility of Kirby's data structures, the power of GraphQL and the simplicity of REST"
-  }
+    "autoload": {
+        "psr-4": {
+            "Bnomei\\": "classes/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "allow-plugins": {
+            "getkirby/composer-installer": true,
+            "pestphp/pest-plugin": true
+        }
+    },
+    "conflict": {
+        "getkirby/cms": "<4.0"
+    },
+    "require": {
+        "php": ">=8.2.0",
+        "getkirby/composer-installer": "^1.2"
+    },
+    "require-dev": {
+        "getkirby/cms": "^4.0.0-beta.2",
+        "laravel/pint": "^1.13",
+        "nunomaduro/larastan": "^2.6",
+        "pestphp/pest": "^2.24"
+    },
+    "scripts": {
+        "analyze": "./vendor/bin/phpstan",
+        "fix": "./vendor/bin/pint",
+        "dist": [
+            "composer install --no-dev --optimize-autoloader",
+            "git rm -rf --cached .; git add .;"
+        ],
+        "kirby": [
+            "composer install",
+            "composer update",
+            "composer install --working-dir=tests/kirby --no-dev --optimize-autoloader",
+            "composer update --working-dir=tests/kirby"
+        ]
+    },
+    "extra": {
+        "kirby-cms-path": "tests/kirby"
+    },
+    "suggest": {
+        "bnomei/kirby3-boost-demo": "Try boost with a big set of data",
+        "bnomei/kirby3-lapse": "Cache any data until set expiration time (with automatic keys)",
+        "bnomei/kirby3-apcu-cachedriver": "APCu based Cache-Driver (with garbage collection)",
+        "bnomei/kirby3-mysql-cachedriver": "MySQL based Cache-Driver",
+        "bnomei/kirby3-php-cachedriver": "PHP based Cache-Driver",
+        "bnomei/kirby3-redis-cachedriver": "Redis based Cache-Driver",
+        "bnomei/kirby3-sqlite-cachedriver": "SQLite based Cache-Driver",
+        "getkirby/kql": "Kirby's Query Language API combines the flexibility of Kirby's data structures, the power of GraphQL and the simplicity of REST"
+    }
 }

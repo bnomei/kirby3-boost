@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 use Bnomei\BoostCache;
 use Kirby\Cms\Page;
@@ -16,12 +16,13 @@ final class PageHasBoostTest extends TestCase
     public function randomPageWithChildren(): ?Page
     {
         $page = null;
-        while (!$page) {
+        while (! $page) {
             $rp = $this->randomPage();
             if ($rp->hasChildren()) {
                 $page = $rp;
             }
         }
+
         return $page;
     }
 
@@ -43,13 +44,12 @@ final class PageHasBoostTest extends TestCase
         $this->assertNotNull($newPage->readContentCache());
         $key = $newPage->contentBoostedKey();
 
-
         $newPage->delete(true);
 
         //$this->assertNull($newPage->readContentCache()); // this would create again
         $cache = BoostCache::singleton();
-        $this->assertNull($cache->get($key . '-content'));
-        $this->assertNull($cache->get($key . '-modified'));
+        $this->assertNull($cache->get($key.'-content'));
+        $this->assertNull($cache->get($key.'-modified'));
     }
 
     public function testExpiredByModified()
@@ -59,15 +59,15 @@ final class PageHasBoostTest extends TestCase
         $cache = BoostCache::singleton();
 
         // fake outdated modified value
-        $this->assertTrue($cache->set($key . '-modified', $randomPage->modified() - 1));
+        $this->assertTrue($cache->set($key.'-modified', $randomPage->modified() - 1));
         $this->assertTrue($randomPage->isContentCacheExpiredByModified());
 
         // fake in future
-        $this->assertTrue($cache->set($key . '-modified', $randomPage->modified() + 1));
+        $this->assertTrue($cache->set($key.'-modified', $randomPage->modified() + 1));
         $this->assertFalse($randomPage->isContentCacheExpiredByModified());
 
         // fake current (to reset for next tests)
-        $this->assertTrue($cache->set($key . '-modified', $randomPage->modified() + 0));
+        $this->assertTrue($cache->set($key.'-modified', $randomPage->modified() + 0));
         $this->assertFalse($randomPage->isContentCacheExpiredByModified());
     }
 }

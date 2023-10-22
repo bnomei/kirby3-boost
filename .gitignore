@@ -3,14 +3,12 @@
 .idea
 *.cache
 
+/build
+
 /tests/kirby
 /tests/logs
 /tests/media
-/tests/content/*
-!/tests/content/site.txt
-!/tests/content/home
-/tests/content/home/_drafts
-!/tests/content/home/home.txt
+!/tests/content/*
 /tests/site/accounts
 /tests/site/cache
 /tests/site/sessions

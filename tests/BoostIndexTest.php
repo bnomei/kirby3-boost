@@ -1,133 +1,99 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
-use Kirby\Cms\Page;
 use Bnomei\BoostIndex;
 use Kirby\Toolkit\A;
-use PHPUnit\Framework\TestCase;
 
-final class BoostIndexTest extends TestCase
-{
-    public function randomPage(): ?Page
-    {
-        return site()->index()->notTemplate('home')->shuffle()->first();
-    }
+test('boost flush', function () {
+    $index = BoostIndex::singleton();
+    $index->flush();
+    $index->write();
+    expect($index->count())->toEqual(0);
+});
+test('boost modified', function () {
+    $randomPage = randomPage();
+    site()->prune();
 
-    public function testBoostFlush()
-    {
-        $index = BoostIndex::singleton();
-        $index->flush();
-        $index->write();
-        $this->assertEquals(0, $index->count());
-    }
+    // make sure it has an entry
+    $triggerContentReadLeadingToCacheWrite = $randomPage->title();
 
-    public function testBoostModified()
-    {
-        $randomPage = $this->randomPage();
-        site()->prune();
+    expect(modified($randomPage->id()))->toEqual($randomPage->modified());
 
-        // make sure it has an entry
-        $triggerContentReadLeadingToCacheWrite = $randomPage->title();
+    // get one thats NOT in index
+    expect(modified('home'))->toEqual(site()->homePage()->modified());
 
-        $this->assertEquals($randomPage->modified(), modified($randomPage->id()));
+    expect(modified('does-not-exist'))->toEqual(null);
+});
+test('boost find by id', function () {
+    expect(option('debug'))->toBeFalse();
 
-        // get one thats NOT in index
-        $this->assertEquals(site()->homePage()->modified(), modified('home'));
+    $index = BoostIndex::singleton();
+    $index->index(true);
 
-        $this->assertEquals(null, modified('does-not-exist'));
-    }
+    $randomPage = randomPage();
 
-    public function testBoostFindById()
-    {
-        $this->assertFalse(option('debug'));
+    //site()->prune();
+    expect(boost($randomPage->uuid()->id())->id())->toEqual($randomPage->id());
+});
+test('boost find', function () {
+    $index = BoostIndex::singleton();
+    $index->index(true);
 
-        $index = BoostIndex::singleton();
-        $index->index(true);
+    $randomPage = randomPage();
 
-        $randomPage = $this->randomPage();
-        //site()->prune();
+    //site()->prune();
+    //if (!$randomPage->uuid()->id()) var_dump($randomPage);
+    expect(boost($randomPage->uuid())->id())->toEqual($randomPage->id());
+});
+test('boost index', function () {
+    $index = BoostIndex::singleton();
+    $index->flush();
 
-        $this->assertEquals(
-            $randomPage->id(),
-            boost($randomPage->uuid()->id())->id()
-        );
-    }
+    //var_dump($index->toArray());
+    expect($index->toArray())->toHaveCount(0);
+    $randomPage = randomPage();
 
-    public function testBoostFind()
-    {
-        $index = BoostIndex::singleton();
-        $index->index(true);
+    //site()->prune();
+    expect($randomPage->uuid()->id())->not->toBeEmpty();
+    expect($index->add($randomPage))->toBeTrue();
 
-        $randomPage = $this->randomPage();
-        //site()->prune();
-        //if (!$randomPage->uuid()->id()) var_dump($randomPage);
+    //$index->write();
+    expect($index->toArray())->toHaveCount(1);
+});
+test('to page boosted', function () {
+    $index = BoostIndex::singleton();
+    $index->index(true);
 
+    $randomPage = randomPage();
 
-        $this->assertEquals(
-            $randomPage->id(),
-            boost($randomPage->uuid())->id()
-        );
-    }
+    //site()->prune();
+    expect($randomPage->someUuidRelationField()->toPageBoosted()->id())->toEqual($randomPage->id());
+});
+test('write on destruct', function () {
+    $index = BoostIndex::singleton();
+    expect($index->flush())->toBeTrue();
+    expect($index->write())->toBeTrue();
 
-    public function testBoostIndex()
-    {
-        $index = BoostIndex::singleton();
-        $index->flush();
-        //var_dump($index->toArray());
-        $this->assertCount(0, $index->toArray());
-        $randomPage = $this->randomPage();
-        //site()->prune();
+    $items = $index->index(true);
 
-        $this->assertNotEmpty($randomPage->uuid()->id());
-        $this->assertTrue($index->add($randomPage));
-        //$index->write();
-        $this->assertCount(1, $index->toArray());
-    }
+    expect($items > 0)->toBeTrue();
+    unset($index);
 
-    public function testToPageBoosted()
-    {
-        $index = BoostIndex::singleton();
-        $index->index(true);
+    // trigger write
+    $index = BoostIndex::singleton();
 
-        $randomPage = $this->randomPage();
-        //site()->prune();
+    // create and load
+    expect($index->count())->toEqual($items);
+});
+test('crawl for missing', function () {
+    $index = BoostIndex::singleton();
+    $randomPage = randomPage();
+    $boostid = $randomPage->uuid()->id();
+    $randomPage->boostIndexAdd();
 
-        $this->assertEquals(
-            $randomPage->id(),
-            $randomPage->someUuidRelationField()->toPageBoosted()->id()
-        );
-    }
-
-    public function testWriteOnDestruct()
-    {
-        $index = BoostIndex::singleton();
-        $this->assertTrue($index->flush());
-        $this->assertTrue($index->write());
-
-        $items = $index->index(true);
-
-        $this->assertTrue($items > 0);
-        unset($index); // trigger write
-
-        $index = BoostIndex::singleton();
-        // create and load
-        $this->assertEquals($items, $index->count());
-    }
-
-    public function testCrawlForMissing()
-    {
-        $index = BoostIndex::singleton();
-        $randomPage = $this->randomPage();
-        $boostid = $randomPage->uuid()->id();
-        $randomPage->boostIndexAdd();
-
-        $this->assertTrue($randomPage->boostIndexRemove());
-        $this->assertNull(A::get($index->toArray(), $boostid));
-        $this->assertEquals(
-            $randomPage->id(),
-            $index->find($boostid)->id() // will crawl
-        );
-        $this->assertNotNull(A::get($index->toArray(), $boostid));
-    }
-}
+    expect($randomPage->boostIndexRemove())->toBeTrue();
+    expect(A::get($index->toArray(), $boostid))->toBeNull();
+    expect($index->find($boostid)->id())->toEqual($randomPage->id());
+    expect(A::get($index->toArray(), $boostid))->not->toBeNull();
+});
