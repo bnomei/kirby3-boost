@@ -5,7 +5,7 @@ const KIRBY_HELPER_E = false;
 
 function patchKirbyHelpers()
 {
-    $h = __DIR__ . '/kirby/config/helpers.php';
+    $h = __DIR__.'/kirby/config/helpers.php';
     if (file_exists($h)) {
         // open file and change a function name dump to xdump and save file again
         $content = file_get_contents($h);
