@@ -1,6 +1,15 @@
-/tests              export-ignore
+# Auto detect text files and perform LF normalization
+* text=auto
+
+/*-lock.json        export-ignore
 /.*                 export-ignore
-/docker-compose     export-ignore
-/fortrabbit         export-ignore
+/docker-compose.yml export-ignore
+/docs               export-ignore
+/examples           export-ignore
+/package.json       export-ignore
+/phpstan.neon.dist  export-ignore
 /phpunit.xml        export-ignore
+/ray.php            export-ignore
+/pint.json          export-ignore
+/tests              export-ignore
 /collections/example_*.php    export-ignore

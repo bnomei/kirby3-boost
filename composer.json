@@ -70,7 +70,8 @@
             "composer install",
             "composer update",
             "composer install --working-dir=tests/kirby --no-dev --optimize-autoloader",
-            "composer update --working-dir=tests/kirby"
+            "composer update --working-dir=tests/kirby",
+            "php tests/patch.php"
         ]
     },
     "extra": {
