@@ -19,7 +19,7 @@
         <env name="CACHE_DRIVER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
     </php>
-    <coverage>
+    <source>
         <include>
             <directory suffix=".php">classes</directory>
         </include>

@@ -56,7 +56,8 @@
         "getkirby/cms": "^4.0.0-beta.2",
         "laravel/pint": "^1.13",
         "nunomaduro/larastan": "^2.6",
-        "pestphp/pest": "^2.24"
+        "pestphp/pest": "^2.24",
+        "pestphp/pest-plugin-type-coverage": "^2.4"
     },
     "scripts": {
         "analyze": "./vendor/bin/phpstan",
