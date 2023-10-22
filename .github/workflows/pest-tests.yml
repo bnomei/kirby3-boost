@@ -21,4 +21,7 @@ jobs:
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Run Tests
-        run: ./vendor/bin/pest
+        run: |
+          php tests/patch.php
+          ./vendor/bin/pest --group=SetupPagesInSeparatePHPUnitRun
+          ./vendor/bin/pest

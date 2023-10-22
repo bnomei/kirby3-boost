@@ -16,7 +16,7 @@ class AWithPagesTest extends TestCase
     /**
      * Only test here will create all pages and set relations
      *
-     * @group SetupPagesInSeperatePHPUnitRun
+     * @group SetupPagesInSeparatePHPUnitRun
      */
     public function testSetUpPages(): void
     {
