@@ -1,7 +1,7 @@
 {
     "name": "bnomei/kirby3-boost",
     "type": "kirby-plugin",
-    "version": "4.0.0",
+    "version": "4.0.1",
     "description": "Boost the speed of Kirby by having content files of files/pages/users cached, with fast lookup based on uuid.",
     "license": "MIT",
     "authors": [
@@ -45,9 +45,6 @@
             "pestphp/pest-plugin": true
         }
     },
-    "conflict": {
-        "getkirby/cms": "<4.0"
-    },
     "require": {
         "php": ">=8.2.0",
         "getkirby/composer-installer": "^1.2"
@@ -78,7 +75,6 @@
         "kirby-cms-path": "tests/kirby"
     },
     "suggest": {
-        "bnomei/kirby3-boost-demo": "Try boost with a big set of data",
         "bnomei/kirby3-lapse": "Cache any data until set expiration time (with automatic keys)",
         "bnomei/kirby3-apcu-cachedriver": "APCu based Cache-Driver (with garbage collection)",
         "bnomei/kirby3-mysql-cachedriver": "MySQL based Cache-Driver",
