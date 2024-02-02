@@ -1,8 +1,9 @@
 type: multiselect
 options: query
 max: 1
-query:
-  fetch: kirby.collection('boostidkvs')
+options: 
+  type: query
+  query: kirby.collection('boostidkvs')
   text: "{{ arrayItem.text }}"
   value: "{{ arrayItem.value }}"
 search:
