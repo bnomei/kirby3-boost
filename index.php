@@ -25,7 +25,7 @@ load([
 ], __DIR__);
 
 if (! function_exists('bolt')) {
-    function bolt(string $id, Page $parent = null, bool $cache = true, bool $extend = true)
+    function bolt(string $id, ?Page $parent = null, bool $cache = true, bool $extend = true)
     {
         $id = str_replace('page://', '', $id);
         $cacheKey = 'page/'.Str::substr($id, 0, 2).'/'.Str::substr($id, 2);

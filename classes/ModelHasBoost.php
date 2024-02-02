@@ -24,12 +24,12 @@ trait ModelHasBoost
         $this->boostWillBeDeleted = $value;
     }
 
-    public function isContentBoosted(string $languageCode = null): bool
+    public function isContentBoosted(?string $languageCode = null): bool
     {
         return $this->readContentCache($languageCode) !== null;
     }
 
-    public function contentBoostedKey(string $languageCode = null): string
+    public function contentBoostedKey(?string $languageCode = null): string
     {
         $key = hash(BoostCache::hashalgo(), $this->id()); // can not use UUID since content not loaded yet
         if (! $languageCode) {
@@ -42,7 +42,7 @@ trait ModelHasBoost
         return $key;
     }
 
-    public function isContentCacheExpiredByModified(string $languageCode = null): bool
+    public function isContentCacheExpiredByModified(?string $languageCode = null): bool
     {
         $cache = BoostCache::singleton();
         if (! $cache) {
@@ -70,7 +70,7 @@ trait ModelHasBoost
         return false;
     }
 
-    public function readContentCache(string $languageCode = null): ?array
+    public function readContentCache(?string $languageCode = null): ?array
     {
         if ($this->checkModifiedTimestampForContentBoost()) {
             if ($this->isContentCacheExpiredByModified($languageCode)) {
@@ -84,7 +84,7 @@ trait ModelHasBoost
         );
     }
 
-    public function readContent(string $languageCode = null): array
+    public function readContent(?string $languageCode = null): array
     {
         // read from boostedCache if exists
         $data = option('bnomei.boost.read') === false || option('debug') ? null : $this->readContentCache($languageCode);
@@ -100,7 +100,7 @@ trait ModelHasBoost
         return $data;
     }
 
-    public function writeContentCache(array $data = null, string $languageCode = null): bool
+    public function writeContentCache(?array $data = null, ?string $languageCode = null): bool
     {
         $cache = BoostCache::singleton();
         if (! $cache || option('bnomei.boost.write') === false) {
@@ -129,7 +129,7 @@ trait ModelHasBoost
         );
     }
 
-    public function writeContent(array $data, string $languageCode = null): bool
+    public function writeContent(array $data, ?string $languageCode = null): bool
     {
         // write to file and cache
         return parent::writeContent($data, $languageCode) &&

@@ -35,7 +35,7 @@ final class Bolt
      */
     private static $idToPage;
 
-    public function __construct(Page $parent = null)
+    public function __construct(?Page $parent = null)
     {
         $kirby = kirby();
         $this->root = $kirby->root('content');
@@ -232,7 +232,7 @@ final class Bolt
         return $page;
     }
 
-    public static function page(string $id, Page $parent = null, bool $cache = true, bool $extend = true): ?Page
+    public static function page(string $id, ?Page $parent = null, bool $cache = true, bool $extend = true): ?Page
     {
         return (new self($parent))->findByID($id, $cache, $extend);
     }
