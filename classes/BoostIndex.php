@@ -70,7 +70,7 @@ final class BoostIndex
         return false;
     }
 
-    public function index(bool $force = false, Page $target = null): int
+    public function index(bool $force = false, ?Page $target = null): int
     {
 
         $count = $this->index ? count($this->index) : 0;
