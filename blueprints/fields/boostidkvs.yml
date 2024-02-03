@@ -1,9 +1,9 @@
 type: multiselect
-options: 
+options:
   type: query
   query: kirby.collection('boostidkvs')
   text: "{{ arrayItem.text }}"
   value: "{{ arrayItem.value }}"
 search:
-  min: 3
-  display: 10
+  # min: 1 # TODO: broken in K4 for arrayItems (aka Obj)
+  display: 2
