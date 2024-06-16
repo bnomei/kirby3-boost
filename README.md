@@ -94,6 +94,22 @@ return [
     'bnomei.boost.patch.files' => true, // default: true
 ```
 
+### Directories Inventory Cache (experimental)
+
+Starting with version 5.0 the plugin will cache the inventory of directories. For that to be possible it will patch the `Kirby\Filesystem\Dir` class. It will automatically flush the cache if you edit pages in the panel, just like the core [pages cache](https://getkirby.com/docs/reference/system/options/cache). It's enabled by default but you can disable it if you want to like the following.
+
+**index.php**
+```php
+// after bootstrap and before kirby runs
+\Bnomei\BoostDirInventory::singleton(['enabled' => false]);
+```
+
+You could also flush the cache manually.
+
+```php
+\Bnomei\BoostDirInventory::singleton()->flush();
+```
+
 ### Pages Field Alternative
 
 This plugin provided a pages field alternative based on the multiselect field and optimized for performance.
@@ -263,35 +279,6 @@ var_dump(\Bnomei\CacheBenchmark::run($caches, 1, site()->index()->count())); // 
 - The File Cache Driver will perform worse the more page objects you have. You are probably better of with no cache. This is the only driver with this flaw. Benchmarking this driver will also create a lot of file which in total might cause the script to exceed your php execution time.
 
 But do not take my word for it. Download the plugin, set realistic benchmark options and run the benchmark on your production server.
-
-### Interactive Demo
-
-I created an interactive demo to compare various cache drivers and prove how much your website can be boosted. It kind of ended up as a love-letter to the <a class="underline" href="https://github.com/getkirby/kql">KQL Plugin</a> as well. You can find the benchmark and interactive demos here:
-
-- [Benchmark with all Drivers](https://kirby3-boost.bnomei.com)
-- [Demo using PHP Cache Driver](https://kirby3-boost-php.bnomei.com)
-- [Demo using APCu Cache Driver](https://kirby3-boost-apcu.bnomei.com)
-- [Demo using MySQL Cache Driver](https://kirby3-boost-mysql.bnomei.com)
-- [Demo using Null Cache Driver](https://kirby3-boost-null.bnomei.com). This setup behaves like having the boost plugin NOT active at all.
-- [Demo using Redis Cache Driver](https://kirby3-boost-redis.bnomei.com)
-- [Demo using SQLite Cache Driver](https://kirby3-boost-sqlite.bnomei.com)
-
-### Headless Demo
-
-You can either use this interactive playground or a tool like HTTPie, Insomnia, PAW or Postman to connect to the public API of the demos. Queries are sent to the public API endpoint of the <a class="underline" href="https://github.com/getkirby/kql">KQL Plugin</a>. This means you can compare response times between cache drivers easily.
-
-**HTTPie examples**
-```shell
-# get benchmark comparing the cachedrivers
-http POST https://kirby3-boost.bnomei.com/benchmark --json
-
-# get boostmark for a specific cache driver
-http POST https://kirby3-boost-apcu.bnomei.com/boostmark --json
-
-# compare apcu and sqlite
-http POST https://kirby3-boost-apcu.bnomei.com/api/query -a api@kirby3-boost.bnomei.com:kirby3boost < myquery.json
-http POST https://kirby3-boost-sqlite.bnomei.com/api/query -a api@kirby3-boost.bnomei.com:kirby3boost < myquery.json
-```
 
 ### Config
 

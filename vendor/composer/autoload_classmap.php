@@ -8,6 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'Bnomei\\Bolt' => $baseDir . '/classes/Bolt.php',
     'Bnomei\\BoostCache' => $baseDir . '/classes/BoostCache.php',
+    'Bnomei\\BoostDirInventory' => $baseDir . '/classes/BoostDirInventory.php',
     'Bnomei\\BoostFile' => $baseDir . '/classes/BoostFile.php',
     'Bnomei\\BoostIndex' => $baseDir . '/classes/BoostIndex.php',
     'Bnomei\\BoostPage' => $baseDir . '/classes/BoostPage.php',

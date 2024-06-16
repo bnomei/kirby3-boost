@@ -1,7 +1,7 @@
 {
     "name": "bnomei/kirby3-boost",
     "type": "kirby-plugin",
-    "version": "4.0.4",
+    "version": "5.0.0",
     "description": "Boost the speed of Kirby by having content files of files/pages/users cached, with fast lookup based on uuid.",
     "license": "MIT",
     "authors": [
@@ -51,8 +51,8 @@
     },
     "require-dev": {
         "getkirby/cms": "^4.0.0-beta.2",
+        "larastan/larastan": "^2.9",
         "laravel/pint": "^1.13",
-        "nunomaduro/larastan": "^2.6",
         "pestphp/pest": "^2.24",
         "pestphp/pest-plugin-type-coverage": "^2.4"
     },

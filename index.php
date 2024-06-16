@@ -2,6 +2,7 @@
 
 use Bnomei\Bolt;
 use Bnomei\BoostCache;
+use Bnomei\BoostDirInventory;
 use Bnomei\BoostIndex;
 use Kirby\Cms\Page;
 use Kirby\Cms\Pages;
@@ -16,6 +17,7 @@ use Kirby\Uuid\Uuids;
 load([
     'bnomei\\bolt' => 'classes/Bolt.php',
     'bnomei\\boostcache' => 'classes/BoostCache.php',
+    'bnomei\\boostdirinventory' => 'classes/BoostDirInventory.php',
     'bnomei\\boostfile' => 'classes/BoostFile.php',
     'bnomei\\boostindex' => 'classes/BoostIndex.php',
     'bnomei\\boostpage' => 'classes/BoostPage.php',
@@ -99,6 +101,8 @@ if (! function_exists('boost')) {
         return null;
     }
 }
+
+BoostDirInventory::singleton(); // init
 
 Kirby::plugin('bnomei/boost', [
     'options' => [
@@ -318,6 +322,11 @@ Kirby::plugin('bnomei/boost', [
         },
     ],
     'hooks' => [
+        'page.*:after' => function ($event, $page) {
+            if ($event->action() !== 'render' && option('bnomei.boost.helper')) {
+                BoostDirInventory::singleton()->flush();
+            }
+        },
         'page.create:after' => function ($page) {
             if (option('bnomei.boost.helper')) {
                 $page->boostIndexAdd();

@@ -31,6 +31,7 @@ class ComposerStaticInit3db6bdf37692b38c1c60b6012e081741
     public static $classMap = array (
         'Bnomei\\Bolt' => __DIR__ . '/../..' . '/classes/Bolt.php',
         'Bnomei\\BoostCache' => __DIR__ . '/../..' . '/classes/BoostCache.php',
+        'Bnomei\\BoostDirInventory' => __DIR__ . '/../..' . '/classes/BoostDirInventory.php',
         'Bnomei\\BoostFile' => __DIR__ . '/../..' . '/classes/BoostFile.php',
         'Bnomei\\BoostIndex' => __DIR__ . '/../..' . '/classes/BoostIndex.php',
         'Bnomei\\BoostPage' => __DIR__ . '/../..' . '/classes/BoostPage.php',
