@@ -49,11 +49,6 @@ class BoostDirInventory
 
     public function file(): string
     {
-        $cache = BoostCache::singleton();
-        if ($cache && method_exists($cache, 'root')) {
-            return $cache->root().'/boost-dir-inventory.cache.php';
-        }
-
         return __DIR__.'/../boost-dir-inventory.cache.php';
     }
 
