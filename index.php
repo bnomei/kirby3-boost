@@ -327,6 +327,11 @@ Kirby::plugin('bnomei/boost', [
                 BoostDirInventory::singleton()->flush();
             }
         },
+        'file.*:after' => function ($event, $page) {
+            if ($event->action() !== 'render' && option('bnomei.boost.helper')) {
+                BoostDirInventory::singleton()->flush();
+            }
+        },
         'page.create:after' => function ($page) {
             if (option('bnomei.boost.helper')) {
                 $page->boostIndexAdd();
