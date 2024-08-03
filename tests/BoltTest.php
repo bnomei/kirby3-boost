@@ -10,7 +10,7 @@ test('index', function () {
     expect(count($index) > 0)->toBeTrue();
 });
 test('construct', function () {
-    $bolt = new Bnomei\Bolt();
+    $bolt = new Bnomei\Bolt;
     expect($bolt)->toBeInstanceOf(Bnomei\Bolt::class);
 
     expect(option('debug'))->toBeFalse();

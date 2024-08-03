@@ -1,5 +1,3 @@
 <?php
 
-class HomePage extends \Kirby\Cms\Page
-{
-}
+class HomePage extends \Kirby\Cms\Page {}

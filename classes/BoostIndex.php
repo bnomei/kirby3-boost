@@ -262,7 +262,7 @@ final class BoostIndex
     public static function singleton(): self
     {
         if (! self::$singleton) {
-            self::$singleton = new self();
+            self::$singleton = new self;
         }
 
         return self::$singleton;
