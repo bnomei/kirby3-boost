@@ -1,10 +1,8 @@
 # :rocket: Kirby Boost <br>⏱️ up to 3x faster content loading<br>🎣 fastest page lookup and resolution of relations
 
-![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-boost?color=ae81ff)
-![Downloads](https://flat.badgen.net/packagist/dt/bnomei/kirby3-boost?color=272822)
-[![Build Status](https://flat.badgen.net/travis/bnomei/kirby3-boost)](https://travis-ci.com/bnomei/kirby3-boost)
-[![Maintainability](https://flat.badgen.net/codeclimate/maintainability/bnomei/kirby3-boost)](https://codeclimate.com/github/bnomei/kirby3-boost) 
-[![Twitter](https://flat.badgen.net/badge/twitter/bnomei?color=66d9ef)](https://twitter.com/bnomei)
+![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-boost?color=ae81ff&icon=github&label)
+[![Discord](https://flat.badgen.net/badge/discord/bnomei?color=7289da&icon=discord&label)](https://discordapp.com/users/bnomei)
+[![Buymecoffee](https://flat.badgen.net/badge/icon/donate?icon=buymeacoffee&color=FF813F&label)](https://www.buymeacoffee.com/bnomei)
 
 Boost the speed of Kirby by having content files of files/pages/users cached, with fast lookup based on uuid.
 
