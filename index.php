@@ -322,12 +322,12 @@ Kirby::plugin('bnomei/boost', [
         },
     ],
     'hooks' => [
-        'page.*:after' => function ($event, $page) {
+        'page.*:before' => function ($event, $page) {
             if ($event->action() !== 'render' && option('bnomei.boost.helper')) {
                 BoostDirInventory::singleton()->flush();
             }
         },
-        'file.*:after' => function ($event, $page) {
+        'file.*:before' => function ($event, $page) {
             if ($event->action() !== 'render' && option('bnomei.boost.helper')) {
                 BoostDirInventory::singleton()->flush();
             }
