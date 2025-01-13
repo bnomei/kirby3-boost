@@ -140,7 +140,7 @@ final class BoostCache
         ], $options));
     }
 
-    public static function sqlite(array $options = [])//: Cache
+    public static function sqlite(array $options = [])// : Cache
     {
         if (class_exists('Bnomei\\SQLiteCache')) {
             $feather = \Bnomei\SQLiteCache::singleton(array_merge([
@@ -152,7 +152,7 @@ final class BoostCache
         return null;
     }
 
-    public static function mysql(array $options = [])//: Cache
+    public static function mysql(array $options = [])// : Cache
     {
         if (class_exists('Bnomei\\MySQLCache')) {
             return \Bnomei\MySQLCache::singleton(array_merge([
@@ -162,7 +162,7 @@ final class BoostCache
         return null;
     }
 
-    public static function php(array $options = [])//: Cache
+    public static function php(array $options = [])// : Cache
     {
         if (class_exists('Bnomei\\PHPCache')) {
             $elephant = \Bnomei\PHPCache::singleton(array_merge([
@@ -174,7 +174,7 @@ final class BoostCache
         return null;
     }
 
-    public static function mongodb(array $options = [])//: Cache
+    public static function mongodb(array $options = [])// : Cache
     {
         if (class_exists('Bnomei\\MongoDBCache')) {
             $ape = \Bnomei\MongoDBCache::singleton(array_merge([
@@ -186,7 +186,7 @@ final class BoostCache
         return null;
     }
 
-    public static function redis(array $options = [])//: Cache
+    public static function redis(array $options = [])// : Cache
     {
         if (class_exists('Bnomei\\Redis')) {
             return new \Bnomei\Redis(array_merge([

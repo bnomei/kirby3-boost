@@ -33,7 +33,7 @@ test('boost find by id', function () {
 
     $randomPage = randomPage();
 
-    //site()->prune();
+    // site()->prune();
     expect(boost($randomPage->uuid()->id())->id())->toEqual($randomPage->id());
 });
 test('boost find', function () {
@@ -42,23 +42,23 @@ test('boost find', function () {
 
     $randomPage = randomPage();
 
-    //site()->prune();
-    //if (!$randomPage->uuid()->id()) var_dump($randomPage);
+    // site()->prune();
+    // if (!$randomPage->uuid()->id()) var_dump($randomPage);
     expect(boost($randomPage->uuid())->id())->toEqual($randomPage->id());
 });
 test('boost index', function () {
     $index = BoostIndex::singleton();
     $index->flush();
 
-    //var_dump($index->toArray());
+    // var_dump($index->toArray());
     expect($index->toArray())->toHaveCount(0);
     $randomPage = randomPage();
 
-    //site()->prune();
+    // site()->prune();
     expect($randomPage->uuid()->id())->not->toBeEmpty();
     expect($index->add($randomPage))->toBeTrue();
 
-    //$index->write();
+    // $index->write();
     expect($index->toArray())->toHaveCount(1);
 });
 test('to page boosted', function () {
@@ -67,7 +67,7 @@ test('to page boosted', function () {
 
     $randomPage = randomPage();
 
-    //site()->prune();
+    // site()->prune();
     expect($randomPage->someUuidRelationField()->toPageBoosted()->id())->toEqual($randomPage->id());
 });
 test('write on destruct', function () {

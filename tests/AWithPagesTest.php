@@ -18,7 +18,7 @@ class AWithPagesTest extends TestCase
      *
      * @group SetupPagesInSeparatePHPUnitRun
      */
-    public function testSetUpPages(): void
+    public function test_set_up_pages(): void
     {
         $this->depth = 2;
 
@@ -71,7 +71,7 @@ class AWithPagesTest extends TestCase
         }
     }
 
-    public function testRelated()
+    public function test_related()
     {
         $boostids = [];
 

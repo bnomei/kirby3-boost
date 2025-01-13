@@ -214,7 +214,7 @@ final class Bolt
                 // Only direct subpages are marked as drafts
                 $draft = false;
             }
-            $page = null; //kirby()->extension('pages', $this->root);
+            $page = null; // kirby()->extension('pages', $this->root);
             if (! $page) {
                 $page = Page::factory($params);
                 $this->pushLookup($treeid, $page);

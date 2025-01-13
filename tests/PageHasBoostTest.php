@@ -26,7 +26,7 @@ final class PageHasBoostTest extends TestCase
         return $page;
     }
 
-    public function testDeleteCacheOnDelete()
+    public function test_delete_cache_on_delete()
     {
         kirby()->impersonate('kirby');
         page('willthisbedeleted')?->delete();
@@ -46,13 +46,13 @@ final class PageHasBoostTest extends TestCase
 
         $newPage->delete(true);
 
-        //$this->assertNull($newPage->readContentCache()); // this would create again
+        // $this->assertNull($newPage->readContentCache()); // this would create again
         $cache = BoostCache::singleton();
         $this->assertNull($cache->get($key.'-content'));
         $this->assertNull($cache->get($key.'-modified'));
     }
 
-    public function testExpiredByModified()
+    public function test_expired_by_modified()
     {
         $randomPage = $this->randomPage();
         $key = $randomPage->contentBoostedKey();
