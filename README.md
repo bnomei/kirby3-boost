@@ -1,3 +1,6 @@
+> ARCHIVED MAY 2025.
+> suggested alternative: https://github.com/bnomei/kirby-turbo
+
 # :rocket: Kirby Boost <br>⏱️ up to 3x faster content loading<br>🎣 fastest page lookup and resolution of relations
 
 ![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-boost?color=ae81ff&icon=github&label)
